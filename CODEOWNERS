@@ -1,32 +1,32 @@
 # Master Repo Owners
 
-* @ICSEng/edu-si-engineering
+* @AGameEmpowerment/agame-org-admins
 
 # Environment and Configuration
 
-/.editorconfig                  @ICSEng/edu-si-repo-maintenance
-/.vsconfig                      @ICSEng/edu-si-repo-maintenance
-/.gitattributes                 @ICSEng/edu-si-repo-maintenance
-/.gitignore                     @ICSEng/edu-si-repo-maintenance
-/.devcontainer/                 @ICSEng/edu-si-repo-maintenance
-/.github/                       @ICSEng/edu-si-repo-maintenance
-/.sonarlint/                    @ICSEng/edu-si-repo-maintenance
-/.vscode/                       @ICSEng/edu-si-repo-maintenance
-/containers/                    @ICSEng/edu-si-repo-maintenance
+/.editorconfig                  @AGameEmpowerment/agame-org-admins
+/.vsconfig                      @AGameEmpowerment/agame-org-admins
+/.gitattributes                 @AGameEmpowerment/agame-org-admins
+/.gitignore                     @AGameEmpowerment/agame-org-admins
+/.devcontainer/                 @AGameEmpowerment/agame-org-admins
+/.github/                       @AGameEmpowerment/agame-org-admins
+/.sonarlint/                    @AGameEmpowerment/agame-org-admins
+/.vscode/                       @AGameEmpowerment/agame-org-admins
+/containers/                    @AGameEmpowerment/agame-org-admins
 
 # Documentation
 
-/CONTRIBUTING.md                @ICSEng/edu-si-repo-maintenance
-/README.md                      @ICSEng/edu-si-repo-maintenance
+/CONTRIBUTING.md                @AGameEmpowerment/agame-org-admins
+/README.md                      @AGameEmpowerment/agame-org-admins
 
 # Source Code
 
-/src/                           @ICSEng/edu-si-engineering
+/src/                           @AGameEmpowerment/agame-org-admins
 
 # Pipeline
 
-/devops/                        @ICSEng/edu-se-engineers
+/devops/                        @AGameEmpowerment/agame-org-admins
 
 # Access Control
 
-/CODEOWNERS                     @ICSEng/edu-si-repo-admins
+/CODEOWNERS                     @AGameEmpowerment/agame-org-admins
