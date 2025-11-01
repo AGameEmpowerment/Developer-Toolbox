@@ -116,7 +116,7 @@ Document any repo-specific variants of these commands in the devops folder or in
 
 ## Recommended tools and resources
 
-- Docker Buildx for multi-arch and cache-friendly builds
+- Docker Build for multi-arch and cache-friendly builds
 - Trivy or Snyk for image scanning
 - GitHub Actions Docker cache or registry cache for CI performance
 - Docker Compose v2 (CLI integrated) for dev stacks
