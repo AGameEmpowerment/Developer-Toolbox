@@ -1,0 +1,17 @@
+version: 2
+
+registries:
+  docker-artifactory:
+    type: docker-registry
+    url: https://icseng.jfrog.io
+    username: dependency_management_svc
+    password: ${{secrets.DEPENDABOT_ARTIFACTORY_TOKEN}}
+    replaces-base: true
+
+updates:
+  - package-ecosystem: docker
+    directory: /
+    registries:
+      - docker-artifactory
+    schedule:
+      interval: monthly

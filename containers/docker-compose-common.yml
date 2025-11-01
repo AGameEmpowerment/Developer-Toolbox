@@ -1,0 +1,151 @@
+# General project Development Resources / Team level configuration
+# These resources are intended for development and testing purposes only.
+# As needed update the exposed frontend port mappings from the container.
+
+services:
+
+  # Local SQL Server Instance
+  mssql:
+    build: ./mssql
+    environment:
+      SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+      ACCEPT_EULA: "${ACCEPT_EULA}"
+      MSSQL_AGENT_ENABLED: "true"
+    ports:
+      - "127.0.0.1:10433:1433" # SQL Server Connection Port
+    #restart: unless-stopped
+    container_name: SqlServer
+    hostname: mssql
+
+  # CosmoDb Server Instance
+  cosmosdb:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+    environment:
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+    ports:
+      - "127.0.0.1:10081:8081"
+      - "127.0.0.1:10251:10251"
+      - "127.0.0.1:10252:10252"
+      - "127.0.0.1:10253:10253"
+    volumes:
+      - cosmos-data:/data
+    container_name: CosmoDb
+    #restart: unless-stopped
+    hostname: cosmosdb
+
+  # Local Redis Cache Instance
+  redis:
+    image: redis:latest
+    ports:
+      - "127.0.0.1:10120:6379" # Redis Cache Endpoint Port
+    #restart: unless-stopped
+    container_name: RedisCache
+
+  # Local Mail Trap
+  smtp4dev:
+    image: rnwood/smtp4dev:latest
+    ports:
+      - "127.0.0.1:10130:25" # smtp server
+      - "127.0.0.1:10131:110" # pop server
+      - "127.0.0.1:10132:143" # imap server
+      - "127.0.0.1:10140:80" # web ui
+    volumes:
+      - smtp4dev-data:/smtp4dev
+    environment:
+      # Container configuration (this binds within the container)
+      - ServerOptions__Urls=http://*:80
+      - ServerOptions__HostName=smtp4dev
+    #restart: unless-stopped
+    container_name: Smtp4Dev
+
+  # Local OpenTelemetry Collector with durable storage
+  otel-collector:
+    image: datalust/seq:latest
+    environment:
+      ACCEPT_EULA: "${ACCEPT_EULA}"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "${SEQ_FIRSTRUN_NOAUTHENTICATION}"
+      SEQ_STORAGE_SECRETKEY: "${SEQ_STORAGE_SECRETKEY}"
+    ports:
+      - "127.0.0.1:10150:80" # Web UI and API port
+    #restart: unless-stopped
+    container_name: OtelCollector
+    volumes:
+      - seq-data:/data
+
+  # Local API Mocking Service
+  wiremock:
+    image: wiremock/wiremock:latest
+    ports:
+        - "127.0.0.1:10080:8080" # Wiremock HTTP Port for API routes
+        #- "10443:8443" # Wiremock HTTPS Port for API routes
+    volumes:
+        - ./extensions:/var/wiremock/extensions
+        - ./__files:/home/wiremock/__files
+        - ./mappings:/home/wiremock/mappings
+    entrypoint:
+        - "/docker-entrypoint.sh"
+        - "--global-response-templating"
+        - "--disable-gzip"
+        - "--verbose"
+    # environment:
+    #     - WIREMOCK_OPTIONS='--https-port 8443 --verbose'
+    #restart: unless-stopped
+    container_name: Wiremock
+
+  # Local Azure Blob Storage
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    ports:
+      - "127.0.0.1:10000:10000" # Blob service
+      - "127.0.0.1:10001:10001" # Queue service
+      - "127.0.0.1:10002:10002" # Table service
+    #restart: unless-stopped
+    container_name: Azurite
+
+# SQL Edge and Service Bus Emulator
+  SqlEdge-ServiceBus:
+    image: mcr.microsoft.com/azure-sql-edge:latest
+    networks:
+      sb-emulator:
+        aliases:
+          - SqlEdge-ServiceBus
+    environment:
+      ACCEPT_EULA: "${ACCEPT_EULA}"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+    #restart: unless-stopped
+    container_name: SqlEdge-ServiceBus
+
+# Service Bus Emulator using SQL Edge
+  service-bus:
+    image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+    pull_policy: always
+    volumes:
+      - "./service-bus/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json"
+    ports:
+      - "127.0.0.1:10170:5672" # Service Bus, Update port if needed
+      - "127.0.0.1:10171:5300" # Service Bus, Update port if needed
+    environment:
+      SQL_SERVER: "SqlEdge-ServiceBus"
+      MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" # Password should be same as what is set for SQL Edge
+      ACCEPT_EULA: "${ACCEPT_EULA}"
+      SQL_WAIT_INTERVAL: "15"                   # Optional: Time in seconds to wait for SQL to be ready (default is 15 seconds)
+    depends_on:
+      - SqlEdge-ServiceBus
+    networks:
+      sb-emulator:
+        aliases:
+          - sb-emulator
+    #restart: unless-stopped
+    container_name: ServiceBus
+
+networks:
+  sb-emulator:
+
+volumes:
+  smtp4dev-data:
+    driver: local
+  seq-data:
+    driver: local
+  cosmos-data:
+    driver: local
