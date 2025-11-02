@@ -276,4 +276,3 @@ try {
 	Write-Log "Unhandled error: $($_.Exception.Message)" 'ERROR'
 	throw
 }
-
