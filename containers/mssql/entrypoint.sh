@@ -1,26 +1,19 @@
-#start SQL Server, start the script to create/setup the DB
-#You need a non-terminating process to keep the container alive.
-#In a series of commands separated by single ampersands the commands to the left of the right-most ampersand are run in the background.
-#So - if you are executing a series of commands simultaneously using single ampersands, the command at the right-most position needs to be non-terminating
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
-# Start SQL Server in the background, then run the DB initialization script.
-# db-init.sh contains its own retry loop and will wait until SQL Server is ready.
-
-echo "Starting SQL Server in background..."
+echo "[entrypoint] Launching SQL Server..."
 /opt/mssql/bin/sqlservr &
-SQLSRV_PID=$!
+SQL_PID=$!
 
-echo "Running DB initialization script..."
-if ! ./db-init.sh; then
-    echo "Database initialization failed. Exiting."
-    # Terminate SQL Server process if init failed
-    kill "$SQLSRV_PID" || true
-    exit 1
-fi
+echo "[entrypoint] SQL Server PID: $SQL_PID"
 
-echo "Database initialization completed. Waiting for SQL Server (foreground)..."
+# Run init script (it will block until server is reachable)
+/usr/src/app/db-init.sh || {
+	echo "[entrypoint] db-init failed (exit $?); stopping server" >&2
+	kill $SQL_PID
+	wait $SQL_PID || true
+	exit 10
+}
 
-# Wait on the SQL Server process so the container stays alive and signals are forwarded properly
-wait "$SQLSRV_PID"
+echo "[entrypoint] Initialization complete. Foregrounding sqlservr."
+wait $SQL_PID
