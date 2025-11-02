@@ -9,20 +9,40 @@ SET ANSI_NULLS, ANSI_PADDING, ANSI_WARNINGS, ARITHABORT, CONCAT_NULL_YIELDS_NULL
 SET NUMERIC_ROUNDABORT OFF;
 
 
-CREATE DATABASE [AiCoaches]
+CREATE DATABASE [ExampleDb]
 GO
 
-USE [AiCoaches];
+USE [ExampleDb];
 GO
 
-CREATE TABLE [dbo].[ProductsServices]
-(
-    [Id]                UNIQUEIDENTIFIER    NOT NULL CONSTRAINT [DF_ProductsServices_Id] DEFAULT (NewSequentialId()),
-    [Name]              NVARCHAR (255)      NOT NULL,
-    [Description]       NVARCHAR (MAX)      NULL,
-    [Price]             DECIMAL (10, 2)     NOT NULL,
-    [IsProduct]         BIT                 NOT NULL CONSTRAINT [DF_ProductsServices_IsProduct] DEFAULT (0),
+CREATE TABLE [dbo].[AspNetUsers] (
+    [Id]                   NVARCHAR (450)     NOT NULL,
+    [UserName]             NVARCHAR (256)     NULL,
+    [NormalizedUserName]   NVARCHAR (256)     NULL,
+    [Email]                NVARCHAR (256)     NULL,
+    [NormalizedEmail]      NVARCHAR (256)     NULL,
+    [EmailConfirmed]       BIT                NOT NULL,
+    [PasswordHash]         NVARCHAR (MAX)     NULL,
+    [SecurityStamp]        NVARCHAR (MAX)     NULL,
+    [ConcurrencyStamp]     NVARCHAR (MAX)     NULL,
+    [PhoneNumber]          NVARCHAR (MAX)     NULL,
+    [PhoneNumberConfirmed] BIT                NOT NULL,
+    [TwoFactorEnabled]     BIT                NOT NULL,
+    [LockoutEnd]           DATETIMEOFFSET (7) NULL,
+    [LockoutEnabled]       BIT                NOT NULL,
+    [AccessFailedCount]    INT                NOT NULL,
 
-    CONSTRAINT [PK_ProductsServices] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [PK_AspNetUsers] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
+GO
+CREATE NONCLUSTERED INDEX [EmailIndex]
+    ON [dbo].[AspNetUsers]([NormalizedEmail] ASC);
+
+
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [UserNameIndex]
+    ON [dbo].[AspNetUsers]([NormalizedUserName] ASC) WHERE ([NormalizedUserName] IS NOT NULL);
+
 GO
