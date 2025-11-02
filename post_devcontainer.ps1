@@ -17,6 +17,10 @@ sudo apt install -y nuget
 # sudo apt install -y npm
 
 # Trust HTTPS developer certificate
+# Note: This command requires a desktop environment and user interaction on Linux.
+# It will fail in Linux-based DevContainers but works on Windows/macOS hosts.
+# On Linux containers, the certificate is generated but cannot be automatically trusted.
+# For local development on Linux, manually trust the certificate or use HTTP endpoints.
 dotnet dev-certs https --trust
 
 Write-Host "run Setup_project.ps1 to complete the process..."
