@@ -5,6 +5,15 @@
 services:
 
   # Local SQL Server Instance
+  #
+  # Custom build from local Dockerfile in ./mssql.
+  # Rationale: Allows for custom configuration, initialization scripts, or extensions not available in standard images.
+  # Build context: ./mssql (see Dockerfile in that directory).
+  # Environment variables:
+  #   - SA_PASSWORD: SQL Server system administrator password (required)
+  #   - ACCEPT_EULA: Must be set to "Y" to accept the license agreement (required)
+  #   - MSSQL_AGENT_ENABLED: Enables SQL Server Agent (optional, default "true")
+  # For more details on Dockerfile instructions, see: https://docs.docker.com/engine/reference/builder/
   mssql:
     build: ./mssql
     environment:
