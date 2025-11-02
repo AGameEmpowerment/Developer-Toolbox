@@ -13,6 +13,7 @@ git config --global credential.useHttpPath true
 
 # Install Package Manager Support
 sudo apt install -y nuget
+# Uncomment the following line to install npm if Node.js development is required
 # sudo apt install -y npm
 
 # Trust HTTPS developer certificate
