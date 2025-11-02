@@ -19,4 +19,4 @@ sudo apt install -y nuget
 # Trust HTTPS developer certificate
 dotnet dev-certs https --trust
 
-Write-Host "run  Setup_project.ps1  to complete the process..."
+Write-Host "run Setup_project.ps1 to complete the process..."
