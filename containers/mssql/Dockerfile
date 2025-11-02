@@ -23,4 +23,4 @@ RUN chmod +x /usr/src/app/entrypoint.sh
 
 # Switch back to mssql user and run the entrypoint script
 USER mssql
-ENTRYPOINT /bin/bash ./entrypoint.sh
+ENTRYPOINT ["/bin/bash", "./entrypoint.sh"]
