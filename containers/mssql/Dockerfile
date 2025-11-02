@@ -9,8 +9,8 @@ ENV ACCEPT_EULA=Y \
 # Install required packages & Microsoft repo for mssql-tools18 / odbc
 RUN apt-get update \
     && apt-get install -y --no-install-recommends curl apt-transport-https gnupg2 dos2unix locales \
-    && curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/microsoft.gpg \
-    && curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sed 's|^deb |deb [signed-by=/usr/share/keyrings/microsoft.gpg] |' > /etc/apt/sources.list.d/mssql-release.list \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list -o /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
     && ACCEPT_EULA=Y apt-get install -y --no-install-recommends msodbcsql18 mssql-tools18 \
     && ln -s /opt/mssql-tools18 /opt/mssql-tools || true \
