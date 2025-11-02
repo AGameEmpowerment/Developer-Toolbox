@@ -23,4 +23,4 @@ sudo apt install -y nuget
 # For local development on Linux, manually trust the certificate or use HTTP endpoints.
 dotnet dev-certs https --trust
 
-Write-Host "run  Setup_project.ps1  to complete the process..."
+Write-Host "run Setup_project.ps1 to complete the process..."
