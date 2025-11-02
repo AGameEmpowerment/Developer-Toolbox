@@ -39,11 +39,7 @@ if [ "$TRUST_SERVER_CERT" = "true" ]; then
     fi
 fi
 
-EXTRA_CONN_OPTS=""
-if [ -z "$SQLCMD_CERT_FLAG" ] && [ "$TRUST_SERVER_CERT" = "true" ]; then
-    # sqlcmd without -C may still fail; add Cloud-specific override.
-    EXTRA_CONN_OPTS="-G 2>/dev/null" # harmless noop if unsupported; placeholder for future options
-fi
+# Removed unused EXTRA_CONN_OPTS variable and related logic for maintainability.
 
 echo "[db-init] Readiness: trust-cert=$TRUST_SERVER_CERT; sqlcmd options: ${SQLCMD_CERT_FLAG:-<none>}"
 
