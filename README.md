@@ -114,7 +114,8 @@ For reproducible environments and easy onboarding:
 
 - If containers fail to start, ensure Docker Desktop is running and you have sufficient resources.
 - For database issues, check SQL Server logs in the container or local instance.
-- Use `Delete_Old_Tags.ps1` to clean up old Docker images/tags if needed.
+- Use `Delete_Old_Git_Tags.ps1` to clean up old Git Repo tags if needed.
+- Use `Delete_Old_Docker_Tags.ps1` to clean up old Docker images/tags if needed.
 - For advanced configuration, review files in `containers/`, `devops/`, and `terraform/`.
 
 ---
