@@ -78,7 +78,7 @@ while true; do
     echo "[db-init] SQL Server not ready yet (attempt $ATTEMPT/$MAX_ATTEMPTS)..."
     ATTEMPT=$((ATTEMPT+1))
     # Exponential backoff with cap (max 10s)
-    SLEEP_SECONDS=$(( BASE_SLEEP_SECONDS * ATTEMPT / 4 ))
+    SLEEP_SECONDS=$(( BASE_SLEEP_SECONDS * 2 ** (ATTEMPT / 4) ))
     if [ $SLEEP_SECONDS -lt $BASE_SLEEP_SECONDS ]; then SLEEP_SECONDS=$BASE_SLEEP_SECONDS; fi
     if [ $SLEEP_SECONDS -gt 10 ]; then SLEEP_SECONDS=10; fi
     sleep $SLEEP_SECONDS

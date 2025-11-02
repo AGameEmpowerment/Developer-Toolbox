@@ -21,7 +21,6 @@ RUN apt-get update \
 # Add sqlcmd to PATH for both root and mssql users
 ENV PATH="/opt/mssql-tools18/bin:$PATH"
 
-# Password is supplied at runtime via environment / compose. DO NOT bake secrets.
 # Create app directory & copy scripts
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
