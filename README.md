@@ -90,6 +90,8 @@ To initialize the database:
 1. Build and publish the `Database.Example` project using the profile `StartupExample.Docker.publish.xml` (default password: `P@ssword123!`).
 2. Connection strings are managed in `appsettings.json`.
 
+> **⚠️ Security Warning**: The default password `P@ssword123!` is provided for **local development environments only** and must **never** be used in production. Always use strong, unique passwords and secure credential management solutions (e.g., Azure Key Vault, HashiCorp Vault) for production deployments.
+
 ---
 
 ### 7. Running Applications
