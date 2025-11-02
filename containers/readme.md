@@ -33,7 +33,7 @@ docker run --rm \
   -v containers_mssql-data:/volume \
   -v ${PWD}:/backup \
   alpine \
-  sh -c "cd /volume && tar czf /backup/mssql-data-backup-$(Get-Date -Format yyyyMMddHHmmss).tgz ."
+  sh -c "cd /volume && tar czf /backup/mssql-data-backup-$(date +%Y%m%d%H%M%S).tgz ."
 ```
 
 To restore from a backup tar into the named volume (overwrite volume contents):
