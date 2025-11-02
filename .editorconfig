@@ -225,7 +225,7 @@ dotnet_naming_style.all_upper.word_separator=
 dotnet_naming_style.all_upper.capitalization=all_upper
 
 [*]
-trim_trailing_whitespace=truefalse
+trim_trailing_whitespace=true
 end_of_line= crlf
 insert_final_newline=false
 indent_style=space
@@ -335,3 +335,16 @@ indent_size=2
 indent_style=space
 indent_size=4
 tab_width=4
+
+# Enum member naming rule
+# Enforce PascalCase and allow underscores for enum members
+dotnet_naming_rule.enum_members_should_be_pascal_case.severity = error
+dotnet_naming_rule.enum_members_should_be_pascal_case.symbols = enum_members
+dotnet_naming_rule.enum_members_should_be_pascal_case.style = pascal_case_with_underscores
+dotnet_naming_symbols.enum_members.applicable_kinds = enum_member
+dotnet_naming_symbols.enum_members.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.enum_members.required_modifiers =
+dotnet_naming_style.pascal_case_with_underscores.capitalization = pascal_case
+dotnet_naming_style.pascal_case_with_underscores.word_separator = _
+dotnet_naming_style.pascal_case_with_underscores.required_prefix =
+dotnet_naming_style.pascal_case_with_underscores.required_suffix =

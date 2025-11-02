@@ -21,7 +21,9 @@ services:
       ACCEPT_EULA: "${ACCEPT_EULA}"
       MSSQL_AGENT_ENABLED: "true"
     ports:
-      - "127.0.0.1:10433:1433" # SQL Server Connection Port
+      - "127.0.0.1:10433:1433" # SQL Server Connection Port (localhost only for security)
+    volumes:
+      - mssql-data:/var/opt/mssql
     #restart: unless-stopped
     container_name: SqlServer
     hostname: mssql
@@ -87,7 +89,7 @@ services:
     image: wiremock/wiremock:latest
     ports:
         - "127.0.0.1:10080:8080" # Wiremock HTTP Port for API routes
-        #- "10443:8443" # Wiremock HTTPS Port for API routes
+        #- "127.0.0.1:10443:8443" # Wiremock HTTPS Port for API routes
     volumes:
         - ./extensions:/var/wiremock/extensions
         - ./__files:/home/wiremock/__files
@@ -157,4 +159,6 @@ volumes:
   seq-data:
     driver: local
   cosmos-data:
+    driver: local
+  mssql-data:
     driver: local
