@@ -39,7 +39,6 @@ if [ "$TRUST_SERVER_CERT" = "true" ]; then
     fi
 fi
 
-# Removed unused EXTRA_CONN_OPTS variable and related logic for maintainability.
 
 echo "[db-init] Readiness: trust-cert=$TRUST_SERVER_CERT; sqlcmd options: ${SQLCMD_CERT_FLAG:-<none>}"
 
