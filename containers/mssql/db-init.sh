@@ -3,7 +3,7 @@ echo "running set up script"
 #do this in a loop because the timing for when the SQL instance is ready is indeterminate
 for i in {1..50};
 do
-    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P P@ssword123! -d master -i ./db-init.sql
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -d master -i ./db-init.sql
     if [ $? -eq 0 ]
     then
         echo "db-init completed"
