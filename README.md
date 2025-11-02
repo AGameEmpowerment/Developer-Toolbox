@@ -71,7 +71,7 @@ Run the setup script to start Docker containers and dependencies:
 ```
 
 This will:
-- Build and start all containers defined in `containers/docker-compose.yml`
+- Build and start all containers defined in `containers/docker-compose-common.yml`
 - Set up SQL Server, Service Bus, MailHog, and other local services
 - Prepare example files and mappings for local use
 
