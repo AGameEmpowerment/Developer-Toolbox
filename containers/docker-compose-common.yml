@@ -21,7 +21,7 @@ services:
       ACCEPT_EULA: "${ACCEPT_EULA}"
       MSSQL_AGENT_ENABLED: "true"
     ports:
-      - "127.0.0.1:10433:1433" # SQL Server Connection Port (localhost only for security)
+      - "0.0.0.0:10433:1433" # SQL Server Connection Port
     volumes:
       - mssql-data:/var/opt/mssql
     #restart: unless-stopped
