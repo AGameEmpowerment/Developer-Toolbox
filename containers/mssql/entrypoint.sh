@@ -13,9 +13,7 @@ echo "Starting SQL Server in background..."
 SQLSRV_PID=$!
 
 echo "Running DB initialization script..."
-cd /usr/src/app || exit 1
-./db-init.sh
-if [ $? -ne 0 ]; then
+if ! ./db-init.sh; then
     echo "Database initialization failed. Exiting."
     # Terminate SQL Server process if init failed
     kill "$SQLSRV_PID" || true
