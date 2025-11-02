@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/mssql/server:2022-latest
+FROM mcr.microsoft.com/mssql/server:latest
 
 # We need tooling (sqlcmd) which is NOT in the base image by default.
 USER root
