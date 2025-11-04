@@ -1,3 +1,3 @@
-# Reusable Manifests
+# Manifests
 
-Reusable Cloud Foundry manifests would be created here
+Cloud Foundry manifests would be created here
