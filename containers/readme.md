@@ -60,5 +60,3 @@ Notes:
 docker run --rm -it -v containers_mssql-data:/volume alpine sh
 ls -la /volume
 ```
-
-If you'd like, I can also add a compose override `docker-compose.override.yml` for developer bind mounts, or a CI job that creates and archives the SQL backup automatically.
