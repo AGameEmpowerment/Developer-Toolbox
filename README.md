@@ -86,11 +86,23 @@ To stop containers:
 
 Open the solution in Visual Studio and build to restore NuGet packages.
 
-To initialize the database:
-1. Build and publish the `Database.Example` project using the profile `StartupExample.Docker.publish.xml` (default password: `P@ssword123!`).
-2. Connection strings are managed in `appsettings.json`.
+This repository provides a local SQL Server instance via Docker (service name: `mssql`) that the init scripts will use to create the example database.
 
-> **⚠️ Security Warning**: The default password `P@ssword123!` is provided for **local development environments only** and must **never** be used in production. Always use strong, unique passwords and secure credential management solutions (e.g., Azure Key Vault, HashiCorp Vault) for production deployments.
+To initialize the database using the provided compose setup:
+
+1. Ensure your environment contains the required variables (or copy `containers/.env.example` to `containers/.env`) and set `MSSQL_SA_PASSWORD`. The example file ships with a development-only password:
+
+	- `MSSQL_SA_PASSWORD="P@ssword123!"` (development only)
+
+2. The `mssql` service exposes SQL Server on localhost port `10433` (container port 1433). The database initialization script (`containers/mssql/db-init.sql`) creates a database named `ProjectExample` and the standard ASP.NET Core Identity tables.
+
+3. Example connection string for local development (use in `appsettings.json` or your project's secrets store):
+
+```text
+Server=127.0.0.1,10433;Database=ProjectExample;User Id=sa;Password=P@ssword123!;TrustServerCertificate=True;
+```
+
+> **⚠️ Security Warning**: The default password `P@ssword123!` is provided for **local development environments only** and must **never** be used in production. Keep secrets out of source control and use secure secret management solutions (for example, Azure Key Vault or HashiCorp Vault) for production deployments.
 
 ---
 

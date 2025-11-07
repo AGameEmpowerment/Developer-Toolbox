@@ -1,156 +1,215 @@
-﻿# Devcontainer & Developer Toolbox Guidance
+﻿# GitHub Copilot Instructions (General Purpose Template)
 
-This file replaces the old project-specific Copilot instructions with focused guidance for maintaining developer devcontainers, Docker-based developer tools, and image maintenance best practices for this repository.
+This repository is a multi-language scaffolding template intended to seed new projects (e.g., .NET (C# / ASP.NET / Blazor), React, TypeScript/JavaScript frontends, infrastructure (Terraform), DevOps pipelines, and containerized services). It intentionally contains minimal source code. These instructions guide Copilot to operate consistently and to defer to the more specialized instruction files in `.github/instructions/` whenever generating or modifying code.
 
-Purpose: provide practical, actionable rules and recommendations contributors should follow when editing, building, publishing, or updating devcontainers and Docker images in this repository.
+---
+## Priority Guidelines
 
-Keep this doc small and change-focused. When you need broader coding conventions for other parts of the project, prefer the repository's root-level documentation (for example `CONTRIBUTING.md`, `README.md`, and `devops/readme.md`).
+When generating code for this repository or any project created from it:
 
-## Key responsibilities
+1. Version Compatibility: Detect concrete language, framework, and library versions from the target project after scaffolding (do NOT assume versions beyond what is declared).
+2. Instruction Files First: Always consult specialized instruction files in `.github/instructions/` (security, performance, accessibility, architecture, etc.) before applying external heuristics.
+3. Codebase Patterns: After a project is seeded, scan existing source folders for naming, error handling, testing, dependency injection, logging, and configuration patterns. Mirror them exactly.
+4. Architectural Consistency: Maintain a Mixed architecture style (this template can evolve into layered, DDD, microservices, or serverless). Never introduce architectural boundaries not already established.
+5. Code Quality: Treat maintainability, performance, security, accessibility, and testability as equal priorities (All). If a trade-off is required, prefer clarity + security + testability, then performance.
 
-- Keep devcontainers minimal and reproducible.
-- Build images with security and caching in mind.
-- Automate image builds, scans, and publishing in CI.
-- Version and tag images deterministically.
-- Provide clear, short troubleshooting notes for common developer workflows.
+---
+## Technology Version Detection
 
-## Files of interest in this repo
+Because this template does not yet define concrete application code, Copilot MUST dynamically detect versions post-seeding:
 
-- `devcontainers/` (if present): devcontainer setups, Dockerfiles, and VS Code config.
-- `containers/` and `containers/__files/`: local example files used by images and compose.
-- `docker-compose*.yml`: compose stacks for running dependent services locally.
-- `mssql/`, `service-bus/`: examples and initialization scripts used by the toolbox images.
-- `devops/`: CI and pipeline conventions for building and publishing images.
+1. Language Versions
+	- For .NET: Inspect `.csproj` `<TargetFramework>` / `<LangVersion>` or global.json. Only use C# features available in that language version.
+	- For Node/React/TypeScript: Inspect `package.json` engines, dependency versions, `tsconfig.json` (target/module/lib). Respect configured ECMAScript/TypeScript targets.
+	- For Python (if added): Read `pyproject.toml` / `requirements.txt` / runtime spec.
+2. Framework Versions
+	- ASP.NET Core / Blazor: Detect from NuGet package versions and SDK references.
+	- React / React DOM / React Router: Use only documented APIs present in detected versions.
+3. Library Versions
+	- Always verify existence of an API before suggesting usage (no speculative future features).
+	- When absent or ambiguous, generate conservative, widely supported patterns.
 
-If you add a new devcontainer or Dockerfile, add a short note in this document describing intent, how to build, and how to run it locally.
+Never introduce language or framework features that exceed detected versions. Always annotate version assumptions in comments ONLY when non-obvious (e.g., performance-critical or security-sensitive code paths) using minimal, purpose-driven commentary.
 
-## Best practices for devcontainer and Dockerfile authors
+---
+## Context & Specialized Instruction Files
 
-1. Small base images
-    - Prefer official, minimal images (Debian slim, distroless, Alpine where compatible). Use pinned tags for reproducible builds (for example, `mcr.microsoft.com/dotnet/sdk:8.0-ubuntu.22.04` rather than `latest`).
+Prioritize these (if present) in order:
 
-2. Layering and cache friendliness
-    - Order Dockerfile steps to maximize cache reuse: install OS packages first, then copy package manifests and run package installs, then copy source. This reduces rebuild time for iterative development.
+1. `.github/instructions/security-and-owasp.instructions.md` (security baseline)
+2. `.github/instructions/performance-optimization.instructions.md`
+3. `.github/instructions/a11y.instructions.md`
+4. `.github/instructions/devops-core-principles.instructions.md`
+5. `.github/instructions/dotnet-architecture-good-practices.instructions.md` (when .NET code exists)
+6. Other technology-specific instruction files (MAUI, WPF, Terraform, etc.) as the stack expands
 
-3. Multi-stage builds
-    - Use multi-stage builds to keep final images minimal. Build-time dependencies should not be present in runtime images.
+If a conflict arises between a specialized file and this general file, defer to the specialized file. Do NOT merge contradictory guidance; follow the more specific domain rules.
 
-4. Secrets and credentials
-    - Never store secrets in Dockerfiles, images, or in the repository. Use build-time secrets (for example Docker BuildKit secrets), devcontainer `runArgs`, or environment variable injection at runtime. Document any required credentials and how to supply them locally.
+---
+## Codebase Scanning Instructions (Post-Seeding)
 
-5. Reproducible tooling versions
-    - Pin versions for language runtimes, package managers, and CLI tools. Add simple checks (for example `dotnet --info`) in README or a build script to help developers verify their environment.
+When the generated project contains actual source code:
 
-6. Image scanning and security
-    - Integrate a vulnerability scanner into CI (Trivy, Snyk, or GitHub Advanced Security). Scans should run for every image build and fail the pipeline on high/critical findings unless an approved exception exists.
+1. Identify comparable files (e.g., controllers, React components, services, repositories) before adding new ones.
+2. Analyze patterns:
+	- Naming: Match existing casing conventions (PascalCase for C# types, camelCase for JS/TS variables, kebab-case for folders when present).
+	- Error Handling: Mirror existing approach (e.g., exceptions + middleware in ASP.NET, try/catch with logging in Node, error boundaries in React).
+	- Logging: Use the same abstractions (e.g., `ILogger<T>` in .NET, structured logging libraries in Node) with consistent log levels.
+	- Configuration: Centralize configuration (e.g., `appsettings.*.json` / environment variables / `.env` files) following existing patterns.
+	- Dependency Injection: Reuse current DI container idioms (e.g., `builder.Services.Add...` in ASP.NET, constructor injection in classes, React Context providers, or inversion via hooks).
+	- Testing: Match test folder structure, assertion libraries, naming conventions (`Given_When_Then`, descriptive `it()` blocks, or `[Fact]`/`[TestMethod]`).
+3. Resolve conflicting patterns by prioritizing:
+	1. Most recent files
+	2. Files with higher explicit test coverage
+	3. More specialized instruction files
+4. Do not introduce patterns absent from the existing codebase (e.g., new logging frameworks, alternate DI containers, speculative architecture layers).
 
-7. Non-root containers
-    - Run services as a non-root user when feasible. Document any ports and capabilities required.
+---
+## Code Quality Standards
 
-8. Build in CI and use reproducible tags
-    - CI builds should produce deterministic tags using semantics like `image-name:sha-<short-commit>` for ephemeral test builds and `image-name:semver` for releases.
-    - Keep a `latest` tag only if your release process clearly defines what `latest` means.
+### Maintainability
+- Self-document through clear function/class naming; avoid redundant comments.
+- Single responsibility per function/class; refactor large multi-purpose functions.
+- Keep public interfaces minimal and explicit.
 
-9. Layered caching for CI
-    - Use build cache or registry cache to reduce CI build time. GitHub Actions has cache actions for Docker and Buildx. Document the cache strategy in `devops/`.
+### Performance
+- Apply optimizations only where measured bottlenecks exist (no premature optimization).
+- Use asynchronous, non-blocking I/O in web/server code.
+- Reuse dependency-injected singletons for expensive resources (DB clients, HTTP clients).
 
-10. Small runtime images
-    - Strip development tools from final runtime images to reduce attack surface and image size.
+### Security
+- Enforce least privilege; deny by default for protected operations.
+- Use parameterized queries / ORM-safe APIs; never concatenate user input into queries.
+- Never hardcode secrets—use environment variables or secret managers.
+- Sanitize/validate all external input (HTTP, CLI, event bus). Output encode for UI contexts.
 
-11. Health checks
-    - Add HEALTHCHECK instructions for long-lived services so orchestrators and CI can verify readiness.
+### Accessibility (UI Code)
+- Use semantic HTML elements first; ARIA only to fill gaps.
+- Ensure keyboard navigability for all interactive components; manage focus intentionally.
+- Provide text alternatives for all informative graphics.
 
-12. Compose for local developer stacks
-    - Keep `docker-compose.yml` focused on dev ergonomics. Use overrides (for example `docker-compose.override.yml`) for developer-specific settings. Avoid committing secrets in compose files.
+### Testability
+- Favor pure functions or clear side-effect boundaries.
+- Inject dependencies (do not instantiate concrete implementations inside business logic).
+- Keep tests deterministic and isolated; avoid shared mutable state.
 
-13. Documentation and shortcuts
-    - Each devcontainer/Dockerfile should have a short README describing: build command, run command, exposed ports, volumes to mount (if any), and common troubleshooting steps. Keep examples concise.
+---
+## Documentation Requirements (Standard)
 
-14. Test the developer experience (DX)
-    - Regularly verify that `devcontainer` builds and recommended compose flows work on a fresh machine. Add a simple CI job that attempts to build devcontainers and run smoke checks.
+- Mirror existing documentation style (once code exists).
+- For C# use XML doc comments only for public APIs that require clarity.
+- For JS/TS use JSDoc only where complex behavior needs explanation.
+- Comment WHY not WHAT: design constraints, performance trade-offs, security assumptions.
+- Use annotation tags (`TODO`, `FIXME`, `SECURITY`, `PERF`) sparingly and purposefully.
 
-## CI & publishing recommendations
+---
+## Testing Approach (All)
 
-- Build matrix: run image builds for supported base OSes or variants.
-- Scanning: fail builds on critical vulnerabilities and report medium findings for triage.
-- Signing/Attestation: where possible, sign images in CI (Notary / Sigstore) and publish provenance.
-- Promotion flow: use a two-step flow — build+scan in PRs, push ephemeral test tags; for releases, run a release job that publishes semver tags and updates an image manifest if multi-arch.
-- Automated cleanup: implement TTL or lifecycle policies in registries to remove ephemeral images older than a set retention (for example 30 days).
+### Unit Testing
+- Follow existing framework: e.g., xUnit/NUnit/MSTest for .NET; Jest/Vitest for JS/TS; React Testing Library for components.
+- One conceptual expectation per test method/block.
 
-## Tagging and versioning strategy
+### Integration Testing
+- Exercise real wiring: database connections (containerized), service bus, HTTP middleware.
+- Use container orchestration (Docker Compose) for ephemeral dependencies where practical.
 
-- Ephemeral/test builds: `image-name:pr-<pr-number>`, `image-name:sha-<short-commit>`
-- Release builds: `image-name:v<major>.<minor>.<patch>`
-- Latest: optionally `image-name:latest` with clearly documented semantic meaning
+### End-to-End Testing
+- For UI stacks (React/Blazor), simulate user flows (e.g., Playwright/Cypress). Reuse accessible selectors (role, name) rather than brittle DOM paths.
 
-Keep the tagging strategy simple and well-documented in `devops/readme.md` or `devops/pipelines`.
+### TDD / BDD (If Practiced)
+- When patterns show Given/When/Then, preserve that narrative style.
+- Add tests before implementing complex business logic or cross-cutting concerns.
 
-## Troubleshooting & common commands
+---
+## Technology-Specific Guidelines (Template Baseline)
 
-- Build (local):
-  - docker build -t my-image:local -f containers/Dockerfile .
-- Build with BuildKit and secrets:
-  - DOCKER_BUILDKIT=1 docker build --secret id=npm,src=$HOME/.npmrc -t my-image:local .
-- Run:
-  - docker run --rm -it -p 8080:8080 -v ${PWD}:/workspace my-image:local
-- Compose up:
-  - docker compose -f docker-compose.yml up --build
-- Scan with Trivy:
-  - trivy image --exit-code 1 --severity CRITICAL,HIGH my-image:local
+### .NET / C# / ASP.NET Core / Blazor
+- Detect target frameworks (e.g., `net8.0`, `net9.0`)—never assume higher.
+- Use async/await per existing pattern; avoid blocking calls (`.Result` / `.Wait()`).
+- Register services in a centralized composition root (e.g., `Program.cs` builder pipeline).
 
-Document any repo-specific variants of these commands in the devops folder or in the corresponding Dockerfile README.
+### JavaScript / TypeScript / React
+- Respect `tsconfig.json` compiler targets; avoid unsupported ECMAScript proposals.
+- Use function components with hooks unless existing code prefers classes.
+- Keep state colocated; escalate to context/state managers only when reuse or cross-cut concerns justify it.
 
-## Adding a new devcontainer or image
+### Infrastructure (Terraform / DevOps)
+- Follow existing folder naming (`terraform/`, `devops/pipelines/`).
+- Parameterize environment-specific values; avoid hardcoding.
+- Keep reusable modules small and composable.
 
-1. Create the Dockerfile and a short README in the same folder.
-2. Add a devcontainer.json when relevant and reference the Dockerfile.
-3. Add CI steps: build, scan, smoke-test. Prefer reusing shared pipeline templates from `devops/pipelines/`.
-4. Update this document with a one-paragraph description of intent and any special run instructions.
+### PowerShell / Scripting
+- Maintain idempotent setup scripts (`docker_setup.ps1`, `docker_down.ps1`).
+- Validate required tooling before execution (e.g., Docker daemon running) using defensive checks.
 
-## Maintenance checklist for maintainers
+---
+## Version Control & Semantic Versioning
 
-- Periodically (quarterly) review base image versions and rebuild to pick up OS/security patches.
-- Monitor CVE feeds and proactively update images for critical fixes.
-- Keep developer documentation up to date; if a change breaks a common DX flow, add a note and fix the CI.
-- Remove unused images and compose files from the repo — keep a small set of supported developer stacks.
+- This template currently uses semantic versioning (`0.0.x` in `CHANGELOG.md`). Continue incrementing: MAJOR (breaking), MINOR (features), PATCH (fixes).
+- Record changes in `CHANGELOG.md` with concise bullet entries; highlight breaking changes clearly.
+- Tag releases accordingly (e.g., `v0.1.0`).
 
-## Recommended tools and resources
+---
+## General Best Practices
 
-- Docker Build for multi-arch and cache-friendly builds
-- Trivy or Snyk for image scanning
-- GitHub Actions Docker cache or registry cache for CI performance
-- Docker Compose v2 (CLI integrated) for dev stacks
-- VS Code Remote - Containers / Dev Containers extension for VS Code integration
-- Sigstore (cosign) for signing images and attesting provenance
+- Consistency > novelty. Prefer existing patterns in seeded projects.
+- Avoid over-abstraction early; refactor only after duplication is measured.
+- Centralize cross-cutting concerns (logging, validation, auth) before feature code depends on them.
+- Keep configuration externalized (environment vars, config files) and never commit secrets.
+- Provide accessible, secure defaults; opt-in to advanced features explicitly.
 
-## Short examples to copy into new images
+---
+## Project-Specific Guidance
 
-- Non-root user creation snippet:
+- Because this repository is a starter template, Copilot must refrain from inventing architectural layers or technology choices not present in the target initialized project.
+- After seeding a new project: perform an initial scan (files, package manifests, project files) before generating new code.
+- If no pattern exists yet (e.g., first service class), generate a minimal, conventional implementation and let subsequent files reinforce it—do not prematurely generalize.
+- When specialized instructions conflict with generic performance or style advice, specialized instructions win.
 
-```
-RUN useradd -m dev && mkdir -p /workspace && chown dev:dev /workspace
-USER dev
-WORKDIR /workspace
-```
+---
+## Examples (Template Context)
 
-- Multi-stage build pattern:
+Since there is little source code, examples derive from existing repository assets:
 
-```
-FROM node:20-alpine AS build
-WORKDIR /src
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
+- Container orchestration lives under `containers/` using Docker Compose—future services should integrate via shared networks/compose overrides rather than ad-hoc scripts.
+- Scripts (`*.ps1`) demonstrate imperative environment setup; future automation should prefer declarative provisioning (Terraform) where possible, respecting existing directory layout.
+- Documentation style: top-level `README.md` uses descriptive sections with fenced code blocks and warnings—follow that clarity style for future root-level docs.
 
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=build /src/dist ./dist
-CMD ["node", "dist/index.js"]
-```
+---
+## When Uncertain
 
-## Closing
+If ambiguity exists (e.g., multiple equally valid patterns or missing conventions):
+1. Choose the simplest, widely supported approach.
+2. Add a terse `TODO` note describing the assumption.
+3. Defer complex pattern introduction until concrete requirements emerge.
 
-Keep this doc focused on the developer toolbox and images. If you need project-specific coding conventions or testing rules, use the main `CONTRIBUTING.md` and the relevant service/module documentation.
+---
+## Out of Scope
 
-If you'd like, I can also add a small CI job example (GitHub Actions or Azure Pipelines) that builds, caches, scans, and publishes a test tag for one of the Dockerfiles in this repo — say which CI system you'd prefer and I'll add it as a follow-up change.
+Do NOT:
+- Introduce unrequested third-party frameworks (e.g., swapping logging libraries) without precedent.
+- Use experimental language features not enabled by project configuration.
+- Generate verbose boilerplate comments explaining obvious code.
+
+---
+## Enforcement Summary
+
+Copilot MUST:
+- Scan for versions & patterns before code generation.
+- Align with specialized instruction files for domain concerns.
+- Favor clarity, security, testability, and accessibility while preserving performance.
+- Avoid speculative architecture, dependencies, or APIs.
+
+Copilot SHOULD:
+- Propose incremental refactors only after patterns stabilize.
+- Surface security/performance/accessibility considerations succinctly when deviations are necessary.
+
+Copilot MAY:
+- Insert minimal doc comments for public APIs in emerging codebases.
+- Suggest test scaffolds to bootstrap coverage early.
+
+---
+## Final Note
+
+This file sets general guardrails. For any domain-specific work (security, accessibility, performance, architecture patterns), always consult the corresponding `.github/instructions/*.instructions.md` file first. Consistency and explicit pattern detection are the foundation—no assumptions beyond observable artifacts.
+
