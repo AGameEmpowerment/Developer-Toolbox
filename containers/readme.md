@@ -16,7 +16,10 @@ This keeps the database files persisted across container restarts and recreation
 From the repository root you can start the configured services with:
 
 ```pwsh
-# Start the full development compose stack
+# Preferred: use the helper script which sets up environment and runs compose
+./docker_setup.ps1
+
+# Or start the full development compose stack directly
 docker compose -f containers/docker-compose-common.yml up -d
 
 # Tail logs for SQL server
@@ -54,11 +57,14 @@ Notes:
 ## Troubleshooting
 
 - Ensure `MSSQL_SA_PASSWORD` and `ACCEPT_EULA` are set in your environment or an `.env` file when running the compose file.
+  - If you don't already have a `.env` file, copy the provided example:
+    ```pwsh
+    Copy-Item .env.example .env
+    ```
+    The repository includes a `.env.example` which contains the necessary variables and sane defaults. Creating a local `.env` (or editing after copying) ensures the `docker_setup.ps1` and `docker compose` commands pick up required configuration.
 - If you need to inspect the volume, use a temporary container and shell into it:
 
 ```pwsh
 docker run --rm -it -v containers_mssql-data:/volume alpine sh
 ls -la /volume
 ```
-
-If you'd like, I can also add a compose override `docker-compose.override.yml` for developer bind mounts, or a CI job that creates and archives the SQL backup automatically.
