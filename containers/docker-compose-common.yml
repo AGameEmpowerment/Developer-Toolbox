@@ -85,22 +85,37 @@ services:
       - seq-data:/data
 
   # Local API Mocking Service
+  #
+  # WireMock configured with HTTPS support using a custom JKS keystore.
+  # Prerequisites: Run ./certs/Generate-WireMockCert.ps1 to create the keystore before first use.
+  # Ports:
+  #   - 10080: HTTP (for backward compatibility)
+  #   - 10443: HTTPS (TLS with custom certificate)
+  # For client trust, import ./certs/wiremock.crt into your application's trust store.
   wiremock:
     image: wiremock/wiremock:latest
     ports:
-        - "127.0.0.1:10080:8080" # Wiremock HTTP Port for API routes
-        #- "127.0.0.1:10443:8443" # Wiremock HTTPS Port for API routes
+      - "127.0.0.1:10080:8080"   # WireMock HTTP Port for API routes
+      - "127.0.0.1:10443:8443"   # WireMock HTTPS Port for API routes
     volumes:
-        - ./extensions:/var/wiremock/extensions
-        - ./__files:/home/wiremock/__files
-        - ./mappings:/home/wiremock/mappings
-    entrypoint:
-        - "/docker-entrypoint.sh"
-        - "--global-response-templating"
-        - "--disable-gzip"
-        - "--verbose"
-    # environment:
-    #     - WIREMOCK_OPTIONS='--https-port 8443 --verbose'
+      - ./extensions:/var/wiremock/extensions
+      - ./__files:/home/wiremock/__files
+      - ./mappings:/home/wiremock/mappings
+      - ./certs:/certs:ro
+    command:
+      - "--port"
+      - "8080"
+      - "--https-port"
+      - "8443"
+      - "--https-keystore"
+      - "/certs/wiremock.jks"
+      - "--keystore-password"
+      - "${WIREMOCK_KEYSTORE_PASSWORD:-changeit}"
+      - "--key-manager-password"
+      - "${WIREMOCK_KEYSTORE_PASSWORD:-changeit}"
+      - "--global-response-templating"
+      - "--disable-gzip"
+      - "--verbose"
     #restart: unless-stopped
     container_name: Wiremock
 
