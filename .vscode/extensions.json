@@ -1,6 +1,5 @@
 {
    "recommendations": [
-      "sonarsource.sonarlint-vscode",
       "ms-azuretools.vscode-bicep",
       "donjayamanne.bower",
       "ms-dotnettools.csharp",
@@ -22,6 +21,6 @@
       "ms-vscode-remote.remote-wsl",
       "redhat.vscode-yaml",
       "streetsidesoftware.code-spell-checker",
-      "editorconfig.editorconfig"
+      "editorconfig.editorconfig"      
    ]
 }
