@@ -118,6 +118,9 @@
         "GitHub.vscode-pull-request-github",
         "eamodio.gitlens",
 
+        // AI Agents
+        "openai.chatgpt",
+
         // .NET & C# Development
         "ms-dotnettools.vscode-dotnet-runtime",
         "ms-dotnettools.csdevkit",
