@@ -39,10 +39,12 @@
       "dockerDashComposeVersion": "latest"
     },
     // Additional .NET SDK versions and workloads (base image already has .NET 10.0)
+    // Note: The 'aspire' workload was deprecated; Aspire now uses NuGet packages + CLI
+    // Aspire templates are installed via postCreateCommand below
     "ghcr.io/devcontainers/features/dotnet:2": {
       "version": "none",
       "additionalVersions": "8.0,9.0",
-      "workloads": "aspire,wasm-tools"
+      "workloads": "wasm-tools"
     },
     // GitHub CLI for repository management
     "ghcr.io/devcontainers/features/github-cli:1": {
@@ -174,6 +176,9 @@
   // Use 'postCreateCommand' to run commands after the container is created.
   // Uses workspaceFolder to ensure correct path regardless of mount configuration
   "postCreateCommand": "sudo pwsh -File ${containerWorkspaceFolder}/post_devcontainer.ps1",
+
+  // Use 'onCreateCommand' to install Aspire templates (replaces deprecated 'aspire' workload)
+  "onCreateCommand": "dotnet new install Aspire.ProjectTemplates --force",
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
