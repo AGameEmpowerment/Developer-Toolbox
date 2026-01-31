@@ -2,7 +2,7 @@
   "name": "Com.AGameEmpowerment.DevContainer",
 
   // Base Image for the dev container. More info: https://aka.ms/vscode-remote/containers/images.
-  "image": "mcr.microsoft.com/devcontainers/dotnet:9.0",
+  "image": "mcr.microsoft.com/devcontainers/dotnet:latest",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {
@@ -73,7 +73,6 @@
         "ms-dotnettools.vscode-dotnet-runtime",
         "ms-dotnettools.csdevkit",
         "ms-dotnettools.csharp",
-        "ms-dotnettools.vscodeintellicode-csharp",
         "ms-mssql.mssql",
         "ms-vscode.vscode-node-azure-pack",
         "ms-vsliveshare.vsliveshare",
@@ -84,10 +83,7 @@
         "msjsdiag.vscode-react-native",
         "donjayamanne.bower",
         "dbaeumer.vscode-eslint",
-        "VisualStudioExptTeam.vscodeintellicode",
-        "VisualStudioExptTeam.vscodeintellicode-completions",
-        "ms-vscode.powershell",
-        "SonarSource.sonarlint-vscode"
+        "ms-vscode.powershell"
       ]
     }
   },
