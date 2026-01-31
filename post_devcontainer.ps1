@@ -12,7 +12,7 @@ if (Get-Command dotnet -ErrorAction SilentlyContinue) {
     if ($LASTEXITCODE -ne 0) {
         Write-Warning "Failed to update .NET workloads. Please check your .NET SDK installation."
     }
-    
+
     Write-Host "Installing LibMan CLI tool..."
     dotnet tool install -g Microsoft.Web.LibraryManager.Cli
     if ($LASTEXITCODE -ne 0) {
@@ -49,4 +49,30 @@ if (Get-Command dotnet -ErrorAction SilentlyContinue) {
     Write-Warning ".NET SDK is not available. Skipping HTTPS certificate trust step."
 }
 
-Write-Host "run Setup_project.ps1 to complete the process..."
+# Setup Docker development environment (WireMock certificates, .env, etc.)
+Write-Host "`n=== Setting up Docker Development Environment ===" -ForegroundColor Cyan
+
+$SetupScript = Join-Path $PSScriptRoot "docker_setup.sh"
+if (Test-Path $SetupScript) {
+    Write-Host "Running docker_setup.sh to configure development services..."
+
+    # Make the script executable
+    chmod +x $SetupScript
+    chmod +x (Join-Path $PSScriptRoot "docker_down.sh")
+    chmod +x (Join-Path $PSScriptRoot "containers/certs/generate-wiremock-cert.sh")
+
+    # Run the setup script
+    bash $SetupScript
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Docker development environment configured successfully." -ForegroundColor Green
+    } else {
+        Write-Warning "Docker setup completed with warnings. Some services may not be fully configured."
+    }
+} else {
+    Write-Warning "docker_setup.sh not found. Skipping Docker development environment setup."
+    Write-Host "You can manually run ./docker_setup.sh to configure development services."
+}
+
+Write-Host "`nPost-container setup complete!" -ForegroundColor Green
+Write-Host "Run './docker_setup.sh' to start development services if not already running."
