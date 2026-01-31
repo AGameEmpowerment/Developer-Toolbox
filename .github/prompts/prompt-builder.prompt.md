@@ -1,5 +1,5 @@
 ---
-agent: 'agent'
+agent: 'prompt-builder'
 tools: ['search/codebase', 'edit/editFiles', 'search']
 description: 'Guide users through creating high-quality GitHub Copilot prompts with proper structure, tools, and best practices.'
 ---
