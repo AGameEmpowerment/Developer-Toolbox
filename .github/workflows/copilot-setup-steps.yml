@@ -1,63 +1,63 @@
 name: "Copilot Setup Steps"
 
-env:
-  GITHUB_HOST: github.com
-
-# Automatically run the setup steps when they are changed to allow for easy validation, and
-# allow manual testing through the repository's "Actions" tab
 on:
-  workflow_dispatch:
-  push:
-    paths:
-      - .github/workflows/copilot-setup-steps.yml
-  pull_request:
-    paths:
-      - .github/workflows/copilot-setup-steps.yml
+    workflow_dispatch:
+    push:
+        paths:
+            - .github/workflows/copilot-setup-steps.yml
+    pull_request:
+        paths:
+            - .github/workflows/copilot-setup-steps.yml
 
 jobs:
-  # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
-  copilot-setup-steps:
-    runs-on: ubuntu-latest
-    #runs-on: [self-hosted, Linux]
+    copilot-setup-steps:
+        runs-on: ubuntu-latest
 
-    # Set the permissions to the lowest permissions possible needed for your steps.
-    # Copilot will be given its own token for its operations.
-    permissions:
-      # Minimal permissions required for Copilot to operate on PRs and to clone repository contents.
-      # `contents: read` allows reading repository files. `pull-requests: write` allows updating PR metadata/status.
-      contents: read
-      pull-requests: write
-      issues: write
+        permissions:
+            contents: read
 
-    # You can define any steps you want, and they will run before the agent starts.
-    # If you do not check out your code, Copilot will do this for you.
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.2.2
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v5
 
-    # - name: Setup .NET 8.x
-    #   uses: actions/setup-dotnet@v4.2.0
-    #   with:
-    #     dotnet-version: '8.0.x'
+            - uses: actions/setup-dotnet@v5
+              with:
+                dotnet-version: |
+                    8.x
+                    9.x
+                    10.x
 
-    # - name: Setup .NET 9.x
-    #   uses: actions/setup-dotnet@v4.2.0
-    #   with:
-    #     dotnet-version: '9.0.x'
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: '24.x'
 
-    # - name: Set up Node.js
-    #   uses: actions/setup-node@v4
-    #   with:
-    #     node-version: 'latest' # Always install the latest Node.js version
+            - name: Configure npm with jFrog artifactory
+              run: |
+                npm config set registry https://icseng.jfrog.io/artifactory/api/npm/npm-ics/
+                npm config set always-auth true
+                npm config set _auth $(echo -n "${{ secrets.JF_ART_USERNAME }}:${{ secrets.JF_ART_TOKEN }}" | base64)
 
-    # - name: Update dotnet SDKs
-    #   run: dotnet workload update
+            - name: Set up JFrog CLI
+              uses: jfrog/setup-jfrog-cli@v4
+              with:
+                server-id: jfrog-server
 
-    # - name: Install Aspire workload
-    #   run: dotnet workload install aspire
+            - name: Configure JFrog CLI with username/password
+              run: |
+                jf config add jfrog-server \
+                --url=https://icseng.jfrog.io \
+                --user=${{ secrets.JF_ART_USERNAME }} \
+                --password=${{ secrets.JF_ART_TOKEN }} \
+                --interactive=false
 
-    # - name: Install LibMan CLI
-    #   run: dotnet tool install -g Microsoft.Web.LibraryManager.Cli
+            - name: Configure JFrog CLI for dotnet
+              run: jf dotnet-config --repo-resolve nuget
 
-    # - name: Restore NuGet packages
-    #   run: dotnet restore
+            - name: npm install
+              run: npm ci --prefix src/Org.ChurchOfJesusChrist.Starter/Org.ChurchOfJesusChrist.Starter.Client
+
+            - name: restore
+              run: |
+                jf dotnet restore src/Edu.Si.Example/Edu.Si.Example.App/Edu.Si.Example.App.csproj
+                jf dotnet restore src/Edu.Si.Example/Edu.Si.Example.Lib/Edu.Si.Example.Lib.csproj
