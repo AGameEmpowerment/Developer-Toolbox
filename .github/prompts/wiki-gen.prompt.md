@@ -1,5 +1,5 @@
 ---
-agent: 'agent'
+agent: 'wiki-generator'
 description: 'Generate and maintain comprehensive project wiki documentation in /wiki (incremental, accurate, accessible, secure, performant)'
 ---
 
