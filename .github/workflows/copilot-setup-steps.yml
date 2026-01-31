@@ -27,13 +27,13 @@ jobs:
                     9.x
                     10.x
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                node-version: '24.x'
+            # - name: Setup Node.js
+            #   uses: actions/setup-node@v4
+            #   with:
+            #     node-version: '24.x'
 
-            - name: npm install
-              run: npm ci
+            # - name: npm install
+            #   run: npm ci
 
             - name: dotnet restore
               run: dotnet restore
