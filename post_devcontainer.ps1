@@ -1,9 +1,11 @@
 # Setup Development Environment DevContainer
 Write-Host "Post Create Commands for Environment..."
 
-# Update the system
-sudo apt update
-sudo apt upgrade -y
+# Note: We skip apt update/upgrade here because:
+# 1. The base devcontainer image is already up-to-date
+# 2. Third-party repos (like Yarn) may have expired GPG keys causing failures
+# 3. Package upgrades during container creation increase build time significantly
+# If you need to update packages, do so manually after container creation
 
 # Check if .NET SDK is available
 if (Get-Command dotnet -ErrorAction SilentlyContinue) {
