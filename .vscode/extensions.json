@@ -9,6 +9,7 @@
       "github.codespaces",
       "github.copilot-chat",
       "github.vscode-pull-request-github",
+      "openai.chatgpt",
       "hashicorp.terraform",
       "ms-vscode.hexeditor",
       "ritwickdey.liveserver",
