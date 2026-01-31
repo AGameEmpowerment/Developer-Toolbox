@@ -32,32 +32,8 @@ jobs:
               with:
                 node-version: '24.x'
 
-            - name: Configure npm with jFrog artifactory
-              run: |
-                npm config set registry https://icseng.jfrog.io/artifactory/api/npm/npm-ics/
-                npm config set always-auth true
-                npm config set _auth $(echo -n "${{ secrets.JF_ART_USERNAME }}:${{ secrets.JF_ART_TOKEN }}" | base64)
-
-            - name: Set up JFrog CLI
-              uses: jfrog/setup-jfrog-cli@v4
-              with:
-                server-id: jfrog-server
-
-            - name: Configure JFrog CLI with username/password
-              run: |
-                jf config add jfrog-server \
-                --url=https://icseng.jfrog.io \
-                --user=${{ secrets.JF_ART_USERNAME }} \
-                --password=${{ secrets.JF_ART_TOKEN }} \
-                --interactive=false
-
-            - name: Configure JFrog CLI for dotnet
-              run: jf dotnet-config --repo-resolve nuget
-
             - name: npm install
-              run: npm ci --prefix src/Org.ChurchOfJesusChrist.Starter/Org.ChurchOfJesusChrist.Starter.Client
+              run: npm ci
 
-            - name: restore
-              run: |
-                jf dotnet restore src/Edu.Si.Example/Edu.Si.Example.App/Edu.Si.Example.App.csproj
-                jf dotnet restore src/Edu.Si.Example/Edu.Si.Example.Lib/Edu.Si.Example.Lib.csproj
+            - name: dotnet restore
+              run: dotnet restore
