@@ -141,6 +141,47 @@ For reproducible environments and easy onboarding:
 
 ---
 
+### 11. Resource Priority of inclusion in projects from the template repository
+
+The easiest option is to copy everything from this repository directly over into your new project repository. There should be little or no conflicts when doing this, be sure to exclude the `.git` folder. However, if you want to be more selective, here is the recommended priority order for including resources from this repository into your new project repository:
+
+1. **High Priority** (must include):
+   - `.github/` folder (GitHub Actions workflows and copilot configuration)
+      - `agents/` folder (Copilot configuration Select those configurations relevant to your project)
+      - `chatmodes/` folder (Copilot configuration Select those configurations relevant to your project)
+      - `collections/` folder (Copilot configuration Select those configurations relevant to your project)
+      - `instructions/` folder (Copilot configuration Select those configurations relevant to your project)
+      - `prompts/` folder (Copilot configuration Select those configurations relevant to your project)
+      - `workflows/copilot-setup-steps.yml` Copilot setup workflow
+      - `copilot-instructions.md` GitHub Copilot setup instructions (Based copilot instructions file, has redirect instructions to the `instructions/` folder)
+      - `dependabot.yml` for dependency updates
+   - `devops/` folder structure for (CI/CD pipelines and scripts)
+   - `src/` folder as starting point for application code
+   - `.editorconfig` standard coding styles
+   - `.gitattributes` file for consistent line endings across environments
+   - `.gitignore` file or latest from [github/gitignore](https://github.com/github/gitignore)
+   - `LICENSE` file (choose appropriate license for your project)
+   - `CODEOWNERS` file (Then update as needed for your team)
+   - `README.md` (customize for your project)
+
+2. **Medium Priority** (include as needed):
+   - `containers/` folder (Docker and container configurations for local development)
+   - `docker_setup.ps1` and `docker_down.ps1` scripts
+   - `.vsconfig` file (Visual Studio configuration)
+   - `Default-Visual-Studio-Settings.vssettings` file (Visual Studio settings)
+   - `setup_docker_container.ps1` script (if using Docker devcontainer setup)
+   - `Delete_Old_Git_Tags.ps1` and `Delete_Old_Docker_Tags.ps1` scripts
+   - `AUTHORS.md`, `CHANGELOG.md`, `CONTRIBUTING.md` files
+
+3. **Low Priority** (nice to have, include as needed):
+   - `.devcontainer/` folder (if using VS Code DevContainers)
+   - Any sample application code or configurations that are not relevant to your project
+     - Many of these will be found under the `.github/` folder for specific copilot configurations and instructions
+     - An Example project under the `src/` folder can also be excluded along with the two example solution files `Edu.Si.Example.sln` and `Edu.Si.Example.slnx`
+   - Documentation files that do not pertain to your specific project such as placement holder `README.md` files in subfolders
+
+---
+
 ## Summary
 
 This guide provides a clear, step-by-step process for setting up your development environment using the repository's scripts and container files. For further details, see documentation in the `devops/` and `containers/` folders.

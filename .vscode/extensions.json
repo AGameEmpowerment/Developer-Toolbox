@@ -1,6 +1,5 @@
 {
    "recommendations": [
-      "sonarsource.sonarlint-vscode",
       "ms-azuretools.vscode-bicep",
       "donjayamanne.bower",
       "ms-dotnettools.csharp",
@@ -10,6 +9,7 @@
       "github.codespaces",
       "github.copilot-chat",
       "github.vscode-pull-request-github",
+      "openai.chatgpt",
       "hashicorp.terraform",
       "ms-vscode.hexeditor",
       "ritwickdey.liveserver",
@@ -22,6 +22,6 @@
       "ms-vscode-remote.remote-wsl",
       "redhat.vscode-yaml",
       "streetsidesoftware.code-spell-checker",
-      "editorconfig.editorconfig"
+      "editorconfig.editorconfig"      
    ]
 }
