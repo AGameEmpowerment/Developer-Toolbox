@@ -51,11 +51,14 @@ sudo apt install -y \
 	docker.io \
 	docker-compose-plugin \
 	powershell \
+	openjdk-25-jdk \
 	dotnet-sdk-8.0 \
 	dotnet-sdk-9.0 \
 	dotnet-sdk-10.0 \
 	azure-cli
 ```
+
+OpenJDK is required for `keytool` if you generate WireMock HTTPS certificates locally.
 
 ### VS Code (optional)
 

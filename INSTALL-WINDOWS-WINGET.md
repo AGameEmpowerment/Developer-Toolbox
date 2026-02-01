@@ -22,11 +22,14 @@ winget install Microsoft.DotNet.SDK.8
 winget install Microsoft.DotNet.SDK.9
 winget install Microsoft.DotNet.SDK.10
 winget install Microsoft.PowerShell
+winget install Microsoft.OpenJDK.25
 winget install Git.Git
 winget install Docker.DockerDesktop
 winget install Microsoft.VisualStudio.2022.Community
 winget install Microsoft.SQLServer.2022.Express
 ```
+
+OpenJDK is required for `keytool` if you generate WireMock HTTPS certificates locally.
 
 ### Optional tools from README
 

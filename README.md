@@ -43,41 +43,37 @@ This is the fastest local setup for Windows 10/11.
 
 1. Clone the repository.
 2. Install tools using winget:
-
-   - .NET SDK 8 and 9
-   - PowerShell
-   - Git
-   - Docker Desktop
-   - Visual Studio 2022
-   - SQL Server Express (optional if using containers)
+    - .NET SDK 8, 9, 10
+    - OpenJDK
+    - PowerShell
+    - Git
+    - Docker Desktop
+    - Visual Studio 2022
+    - SQL Server Express (optional if using containers)
 
 3. Start the containerized dependencies:
-
-   - Run docker_setup.ps1
+    - Run docker_setup.ps1
 
 4. Stop containers when finished:
-
-   - Run docker_down.ps1
+    - Run docker_down.ps1
 
 ### Option C: Local setup on Linux (apt)
 
 Use this if you want native tooling on Linux without Dev Containers.
 
 1. Install prerequisites using apt:
-
-   - Git
-   - Docker Engine / Docker Compose
-   - PowerShell
-   - .NET SDK 8 and 9
-   - Node.js LTS (optional)
+    - Git
+    - Docker Engine / Docker Compose
+    - PowerShell
+    - .NET SDK 8, 9, 10
+    - OpenJDK
+    - Node.js LTS (optional)
 
 2. Start the containerized dependencies:
-
-   - Run docker_setup.sh
+    - Run docker_setup.sh
 
 3. Stop containers when finished:
-
-   - Run docker_down.sh
+    - Run docker_down.sh
 
 ### Option D: Node.js-focused setup (npm)
 
@@ -91,6 +87,8 @@ Use this if you only need frontend tooling or Node.js-based automation.
 ## Database and local services
 
 The default Docker Compose setup runs a local SQL Server instance and other supporting services. The SQL Server container exposes localhost port 10433 and initializes a database named ProjectExample.
+
+WireMock HTTPS certificate generation uses `keytool`, which is provided by a Java Development Kit (JDK). If you plan to generate WireMock certificates locally, install OpenJDK (recommended) and ensure `keytool` is available on your PATH.
 
 Use the following example connection string for local development:
 
@@ -112,17 +110,17 @@ Use this checklist to adapt the template for your own repository.
 Recommended priority for copying into a new repository:
 
 - High priority:
-  - .github (Copilot instructions, workflows, and repo automation)
-  - devops (pipelines, manifests, and structure)
-  - src (starting point for application code)
-  - .editorconfig, .gitattributes, .gitignore
-  - README, LICENSE, CODEOWNERS
+    - .github (Copilot instructions, workflows, and repo automation)
+    - devops (pipelines, manifests, and structure)
+    - src (starting point for application code)
+    - .editorconfig, .gitattributes, .gitignore
+    - README, LICENSE, CODEOWNERS
 - Medium priority:
-  - containers and Docker scripts
-  - Visual Studio settings files
-  - authoring and contributing docs
+    - containers and Docker scripts
+    - Visual Studio settings files
+    - authoring and contributing docs
 - Low priority:
-  - example content or sample solutions you do not need
+    - example content or sample solutions you do not need
 
 ## Dev Container workload summary
 
@@ -147,7 +145,7 @@ Use the links below to find focused documentation in this repository. Each link 
 - [containers/certs/readme.md](containers/certs/readme.md) – Certificate setup for HTTPS and WireMock scenarios.
 - [containers/extensions/readme.md](containers/extensions/readme.md) – VS Code extensions copied into container images.
 - [containers/mappings/readme.md](containers/mappings/readme.md) – Example mappings used by local container services.
-- [containers/__files/readme.md](containers/__files/readme.md) – Example files used by local container services.
+- [containers/\_\_files/readme.md](containers/__files/readme.md) – Example files used by local container services.
 - [devops/readme.md](devops/readme.md) – DevOps folder overview and how to use it in CI/CD.
 - [devops/manifest/readme.md](devops/manifest/readme.md) – Manifest templates and conventions for release artifacts.
 - [devops/pipelines/readme.md](devops/pipelines/readme.md) – CI/CD pipeline templates and conventions.
@@ -158,6 +156,7 @@ Use the links below to find focused documentation in this repository. Each link 
 
 - Ensure Docker Desktop or Docker Engine is running before starting containers.
 - If SQL Server does not start, check container logs and confirm the environment variables in containers/.env.
+- If WireMock certificate generation fails, verify OpenJDK is installed and `keytool` is available on PATH.
 - For script execution issues on Windows, set PowerShell execution policy to allow local scripts.
 
 ## Additional resources
