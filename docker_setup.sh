@@ -33,13 +33,8 @@ if [[ ! -f "$ENV_FILE" ]]; then
     fi
 fi
 
-# Load .env values for display
-if [[ -f "$ENV_FILE" ]]; then
-    set -a
-    # shellcheck source=/dev/null
-    source "$ENV_FILE"
-    set +a
-fi
+# Note: .env is consumed by docker compose; this script does not execute it
+# to avoid running arbitrary configuration as shell code.
 #endregion
 
 #region WireMock Certificate Setup
