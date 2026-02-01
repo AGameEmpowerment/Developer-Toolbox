@@ -34,7 +34,7 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
-            echo "  -c, --clean-certs  Remove WireMock certificates (wiremock.jks, wiremock.crt)"
+            echo "  -c, --clean-certs  Remove WireMock certificates (*.pfx, *.crt, *.key, etc.)"
             echo "  -e, --clean-env    Remove .env file (will be regenerated on next setup)"
             echo "  -a, --clean-all    Remove all ephemeral files (certs + .env)"
             echo "  -h, --help         Show this help message"
@@ -120,8 +120,11 @@ if [[ "$CLEAN_CERTS" == true ]] || [[ "$CLEAN_ALL" == true ]]; then
 
     # Remove certificate files
     CERT_FILES=(
-        "${CERTS_DIR}/wiremock.jks"
+        "${CERTS_DIR}/wiremock.pfx"
         "${CERTS_DIR}/wiremock.crt"
+        "${CERTS_DIR}/wiremock.key"
+        "${CERTS_DIR}/wiremock.conf"
+        "${CERTS_DIR}/wiremock.jks"
         "${CERTS_DIR}/truststore.jks"
     )
 
