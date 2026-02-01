@@ -60,8 +60,8 @@ if command -v docker &> /dev/null; then
     echo -e "${YELLOW}Stopping and removing containers...${NC}"
 
     # Teardown the vs multi-container
-    docker compose -f "./containers/docker-compose-common.yml" -p dev_common_shared down || true
-    #docker compose -f "./containers/docker-compose.yml" -p example down
+    docker compose -f "${CONTAINERS_DIR}/docker-compose-common.yml" -p dev_common_shared down || true
+    #docker compose -f "${CONTAINERS_DIR}/docker-compose.yml" -p example down
 
     echo -e "${GREEN}Containers removed.${NC}"
 else

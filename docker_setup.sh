@@ -162,8 +162,8 @@ if command -v docker &> /dev/null; then
     echo -e "${YELLOW}Starting Docker containers...${NC}"
 
     # Start the vs multi-container
-    docker compose -f "./containers/docker-compose-common.yml" -p dev_common_shared up -d
-    #docker compose -f "./containers/docker-compose.yml" -p example up -d
+    docker compose --env-file "$ENV_FILE" -f "${CONTAINERS_DIR}/docker-compose-common.yml" -p dev_common_shared up -d
+    #docker compose --env-file "$ENV_FILE" -f "${CONTAINERS_DIR}/docker-compose.yml" -p example up -d
 
     echo -e "${GREEN}Docker containers started.${NC}"
 else

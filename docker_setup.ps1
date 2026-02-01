@@ -69,12 +69,41 @@ $WireMockCert = Join-Path $CertsDir "wiremock.crt"
 if (Test-Path $WireMockCert) {
     Write-Host "Importing WireMock certificate to Windows trusted root store..." -ForegroundColor Yellow
 
-    # Check if already imported
-    $existingCert = Get-ChildItem -Path Cert:\CurrentUser\Root | Where-Object { $_.Subject -like "*CN=localhost*OU=Development*" }
+    try {
+        # Load the certificate file so we can compare its thumbprint with any existing trusted certs
+        $fileCert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $WireMockCert
+    } catch {
+        Write-Warning "Failed to load WireMock certificate from '$WireMockCert': $_"
+        Write-Warning "Skipping trusted root import check. You may need to manually trust the certificate."
+        $fileCert = $null
+    }
 
-    if ($existingCert) {
-        Write-Host "Certificate already trusted in CurrentUser\Root store." -ForegroundColor Gray
+    # Find any existing WireMock certificates in the CurrentUser\Root store by subject
+    $existingCerts = Get-ChildItem -Path Cert:\CurrentUser\Root | Where-Object { $_.Subject -like "*CN=localhost*OU=Development*" }
+
+    if ($fileCert -and $existingCerts) {
+        # Check if any existing certificate has the same thumbprint as the file
+        $matchingCert = $existingCerts | Where-Object { $_.Thumbprint -eq $fileCert.Thumbprint }
     } else {
+        $matchingCert = $null
+    }
+
+    if ($matchingCert) {
+        Write-Host "WireMock certificate already trusted in CurrentUser\Root store." -ForegroundColor Gray
+        Write-Host "  Thumbprint: $($fileCert.Thumbprint)" -ForegroundColor Gray
+    } else {
+        if ($existingCerts) {
+            Write-Host "Existing WireMock certificate(s) with subject 'CN=localhost, OU=Development' found with different thumbprint. Removing stale certificate(s)..." -ForegroundColor Yellow
+            foreach ($old in $existingCerts) {
+                try {
+                    Remove-Item -Path "Cert:\CurrentUser\Root\$($old.Thumbprint)" -Force
+                    Write-Host "  Removed old WireMock certificate with thumbprint $($old.Thumbprint)" -ForegroundColor Gray
+                } catch {
+                    Write-Warning "  Failed to remove old WireMock certificate with thumbprint $($old.Thumbprint): $_"
+                }
+            }
+        }
+
         try {
             $cert = Import-Certificate -FilePath $WireMockCert -CertStoreLocation Cert:\CurrentUser\Root
             Write-Host "Certificate imported to CurrentUser\Root store." -ForegroundColor Green
@@ -97,8 +126,8 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "Starting Docker containers..." -ForegroundColor Yellow
 
     ## Start the vs multi-container
-    docker compose -f "./containers/docker-compose-common.yml" -p dev_common_shared up -d
-    #docker compose -f "./containers/docker-compose.yml" -p example up -d
+    docker compose --env-file "$EnvFile" -f "$ContainersDir/docker-compose-common.yml" -p dev_common_shared up -d
+    #docker compose --env-file "$EnvFile" -f "$ContainersDir/docker-compose.yml" -p example up -d
 
     Write-Host "Docker containers started." -ForegroundColor Green
 } else {
