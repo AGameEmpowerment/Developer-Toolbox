@@ -11,17 +11,27 @@ This directory contains certificates and keystores for WireMock HTTPS support.
 .\docker_setup.ps1
 ```
 
-### Linux/macOS/WSL/Devcontainer (Bash)
+### Linux/WSL/Devcontainer (Bash)
 
 ```bash
 # From repository root - handles everything automatically
 ./docker_setup.sh
 ```
 
+### macOS
+
+```bash
+# From repository root - generates certificates but does NOT auto-import to system trust
+./docker_setup.sh
+
+# After running docker_setup.sh, manually trust the certificate (see Manual Trust section below)
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ./containers/certs/wiremock.crt
+```
+
 The setup scripts will:
 1. Generate the keystore and certificate if not present
 2. Create `.env` from `.env.example` with a random password
-3. Import the certificate to the system trust store
+3. Import the certificate to the system trust store (Windows and Linux only; macOS requires manual import - see above)
 4. Start all Docker containers
 
 ### Manual Certificate Generation
