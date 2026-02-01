@@ -25,6 +25,22 @@ if (-not (Test-Path $EnvFile)) {
         exit 1
     }
 }
+
+# Load .env values for display
+$EnvValues = @{}
+if (Test-Path $EnvFile) {
+    Get-Content $EnvFile | ForEach-Object {
+        $line = $_.Trim()
+        if ($line -and -not $line.StartsWith('#') -and $line -match '^\s*([^=]+)=(.*)\s*$') {
+            $key = $matches[1].Trim()
+            $val = $matches[2].Trim()
+            if ($val.StartsWith('"') -and $val.EndsWith('"')) {
+                $val = $val.Substring(1, $val.Length - 2)
+            }
+            $EnvValues[$key] = $val
+        }
+    }
+}
 #endregion
 
 #region WireMock Certificate Setup
@@ -141,12 +157,15 @@ Write-Host "Services available:" -ForegroundColor White
 Write-Host "  SQL Server:    localhost:10433" -ForegroundColor Gray
 Write-Host "  CosmosDB:      localhost:10081" -ForegroundColor Gray
 Write-Host "  Redis:         localhost:10120" -ForegroundColor Gray
-Write-Host "  SMTP4Dev:      http://localhost:10140" -ForegroundColor Gray
-Write-Host "  Seq (OTEL):    http://localhost:10150" -ForegroundColor Gray
+$smtpWebPort = if ($EnvValues.ContainsKey('SMTP4DEV_WEB_PORT') -and $EnvValues['SMTP4DEV_WEB_PORT']) { $EnvValues['SMTP4DEV_WEB_PORT'] } else { '10140' }
+$seqPort = if ($EnvValues.ContainsKey('SEQ_HTTP_PORT') -and $EnvValues['SEQ_HTTP_PORT']) { $EnvValues['SEQ_HTTP_PORT'] } else { '10150' }
+Write-Host "  SMTP4Dev:      http://localhost:$smtpWebPort" -ForegroundColor Gray
+Write-Host "  Seq (OTEL):    http://localhost:$seqPort" -ForegroundColor Gray
 Write-Host "  WireMock HTTP: http://localhost:10080" -ForegroundColor Gray
 Write-Host "  WireMock HTTPS: https://localhost:10443" -ForegroundColor Gray
 Write-Host "  Azurite:       localhost:10000-10002" -ForegroundColor Gray
-Write-Host "  Service Bus:   localhost:10170" -ForegroundColor Gray
+$serviceBusPort = if ($EnvValues.ContainsKey('SERVICEBUS_AMQP_PORT') -and $EnvValues['SERVICEBUS_AMQP_PORT']) { $EnvValues['SERVICEBUS_AMQP_PORT'] } else { '10170' }
+Write-Host "  Service Bus:   localhost:$serviceBusPort" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Head back to README.md for deployment of the database and other services..."
 

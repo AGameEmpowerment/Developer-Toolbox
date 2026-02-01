@@ -32,6 +32,14 @@ if [[ ! -f "$ENV_FILE" ]]; then
         exit 1
     fi
 fi
+
+# Load .env values for display
+if [[ -f "$ENV_FILE" ]]; then
+    set -a
+    # shellcheck source=/dev/null
+    source "$ENV_FILE"
+    set +a
+fi
 #endregion
 
 #region WireMock Certificate Setup
@@ -177,11 +185,11 @@ echo -e "Services available:"
 echo -e "${GRAY}  SQL Server:     localhost:10433${NC}"
 echo -e "${GRAY}  CosmosDB:       localhost:10081${NC}"
 echo -e "${GRAY}  Redis:          localhost:10120${NC}"
-echo -e "${GRAY}  SMTP4Dev:       http://localhost:10140${NC}"
-echo -e "${GRAY}  Seq (OTEL):     http://localhost:10150${NC}"
+echo -e "${GRAY}  SMTP4Dev:       http://localhost:${SMTP4DEV_WEB_PORT:-10140}${NC}"
+echo -e "${GRAY}  Seq (OTEL):     http://localhost:${SEQ_HTTP_PORT:-10150}${NC}"
 echo -e "${GRAY}  WireMock HTTP:  http://localhost:10080${NC}"
 echo -e "${GRAY}  WireMock HTTPS: https://localhost:10443${NC}"
 echo -e "${GRAY}  Azurite:        localhost:10000-10002${NC}"
-echo -e "${GRAY}  Service Bus:    localhost:10170${NC}"
+echo -e "${GRAY}  Service Bus:    localhost:${SERVICEBUS_AMQP_PORT:-10170}${NC}"
 echo ""
 echo "Head back to README.md for deployment of the database and other services..."
