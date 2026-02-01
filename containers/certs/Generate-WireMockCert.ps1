@@ -154,7 +154,7 @@ ST=UT
 C=US
 
 [v3_req]
-subjectAltName = dns:localhost,dns:wiremock,dns:host.docker.internal,ip:127.0.0.1
+subjectAltName = DNS:localhost,DNS:wiremock,DNS:host.docker.internal,IP:127.0.0.1
 "@
 
 Set-Content -Path $ConfigPath -Value $opensslConfig -Encoding UTF8
@@ -204,6 +204,32 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
+# Convert PKCS12 to JKS for better compatibility with WireMock
+# Check if keytool is available (usually with Java or in Docker containers)
+$jksPath = Join-Path $CertsDir "wiremock.jks"
+$keytool = Get-Command keytool -ErrorAction SilentlyContinue
+
+if ($keytool) {
+    Write-Host "Converting PKCS12 to JKS format for WireMock compatibility..."
+    $jksArgs = @(
+        "-importkeystore",
+        "-srckeystore", $KeystorePath,
+        "-srcstoretype", "PKCS12",
+        "-srcstorepass", $KeystorePassword,
+        "-destkeystore", $jksPath,
+        "-deststoretype", "JKS",
+        "-deststorepass", $KeystorePassword,
+        "-noprompt"
+    )
+    & keytool @jksArgs 2>&1 | Out-Null
+
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "JKS keystore created: $jksPath" -ForegroundColor Green
+    } else {
+        Write-Host "Note: keytool conversion to JKS skipped (keytool not available or failed)" -ForegroundColor Yellow
+    }
+}
+
 # Summary
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
@@ -214,6 +240,9 @@ Write-Host "Files created:" -ForegroundColor White
 Write-Host "  Certificate: $CertPath" -ForegroundColor Gray
 Write-Host "  Private key: $PrivateKeyPath" -ForegroundColor Gray
 Write-Host "  Keystore:    $KeystorePath" -ForegroundColor Gray
+if (Test-Path $jksPath) {
+    Write-Host "  JKS Keystore: $jksPath" -ForegroundColor Gray
+}
 Write-Host ""
 Write-Host "Keystore password: $KeystorePassword" -ForegroundColor Yellow
 Write-Host ""

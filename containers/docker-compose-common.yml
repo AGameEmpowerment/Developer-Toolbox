@@ -85,14 +85,20 @@ services:
 
     # Local API Mocking Service
     #
-    # WireMock configured with HTTPS support using a custom JKS keystore.
-    # Prerequisites: From the repo root, run ./containers/certs/Generate-WireMockCert.ps1 (or ./certs/Generate-WireMockCert.ps1 from the containers/ folder), or run docker_setup.ps1/docker_setup.sh to create the keystore before first use.
+    # WireMock configured with HTTPS support using a self-signed JKS keystore.
+    # Prerequisites: From the repo root, run ./containers/certs/Generate-WireMockCert.ps1 (or ./generate-wiremock-cert.sh), or run docker_setup.ps1/docker_setup.sh to create the keystore before first use.
     # Ports:
     #   - 10080: HTTP (for backward compatibility)
-    #   - 10443: HTTPS (TLS with custom certificate)
+    #   - 10443: HTTPS (TLS with custom self-signed certificate)
+    # HTTPS Configuration:
+    #   - Keystore: JKS format (created from PKCS12 certificate)
+    #   - Keystore password must be passed as both --keystore-password and --key-manager-password
+    #   - Certificate SAN: localhost, wiremock, host.docker.internal, 127.0.0.1
     # For client trust, import ./containers/certs/wiremock.crt (from the repo root) into your application's trust store.
     wiremock:
         image: wiremock/wiremock:latest
+        environment:
+            _JAVA_OPTIONS: "-Dcom.sun.net.ssl.checkRevocation=false -Djavax.net.debug=ssl:handshake"
         ports:
             - "127.0.0.1:10080:8080" # WireMock HTTP Port for API routes
             - "127.0.0.1:10443:8443" # WireMock HTTPS Port for API routes
@@ -108,6 +114,8 @@ services:
             - "8443"
             - "--https-keystore"
             - "/certs/wiremock.jks"
+            - "--keystore-type"
+            - "JKS"
             - "--keystore-password"
             - "${WIREMOCK_KEYSTORE_PASSWORD:-changeit}"
             - "--key-manager-password"

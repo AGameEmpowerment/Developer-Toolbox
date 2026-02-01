@@ -153,7 +153,7 @@ ST=UT
 C=US
 
 [v3_req]
-subjectAltName = dns:localhost,dns:wiremock,dns:host.docker.internal,ip:127.0.0.1
+subjectAltName = DNS:localhost,DNS:wiremock,DNS:host.docker.internal,IP:127.0.0.1
 EOF
 
 # Generate private key and self-signed certificate in one step
@@ -192,6 +192,48 @@ fi
 
 echo -e "${GREEN}Keystore created: ${KEYSTORE_PATH}${NC}"
 
+# Convert PKCS12 to JKS for better compatibility with WireMock
+# This is done using keytool if available (usually in Java or Docker containers)
+JKS_PATH="${CERTS_DIR}/wiremock.jks"
+
+# Try to use keytool from a Docker image if local keytool is not available
+if command -v keytool &> /dev/null; then
+    echo ""
+    echo -e "${CYAN}Converting PKCS12 to JKS format for WireMock compatibility...${NC}"
+    keytool -importkeystore \
+        -srckeystore "$KEYSTORE_PATH" \
+        -srcstoretype PKCS12 \
+        -srcstorepass "$KEYSTORE_PASSWORD" \
+        -destkeystore "$JKS_PATH" \
+        -deststoretype JKS \
+        -deststorepass "$KEYSTORE_PASSWORD" \
+        -noprompt 2>&1 | grep -v "^Warning:" || true
+
+    if [[ $? -eq 0 ]]; then
+        echo -e "${GREEN}JKS keystore created: ${JKS_PATH}${NC}"
+    fi
+elif command -v docker &> /dev/null; then
+    echo ""
+    echo -e "${CYAN}Converting PKCS12 to JKS format using Docker keytool...${NC}"
+    docker run --rm -v "$(pwd):/certs" wiremock/wiremock:latest keytool \
+        -importkeystore \
+        -srckeystore /certs/wiremock.pfx \
+        -srcstoretype PKCS12 \
+        -srcstorepass "$KEYSTORE_PASSWORD" \
+        -destkeystore /certs/wiremock.jks \
+        -deststoretype JKS \
+        -deststorepass "$KEYSTORE_PASSWORD" \
+        -noprompt 2>&1 | grep -v "^Warning:" || true
+
+    if [[ $? -eq 0 ]]; then
+        echo -e "${GREEN}JKS keystore created: ${JKS_PATH}${NC}"
+    fi
+else
+    echo -e "${YELLOW}Note: keytool not found. JKS conversion skipped.${NC}"
+    echo -e "${YELLOW}To create JKS keystore manually, run:${NC}"
+    echo -e "  keytool -importkeystore -srckeystore ${KEYSTORE_PATH} -srcstoretype PKCS12 -destkeystore ${JKS_PATH} -deststoretype JKS"
+fi
+
 # Summary
 echo ""
 echo -e "${CYAN}========================================${NC}"
@@ -202,6 +244,9 @@ echo -e "Files created:"
 echo -e "${GRAY}  Certificate: ${CERT_PATH}${NC}"
 echo -e "${GRAY}  Private key: ${PRIVATE_KEY_PATH}${NC}"
 echo -e "${GRAY}  Keystore:    ${KEYSTORE_PATH}${NC}"
+if [[ -f "$JKS_PATH" ]]; then
+    echo -e "${GRAY}  JKS Keystore: ${JKS_PATH}${NC}"
+fi
 echo ""
 echo -e "${YELLOW}Keystore password: ${KEYSTORE_PASSWORD}${NC}"
 echo ""

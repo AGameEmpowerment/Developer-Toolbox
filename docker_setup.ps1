@@ -46,7 +46,7 @@ if (Test-Path $EnvFile) {
 #region WireMock Certificate Setup
 Write-Host "`n=== WireMock Certificate Setup ===" -ForegroundColor Cyan
 
-$WireMockKeystore = Join-Path $CertsDir "wiremock.jks"
+$WireMockKeystore = Join-Path $CertsDir "wiremock.pfx"
 $GenerateCertScript = Join-Path $CertsDir "Generate-WireMockCert.ps1"
 
 if (-not (Test-Path $WireMockKeystore)) {
