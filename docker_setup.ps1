@@ -61,12 +61,12 @@ if (-not (Test-Path $WireMockKeystore)) {
 
         if ($LASTEXITCODE -eq 0 -or (Test-Path $WireMockKeystore)) {
             # Update .env with the generated password
-            $envContent = Get-Content $EnvFile -Raw
-            if ($envContent -match 'WIREMOCK_KEYSTORE_PASSWORD=') {
-                $envContent = $envContent -replace 'WIREMOCK_KEYSTORE_PASSWORD="[^"]*"', "WIREMOCK_KEYSTORE_PASSWORD=`"$KeystorePassword`""
-            } else {
-                $envContent += "`nWIREMOCK_KEYSTORE_PASSWORD=`"$KeystorePassword`"`n"
-            }
+            # Remove any existing WIREMOCK_KEYSTORE_PASSWORD entries, regardless of format
+            $envLines = Get-Content $EnvFile
+            $envLines = $envLines | Where-Object { $_ -notmatch '^\s*WIREMOCK_KEYSTORE_PASSWORD\s*=' }
+            # Append a normalized WIREMOCK_KEYSTORE_PASSWORD line
+            $envLines += "WIREMOCK_KEYSTORE_PASSWORD=`"$KeystorePassword`""
+            $envContent = ($envLines -join [Environment]::NewLine) + [Environment]::NewLine
             Set-Content $EnvFile $envContent -NoNewline
             Write-Host "WireMock certificate generated and .env updated." -ForegroundColor Green
         } else {

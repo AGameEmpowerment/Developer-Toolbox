@@ -32,6 +32,7 @@ NC='\033[0m' # No Color
 KEYSTORE_PASSWORD="changeit"
 VALIDITY_DAYS=3650
 FORCE=false
+VERBOSE=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -48,6 +49,10 @@ while [[ $# -gt 0 ]]; do
             FORCE=true
             shift
             ;;
+        --verbose)
+            VERBOSE=true
+            shift
+            ;;
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
             echo ""
@@ -55,6 +60,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -p, --password PASSWORD  Keystore password (default: changeit)"
             echo "  -v, --validity DAYS      Certificate validity in days (default: 3650)"
             echo "  -f, --force              Overwrite existing files without prompting"
+            echo "  --verbose                Print the keystore password to stdout (use with caution)"
             echo "  -h, --help               Show this help message"
             exit 0
             ;;
@@ -177,11 +183,17 @@ echo -e "Files created:"
 echo -e "${GRAY}  Keystore:    ${KEYSTORE_PATH}${NC}"
 echo -e "${GRAY}  Certificate: ${CERT_PATH}${NC}"
 echo ""
-echo -e "${YELLOW}Keystore password: ${KEYSTORE_PASSWORD}${NC}"
-echo ""
+if [[ "$VERBOSE" == "true" ]]; then
+    echo -e "${YELLOW}Keystore password: ${KEYSTORE_PASSWORD}${NC}"
+    echo ""
+fi
 echo -e "Next steps:"
 echo -e "${GRAY}  1. Add to your .env file:${NC}"
-echo -e "     WIREMOCK_KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}"
+if [[ "$VERBOSE" == "true" ]]; then
+    echo -e "     WIREMOCK_KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}"
+else
+    echo -e "     WIREMOCK_KEYSTORE_PASSWORD=<password-from-generation-output>"
+fi
 echo ""
 echo -e "${GRAY}  2. Start WireMock:${NC}"
 echo -e "     docker compose up wiremock"
