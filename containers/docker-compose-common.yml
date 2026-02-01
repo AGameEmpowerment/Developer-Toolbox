@@ -56,10 +56,10 @@ services:
     smtp4dev:
         image: rnwood/smtp4dev:latest
         ports:
-            - "127.0.0.1:${SMTP4DEV_SMTP_PORT:-10130}:25" # smtp server
-            - "127.0.0.1:${SMTP4DEV_POP_PORT:-10131}:110" # pop server
-            - "127.0.0.1:${SMTP4DEV_IMAP_PORT:-10132}:143" # imap server
-            - "127.0.0.1:${SMTP4DEV_WEB_PORT:-10140}:80" # web ui
+            - "127.0.0.1:10130:25" # smtp server
+            - "127.0.0.1:10131:110" # pop server
+            - "127.0.0.1:10132:143" # imap server
+            - "127.0.0.1:10140:80" # web ui
         volumes:
             - smtp4dev-data:/smtp4dev
         environment:
@@ -77,7 +77,7 @@ services:
             SEQ_FIRSTRUN_NOAUTHENTICATION: "${SEQ_FIRSTRUN_NOAUTHENTICATION}"
             SEQ_STORAGE_SECRETKEY: "${SEQ_STORAGE_SECRETKEY}"
         ports:
-            - "127.0.0.1:${SEQ_HTTP_PORT:-10150}:80" # Web UI and API port
+            - "127.0.0.1:10150:80" # Web UI and API port
         #restart: unless-stopped
         container_name: OtelCollector
         volumes:
@@ -148,8 +148,8 @@ services:
         volumes:
             - "./service-bus/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json"
         ports:
-            - "127.0.0.1:${SERVICEBUS_AMQP_PORT:-10170}:5672" # Service Bus, Update port if needed
-            - "127.0.0.1:${SERVICEBUS_HTTP_PORT:-10171}:5300" # Service Bus, Update port if needed
+            - "127.0.0.1:10170:5672" # Service Bus, Update port if needed
+            - "127.0.0.1:10171:5300" # Service Bus, Update port if needed
         environment:
             SQL_SERVER: "SqlEdge-ServiceBus"
             MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" # Password should be same as what is set for SQL Edge
