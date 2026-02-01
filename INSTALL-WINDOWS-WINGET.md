@@ -34,6 +34,7 @@ winget install Microsoft.SQLServer.2022.Express
 winget install Microsoft.VisualStudioCode
 winget install Microsoft.SQLServerManagementStudio
 winget install Microsoft.AzureCLI
+winget install Bruno.Bruno
 winget install Postman.Postman
 winget install LINQPad.LINQPad
 winget install JetBrains.Toolbox
