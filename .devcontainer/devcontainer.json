@@ -175,7 +175,7 @@
 
   // Use 'postCreateCommand' to run commands after the container is created.
   // Uses workspaceFolder to ensure correct path regardless of mount configuration
-  "postCreateCommand": "sudo pwsh -File ${containerWorkspaceFolder}/post_devcontainer.ps1",
+  "postCreateCommand": "pwsh -File ${containerWorkspaceFolder}/post_devcontainer.ps1",
 
   // Use 'onCreateCommand' to install Aspire templates (replaces deprecated 'aspire' workload)
   "onCreateCommand": "dotnet new install Aspire.ProjectTemplates --force",
