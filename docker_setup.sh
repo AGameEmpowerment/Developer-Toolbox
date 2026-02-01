@@ -45,7 +45,7 @@ fi
 #region WireMock Certificate Setup
 echo -e "\n${CYAN}=== WireMock Certificate Setup ===${NC}"
 
-WIREMOCK_KEYSTORE="${CERTS_DIR}/wiremock.pfx"
+WIREMOCK_KEYSTORE="${CERTS_DIR}/wiremock.jks"
 GENERATE_CERT_SCRIPT="${CERTS_DIR}/generate-wiremock-cert.sh"
 
 if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then

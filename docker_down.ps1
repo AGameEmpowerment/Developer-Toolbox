@@ -56,11 +56,8 @@ if ($CleanCerts -or $CleanAll) {
 
     # Remove certificate files
     $certFiles = @(
-        (Join-Path $CertsDir "wiremock.pfx"),
-        (Join-Path $CertsDir "wiremock.crt"),
-        (Join-Path $CertsDir "wiremock.key"),
-        (Join-Path $CertsDir "wiremock.conf"),
         (Join-Path $CertsDir "wiremock.jks"),
+        (Join-Path $CertsDir "wiremock.crt"),
         (Join-Path $CertsDir "truststore.jks")
     )
 
@@ -90,7 +87,7 @@ Write-Host "`n=== Teardown Complete ===" -ForegroundColor Green
 if (-not $CleanCerts -and -not $CleanEnv -and -not $CleanAll) {
     Write-Host ""
     Write-Host "Tip: Use these flags to clean ephemeral files:" -ForegroundColor Yellow
-    Write-Host "  -CleanCerts  : Remove WireMock certificates (*.pfx, *.crt, *.key, etc.)" -ForegroundColor Gray
+    Write-Host "  -CleanCerts  : Remove WireMock certificates (wiremock.jks, wiremock.crt)" -ForegroundColor Gray
     Write-Host "  -CleanEnv    : Remove .env file (will be regenerated on next setup)" -ForegroundColor Gray
     Write-Host "  -CleanAll    : Remove all ephemeral files (certs + .env)" -ForegroundColor Gray
 }

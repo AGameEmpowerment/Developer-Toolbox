@@ -422,8 +422,5 @@ FodyWeavers.xsd
 
 # WireMock TLS certificates (generated, contain private keys)
 containers/certs/*.jks
-containers/certs/*.pfx
 containers/certs/*.crt
-containers/certs/*.key
-containers/certs/*.conf
 containers/certs/truststore.*
