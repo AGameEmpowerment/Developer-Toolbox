@@ -145,6 +145,10 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
     docker compose --env-file "$EnvFile" -f "$ContainersDir/docker-compose-common.yml" -p dev_common_shared up -d
     #docker compose --env-file "$EnvFile" -f "$ContainersDir/docker-compose.yml" -p example up -d
 
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Docker compose failed with exit code $LASTEXITCODE."
+        exit $LASTEXITCODE
+    }
     Write-Host "Docker containers started." -ForegroundColor Green
 } else {
     Write-Error "Docker is not installed or not in PATH."
