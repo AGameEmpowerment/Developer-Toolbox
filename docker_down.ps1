@@ -39,25 +39,39 @@ if ($CleanCerts -or $CleanAll) {
     Write-Host "`n=== Cleaning WireMock Certificates ===" -ForegroundColor Cyan
 
     # Remove certificate from Windows trusted root store
-    Write-Host "Removing WireMock certificate from Windows trusted root store..." -ForegroundColor Yellow
-    $trustedCerts = Get-ChildItem -Path Cert:\CurrentUser\Root | Where-Object { $_.Subject -like "*CN=localhost*OU=Development*" }
-    if ($trustedCerts) {
-        foreach ($cert in $trustedCerts) {
-            try {
-                Remove-Item -Path "Cert:\CurrentUser\Root\$($cert.Thumbprint)" -Force
-                Write-Host "  Removed from trust store: $($cert.Thumbprint)" -ForegroundColor Gray
-            } catch {
-                Write-Warning "Failed to remove certificate from trust store: $_"
+    if ($IsWindows) {
+        Write-Host "Removing WireMock certificate from Windows trusted root store..." -ForegroundColor Yellow
+        try {
+            $store = [System.Security.Cryptography.X509Certificates.X509Store]::new("Root", "CurrentUser")
+            $store.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+
+            $trustedCerts = $store.Certificates | Where-Object { $_.Subject -like "*CN=localhost*OU=Development*" }
+            if ($trustedCerts -and $trustedCerts.Count -gt 0) {
+                foreach ($cert in $trustedCerts) {
+                    $store.Remove($cert)
+                    Write-Host "  Removed from trust store: $($cert.Thumbprint)" -ForegroundColor Gray
+                }
+            } else {
+                Write-Host "  No WireMock certificates found in trust store." -ForegroundColor Gray
+            }
+        } catch {
+            Write-Warning "Failed to remove certificate from trust store: $($_.Exception.Message)"
+        } finally {
+            if ($store) {
+                $store.Close()
             }
         }
     } else {
-        Write-Host "  No WireMock certificates found in trust store." -ForegroundColor Gray
+        Write-Host "  Skipping trust store cleanup (Windows only)." -ForegroundColor Gray
     }
 
     # Remove certificate files
     $certFiles = @(
-        (Join-Path $CertsDir "wiremock.jks"),
+        (Join-Path $CertsDir "wiremock.pfx"),
         (Join-Path $CertsDir "wiremock.crt"),
+        (Join-Path $CertsDir "wiremock.key"),
+        (Join-Path $CertsDir "wiremock.conf"),
+        (Join-Path $CertsDir "wiremock.jks"),
         (Join-Path $CertsDir "truststore.jks")
     )
 
@@ -87,7 +101,7 @@ Write-Host "`n=== Teardown Complete ===" -ForegroundColor Green
 if (-not $CleanCerts -and -not $CleanEnv -and -not $CleanAll) {
     Write-Host ""
     Write-Host "Tip: Use these flags to clean ephemeral files:" -ForegroundColor Yellow
-    Write-Host "  -CleanCerts  : Remove WireMock certificates (wiremock.jks, wiremock.crt)" -ForegroundColor Gray
+    Write-Host "  -CleanCerts  : Remove WireMock certificates (*.pfx, *.crt, *.key, etc.)" -ForegroundColor Gray
     Write-Host "  -CleanEnv    : Remove .env file (will be regenerated on next setup)" -ForegroundColor Gray
     Write-Host "  -CleanAll    : Remove all ephemeral files (certs + .env)" -ForegroundColor Gray
 }
