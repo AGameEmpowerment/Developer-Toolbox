@@ -49,11 +49,11 @@ USER_PROMPT_TIMEOUT=30
 
 # Function to remove existing keystore files in preparation for regeneration
 remove_existing_keystore() {
-    echo -e "${YELLOW}Removing existing WireMock keystore and certificate...${NC}"
+    echo -e "${YELLOW}Preparing for keystore regeneration...${NC}"
     # Remove to ensure clean regeneration with new password
     rm -f "$WIREMOCK_KEYSTORE"
     rm -f "${CERTS_DIR}/wiremock.crt"
-    echo -e "${GRAY}Removed existing keystore and certificate files.${NC}"
+    echo -e "${GRAY}Cleaned up existing keystore artifacts.${NC}"
 }
 
 # Check for keystore/env mismatch scenario
@@ -71,7 +71,7 @@ if [[ "$ENV_FILE_WAS_CREATED" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
     if [[ -t 0 ]]; then
         read -t "$USER_PROMPT_TIMEOUT" -p "Choose option [1-3] (default: 1): " response
         read_status=$?
-        # Handle timeout (exit code 142) separately from empty input
+        # Handle timeout: read returns exit code > 128 when timeout occurs
         if [[ $read_status -gt 128 ]]; then
             echo -e "${GRAY}Timeout reached. Defaulting to option 1 (regenerate).${NC}"
             response="1"
