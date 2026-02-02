@@ -69,20 +69,19 @@ if [[ "$ENV_FILE_WAS_CREATED" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
     
     # Check if running in interactive mode
     if [[ -t 0 ]]; then
-        read -t "$USER_PROMPT_TIMEOUT" -p "Choose option [1-3] (default: 1): " response
+        read -t "$USER_PROMPT_TIMEOUT" -p "Choose option [1-3] (press Enter for default 1): " response
         read_status=$?
-        # Handle timeout: read returns exit code > 128 on timeout (typically 142 = 128 + SIGALRM)
+        # Handle timeout: read returns exit code > 128 on timeout (128 + 14 (SIGALRM) = 142)
         if [[ $read_status -gt 128 ]]; then
             echo -e "${GRAY}Timeout reached. Defaulting to option 1 (regenerate).${NC}"
             response="1"
         fi
+        # Handle empty input (user pressed Enter without typing)
+        response=${response:-1}
     else
         echo -e "${GRAY}Non-interactive mode detected. Defaulting to option 1 (regenerate).${NC}"
         response="1"
     fi
-    
-    # Handle empty input in interactive mode (user pressed Enter without typing)
-    response=${response:-1}
     
     case "$response" in
         1)
