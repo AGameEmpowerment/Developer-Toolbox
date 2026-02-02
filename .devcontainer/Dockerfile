@@ -9,4 +9,5 @@ FROM mcr.microsoft.com/devcontainers/dotnet:1-10.0
 # Yarn can still be installed via npm (npm install -g yarn) or corepack if needed.
 RUN rm -f /etc/apt/sources.list.d/yarn.list \
     && rm -f /etc/apt/keyrings/yarn.gpg \
-    && apt-get update
+    && apt-get update \
+    && rm -rf /var/lib/apt/lists/*
