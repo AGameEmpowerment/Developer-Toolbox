@@ -71,7 +71,7 @@ if [[ "$ENV_FILE_WAS_CREATED" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
     if [[ -t 0 ]]; then
         read -t "$USER_PROMPT_TIMEOUT" -p "Choose option [1-3] (press Enter for default 1): " response
         read_status=$?
-        # Handle timeout: read returns exit code > 128 on timeout (128 + 14 (SIGALRM) = 142)
+        # Handle timeout: bash read -t returns 142 on timeout (or > 128 for other timeout conditions)
         if [[ $read_status -gt 128 ]]; then
             echo -e "${GRAY}Timeout reached. Defaulting to option 1 (regenerate).${NC}"
             response="1"
