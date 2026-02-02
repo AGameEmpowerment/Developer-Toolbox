@@ -1,16 +1,19 @@
-name: "Copilot Setup Steps"
+name: "Copilot Setup Validation"
 
 on:
     workflow_dispatch:
     push:
         paths:
+            - .github/**
             - .github/workflows/copilot-setup-steps.yml
     pull_request:
         paths:
+            - .github/**
             - .github/workflows/copilot-setup-steps.yml
 
 jobs:
-    copilot-setup-steps:
+    validate-copilot-setup:
+        name: Validate Copilot Configuration
         runs-on: ubuntu-latest
 
         permissions:
@@ -20,20 +23,52 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v5
 
-            - uses: actions/setup-dotnet@v5
-              with:
-                dotnet-version: |
-                    8.x
-                    9.x
-                    10.x
-
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
                 node-version: '24.x'
 
-            # - name: npm install
-            #   run: npm ci
+            - name: Validate Copilot setup
+              run: node .github/scripts/validate-copilot-setup.js
 
-            # - name: dotnet restore
-            #   run: dotnet restore
+            - name: Check for required files
+              run: |
+                echo "Checking for required Copilot configuration files..."
+                
+                # Check main instructions file
+                if [ ! -f .github/copilot-instructions.md ]; then
+                  echo "❌ Missing .github/copilot-instructions.md"
+                  exit 1
+                fi
+                echo "✓ .github/copilot-instructions.md exists"
+                
+                # Check instructions directory
+                if [ ! -d .github/instructions ]; then
+                  echo "❌ Missing .github/instructions/ directory"
+                  exit 1
+                fi
+                echo "✓ .github/instructions/ directory exists"
+                
+                # Count instruction files
+                INSTRUCTION_COUNT=$(find .github/instructions -name "*.md" | wc -l)
+                echo "✓ Found $INSTRUCTION_COUNT instruction files"
+                
+                # Check for optional directories
+                if [ -d .github/agents ]; then
+                  AGENT_COUNT=$(find .github/agents -name "*.md" | wc -l)
+                  echo "ℹ Found $AGENT_COUNT agent files"
+                fi
+                
+                if [ -d .github/prompts ]; then
+                  PROMPT_COUNT=$(find .github/prompts -name "*.md" | wc -l)
+                  echo "ℹ Found $PROMPT_COUNT prompt files"
+                fi
+                
+                if [ -d .github/collections ]; then
+                  COLLECTION_COUNT=$(find .github/collections -name "*.yml" -o -name "*.md" | wc -l)
+                  echo "ℹ Found $COLLECTION_COUNT collection files"
+                fi
+                
+                echo ""
+                echo "✅ All required Copilot configuration files are in place!"
+                echo "Reference: https://gh.io/copilot-coding-agent-tips"
