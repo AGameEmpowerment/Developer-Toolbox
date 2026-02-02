@@ -1,4 +1,4 @@
-name: "Copilot Setup Validation"
+name: "Copilot Setup Steps"
 
 on:
     workflow_dispatch:
@@ -12,8 +12,8 @@ on:
             - .github/workflows/copilot-setup-steps.yml
 
 jobs:
-    validate-copilot-setup:
-        name: Validate Copilot Configuration
+    copilot-setup-steps:
+        name: Copilot Configuration
         runs-on: ubuntu-latest
 
         permissions:
@@ -25,15 +25,15 @@ jobs:
 
             - uses: actions/setup-dotnet@v5
               with:
-                  dotnet-version: |
-                      8.x
-                      9.x
-                      10.x
+                dotnet-version: |
+                    8.x
+                    9.x
+                    10.x
 
             - name: Setup Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: "24.x"
+                node-version: '24.x'
 
             - name: Validate Copilot setup
               run: node .github/scripts/validate-copilot-setup.js
