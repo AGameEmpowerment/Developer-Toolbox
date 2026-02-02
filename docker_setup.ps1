@@ -14,12 +14,16 @@ $EnvExampleFile = Join-Path $ContainersDir ".env.example"
 #region Environment Setup
 Write-Host "=== Environment Setup ===" -ForegroundColor Cyan
 
+# Track if .env was just created to detect potential keystore password mismatch
+$EnvFileJustCreated = $false
+
 # Create .env from .env.example if it doesn't exist
 if (-not (Test-Path $EnvFile)) {
     if (Test-Path $EnvExampleFile) {
         Write-Host "Creating .env from .env.example..." -ForegroundColor Yellow
         Copy-Item $EnvExampleFile $EnvFile
         Write-Host ".env file created." -ForegroundColor Green
+        $EnvFileJustCreated = $true
     } else {
         Write-Error ".env.example not found. Cannot create .env file."
         exit 1
@@ -77,7 +81,34 @@ if (-not (Test-Path $WireMockKeystore)) {
         Write-Warning "WireMock certificate script not found at: $GenerateCertScript"
     }
 } else {
-    Write-Host "WireMock keystore already exists. Skipping certificate generation." -ForegroundColor Gray
+    # Keystore exists - check for potential password mismatch
+    if ($EnvFileJustCreated) {
+        Write-Host "WireMock keystore already exists, but .env was just created from .env.example." -ForegroundColor Yellow
+        Write-Host "This may cause a password mismatch. Regenerating keystore to match .env password..." -ForegroundColor Yellow
+        
+        if (Test-Path $GenerateCertScript) {
+            # Read the password from the newly created .env file
+            $EnvPassword = $EnvValues['WIREMOCK_KEYSTORE_PASSWORD']
+            if (-not $EnvPassword) {
+                $EnvPassword = "changeit"  # Default from .env.example
+            }
+
+            # Regenerate keystore with the .env password
+            & $GenerateCertScript -KeystorePassword $EnvPassword -Force
+
+            if ($LASTEXITCODE -eq 0 -or (Test-Path $WireMockKeystore)) {
+                Write-Host "WireMock keystore regenerated to match .env password." -ForegroundColor Green
+            } else {
+                Write-Warning "Failed to regenerate WireMock keystore. HTTPS may not work."
+                Write-Warning "You can manually run: $GenerateCertScript -KeystorePassword `"$EnvPassword`" -Force"
+            }
+        } else {
+            Write-Warning "WireMock certificate script not found. Cannot regenerate keystore."
+            Write-Warning "Manual action needed: Either regenerate .env or regenerate the keystore."
+        }
+    } else {
+        Write-Host "WireMock keystore already exists. Skipping certificate generation." -ForegroundColor Gray
+    }
 }
 
 # Import certificate to Windows trusted root store for automatic trust
