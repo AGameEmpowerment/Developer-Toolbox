@@ -1,5 +1,10 @@
 # Setup Docker Services
 
+[CmdletBinding()]
+param(
+    [switch]$TrustCertificate
+)
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
@@ -111,55 +116,64 @@ if (-not (Test-Path $WireMockKeystore)) {
     }
 }
 
-# Import certificate to Windows trusted root store for automatic trust
+# Import certificate to Windows trusted root store for automatic trust (Windows only)
 $WireMockCert = Join-Path $CertsDir "wiremock.crt"
 if (Test-Path $WireMockCert) {
-    Write-Host "Importing WireMock certificate to Windows trusted root store..." -ForegroundColor Yellow
-
-    try {
-        # Load the certificate file so we can compare its thumbprint with any existing trusted certs
-        $fileCert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $WireMockCert
-    } catch {
-        Write-Warning "Failed to load WireMock certificate from '$WireMockCert': $_"
-        Write-Warning "Skipping trusted root import check. You may need to manually trust the certificate."
-        $fileCert = $null
-    }
-
-    # Find any existing WireMock certificates in the CurrentUser\Root store by subject
-    $existingCerts = Get-ChildItem -Path Cert:\CurrentUser\Root | Where-Object { $_.Subject -like "*CN=localhost*OU=Development*" }
-
-    if ($fileCert -and $existingCerts) {
-        # Check if any existing certificate has the same thumbprint as the file
-        $matchingCert = $existingCerts | Where-Object { $_.Thumbprint -eq $fileCert.Thumbprint }
-    } else {
-        $matchingCert = $null
-    }
-
-    if ($matchingCert) {
-        Write-Host "WireMock certificate already trusted in CurrentUser\Root store." -ForegroundColor Gray
-        Write-Host "  Thumbprint: $($fileCert.Thumbprint)" -ForegroundColor Gray
-    } else {
-        if ($existingCerts) {
-            Write-Host "Existing WireMock certificate(s) with subject 'CN=localhost, OU=Development' found with different thumbprint. Removing stale certificate(s)..." -ForegroundColor Yellow
-            foreach ($old in $existingCerts) {
-                try {
-                    Remove-Item -Path "Cert:\CurrentUser\Root\$($old.Thumbprint)" -Force
-                    Write-Host "  Removed old WireMock certificate with thumbprint $($old.Thumbprint)" -ForegroundColor Gray
-                } catch {
-                    Write-Warning "  Failed to remove old WireMock certificate with thumbprint $($old.Thumbprint): $_"
-                }
-            }
-        }
+    # Only attempt to import to Windows certificate store on Windows and if -TrustCertificate is specified
+    if ($IsWindows -and $TrustCertificate) {
+        Write-Host "Importing WireMock certificate to Windows trusted root store..." -ForegroundColor Yellow
 
         try {
-            $cert = Import-Certificate -FilePath $WireMockCert -CertStoreLocation Cert:\CurrentUser\Root
-            Write-Host "Certificate imported to CurrentUser\Root store." -ForegroundColor Green
-            Write-Host "  Thumbprint: $($cert.Thumbprint)" -ForegroundColor Gray
+            # Load the certificate file so we can compare its thumbprint with any existing trusted certs
+            $fileCert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $WireMockCert
         } catch {
-            Write-Warning "Failed to import certificate to trusted store: $_"
-            Write-Warning "You may need to run as Administrator or manually trust the certificate."
-            Write-Host "  Manual import: Import-Certificate -FilePath '$WireMockCert' -CertStoreLocation Cert:\CurrentUser\Root" -ForegroundColor Gray
+            Write-Warning "Failed to load WireMock certificate from '$WireMockCert': $_"
+            Write-Warning "Skipping trusted root import check. You may need to manually trust the certificate."
+            $fileCert = $null
         }
+
+        # Find any existing WireMock certificates in the CurrentUser\Root store by subject
+        $existingCerts = Get-ChildItem -Path Cert:\CurrentUser\Root | Where-Object { $_.Subject -like "*CN=localhost*OU=Development*" }
+
+        if ($fileCert -and $existingCerts) {
+            # Check if any existing certificate has the same thumbprint as the file
+            $matchingCert = $existingCerts | Where-Object { $_.Thumbprint -eq $fileCert.Thumbprint }
+        } else {
+            $matchingCert = $null
+        }
+
+        if ($matchingCert) {
+            Write-Host "WireMock certificate already trusted in CurrentUser\Root store." -ForegroundColor Gray
+            Write-Host "  Thumbprint: $($fileCert.Thumbprint)" -ForegroundColor Gray
+        } else {
+            if ($existingCerts) {
+                Write-Host "Existing WireMock certificate(s) with subject 'CN=localhost, OU=Development' found with different thumbprint. Removing stale certificate(s)..." -ForegroundColor Yellow
+                foreach ($old in $existingCerts) {
+                    try {
+                        Remove-Item -Path "Cert:\CurrentUser\Root\$($old.Thumbprint)" -Force
+                        Write-Host "  Removed old WireMock certificate with thumbprint $($old.Thumbprint)" -ForegroundColor Gray
+                    } catch {
+                        Write-Warning "  Failed to remove old WireMock certificate with thumbprint $($old.Thumbprint): $_"
+                    }
+                }
+            }
+
+            try {
+                $cert = Import-Certificate -FilePath $WireMockCert -CertStoreLocation Cert:\CurrentUser\Root
+                Write-Host "Certificate imported to CurrentUser\Root store." -ForegroundColor Green
+                Write-Host "  Thumbprint: $($cert.Thumbprint)" -ForegroundColor Gray
+            } catch {
+                Write-Warning "Failed to import certificate to trusted store: $_"
+                Write-Warning "You may need to run as Administrator or manually trust the certificate."
+                Write-Host "  Manual import: Import-Certificate -FilePath '$WireMockCert' -CertStoreLocation Cert:\CurrentUser\Root" -ForegroundColor Gray
+            }
+        }
+    } elseif ($IsWindows) {
+        Write-Host "WireMock certificate generated at: $WireMockCert" -ForegroundColor Gray
+        Write-Host "To trust the certificate on Windows, run: .\docker_setup.ps1 -TrustCertificate" -ForegroundColor Yellow
+    } else {
+        Write-Host "WireMock certificate generated at: $WireMockCert" -ForegroundColor Gray
+        Write-Host "To trust the certificate on Linux/macOS, you may need to add it to your system's CA trust store." -ForegroundColor Yellow
     }
 } else {
     Write-Warning "WireMock certificate not found. HTTPS clients may not trust the server."
