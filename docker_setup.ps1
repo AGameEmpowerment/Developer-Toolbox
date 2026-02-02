@@ -1,9 +1,7 @@
 # Setup Docker Services
 
 [CmdletBinding()]
-param(
-    [switch]$TrustCertificate
-)
+param()
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -90,7 +88,7 @@ if (-not (Test-Path $WireMockKeystore)) {
     if ($EnvFileJustCreated) {
         Write-Host "WireMock keystore already exists, but .env was just created from .env.example." -ForegroundColor Yellow
         Write-Host "This may cause a password mismatch. Regenerating keystore to match .env password..." -ForegroundColor Yellow
-        
+
         if (Test-Path $GenerateCertScript) {
             # Read the password from the newly created .env file
             $EnvPassword = $EnvValues['WIREMOCK_KEYSTORE_PASSWORD']
@@ -119,8 +117,8 @@ if (-not (Test-Path $WireMockKeystore)) {
 # Import certificate to Windows trusted root store for automatic trust (Windows only)
 $WireMockCert = Join-Path $CertsDir "wiremock.crt"
 if (Test-Path $WireMockCert) {
-    # Only attempt to import to Windows certificate store on Windows and if -TrustCertificate is specified
-    if ($IsWindows -and $TrustCertificate) {
+    # Always attempt to import to Windows certificate store on Windows
+    if ($IsWindows) {
         Write-Host "Importing WireMock certificate to Windows trusted root store..." -ForegroundColor Yellow
 
         try {
@@ -168,9 +166,6 @@ if (Test-Path $WireMockCert) {
                 Write-Host "  Manual import: Import-Certificate -FilePath '$WireMockCert' -CertStoreLocation Cert:\CurrentUser\Root" -ForegroundColor Gray
             }
         }
-    } elseif ($IsWindows) {
-        Write-Host "WireMock certificate generated at: $WireMockCert" -ForegroundColor Gray
-        Write-Host "To trust the certificate on Windows, run: .\docker_setup.ps1 -TrustCertificate" -ForegroundColor Yellow
     } else {
         Write-Host "WireMock certificate generated at: $WireMockCert" -ForegroundColor Gray
         Write-Host "To trust the certificate on Linux/macOS, you may need to add it to your system's CA trust store." -ForegroundColor Yellow

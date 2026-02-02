@@ -29,6 +29,7 @@ sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keyc
 ```
 
 The setup scripts will:
+
 1. Generate the keystore and certificate if not present
 2. Create `.env` from `.env.example` with a random password
 3. Import the certificate to the system trust store (Windows and Linux only; macOS requires manual import - see above)
@@ -39,11 +40,13 @@ The setup scripts will:
 If you need to regenerate certificates manually:
 
 **Windows (PowerShell):**
+
 ```powershell
 .\Generate-WireMockCert.ps1 -Force -KeystorePassword "mypassword"
 ```
 
 **Linux/macOS/WSL (Bash):**
+
 ```bash
 ./generate-wiremock-cert.sh -f -p "mypassword"
 ```
@@ -60,12 +63,12 @@ curl https://localhost:10443/__admin/health
 
 ## Files
 
-| File | Description |
-|------|-------------|
-| `Generate-WireMockCert.ps1` | PowerShell script to generate keystore and certificate (Windows) |
-| `generate-wiremock-cert.sh` | Bash script to generate keystore and certificate (Linux/macOS/WSL) |
-| `wiremock.jks` | Java KeyStore containing the private key and certificate (generated) |
-| `wiremock.crt` | Public certificate in PEM format for client trust (generated) |
+| File                        | Description                                                          |
+| --------------------------- | -------------------------------------------------------------------- |
+| `Generate-WireMockCert.ps1` | PowerShell script to generate keystore and certificate (Windows)     |
+| `generate-wiremock-cert.sh` | Bash script to generate keystore and certificate (Linux/macOS/WSL)   |
+| `wiremock.jks`              | Java KeyStore containing the private key and certificate (generated) |
+| `wiremock.crt`              | Public certificate in PEM format for client trust (generated)        |
 
 ## Certificate Details
 
@@ -73,10 +76,10 @@ The generated certificate includes:
 
 - **CN (Common Name)**: `localhost`
 - **SANs (Subject Alternative Names)**:
-  - `dns:localhost`
-  - `dns:wiremock`
-  - `dns:host.docker.internal`
-  - `ip:127.0.0.1`
+    - `dns:localhost`
+    - `dns:wiremock`
+    - `dns:host.docker.internal`
+    - `ip:127.0.0.1`
 - **Validity**: 10 years (default)
 - **Key Algorithm**: RSA 2048-bit
 
@@ -86,7 +89,7 @@ The generated certificate includes:
 
 #### Windows
 
-When you run `docker_setup.ps1`, the WireMock certificate is **automatically imported** into your Windows `CurrentUser\Root` certificate store. This means:
+When you run `docker_setup.ps1`, the WireMock certificate is **automatically imported and approved** on your local Windows machine in the `CurrentUser\Root` certificate store. This means:
 
 - ✅ .NET `HttpClient` will trust the certificate automatically
 - ✅ Browsers (Edge, Chrome) will trust the certificate
@@ -97,7 +100,7 @@ When you run `docker_down.ps1 -CleanCerts` or `-CleanAll`, the certificate is au
 
 #### Linux/macOS/WSL/Devcontainer
 
-When you run `docker_setup.sh`, the WireMock certificate is **automatically imported** into the system CA trust store:
+When you run `docker_setup.sh`, the WireMock certificate is **automatically imported and approved** on your local Linux machine in the system CA trust store:
 
 - ✅ Debian/Ubuntu: `/usr/local/share/ca-certificates/`
 - ✅ RHEL/CentOS/Fedora: `/etc/pki/ca-trust/source/anchors/`
@@ -205,11 +208,11 @@ export NODE_EXTRA_CA_CERTS=/path/to/containers/certs/wiremock.crt
 Or in your code:
 
 ```javascript
-const https = require('https');
-const fs = require('fs');
+const https = require("https");
+const fs = require("fs");
 
 const agent = new https.Agent({
-  ca: fs.readFileSync('./certs/wiremock.crt')
+    ca: fs.readFileSync("./certs/wiremock.crt"),
 });
 
 // Use agent in fetch/axios/http requests
@@ -232,12 +235,14 @@ curl --cacert ./certs/wiremock.crt https://localhost:10443/__admin/health
 To regenerate certificates (e.g., after expiry or changing password):
 
 **Windows:**
+
 ```powershell
 .\docker_down.ps1 -CleanCerts
 .\docker_setup.ps1
 ```
 
 **Linux/macOS/WSL:**
+
 ```bash
 ./docker_down.sh --clean-certs
 ./docker_setup.sh
@@ -246,11 +251,13 @@ To regenerate certificates (e.g., after expiry or changing password):
 Or manually with a custom password:
 
 **Windows:**
+
 ```powershell
 .\Generate-WireMockCert.ps1 -Force -KeystorePassword "newpassword"
 ```
 
 **Linux/macOS/WSL:**
+
 ```bash
 ./generate-wiremock-cert.sh -f -p "newpassword"
 ```
@@ -259,10 +266,10 @@ Remember to update `WIREMOCK_KEYSTORE_PASSWORD` in your `.env` file if regenerat
 
 ## Ports
 
-| Port | Protocol | Description |
-|------|----------|-------------|
-| 10080 | HTTP | WireMock HTTP endpoint (backward compatibility) |
-| 10443 | HTTPS | WireMock HTTPS endpoint with TLS |
+| Port  | Protocol | Description                                     |
+| ----- | -------- | ----------------------------------------------- |
+| 10080 | HTTP     | WireMock HTTP endpoint (backward compatibility) |
+| 10443 | HTTPS    | WireMock HTTPS endpoint with TLS                |
 
 ## Troubleshooting
 
@@ -277,8 +284,8 @@ Use `--cacert ./certs/wiremock.crt` or `-k` to skip verification (dev only).
 ### Container fails to start
 
 1. Ensure `wiremock.jks` exists:
-   - Windows: Run `.\docker_setup.ps1` or `.\Generate-WireMockCert.ps1`
-   - Linux: Run `./docker_setup.sh` or `./generate-wiremock-cert.sh`
+    - Windows: Run `.\docker_setup.ps1` or `.\Generate-WireMockCert.ps1`
+    - Linux: Run `./docker_setup.sh` or `./generate-wiremock-cert.sh`
 2. Verify `WIREMOCK_KEYSTORE_PASSWORD` in `.env` matches the keystore password
 3. Check Docker logs: `docker logs Wiremock`
 
@@ -287,11 +294,13 @@ Use `--cacert ./certs/wiremock.crt` or `-k` to skip verification (dev only).
 **Windows:** Install Java JDK from [Adoptium](https://adoptium.net/) or set `JAVA_HOME` environment variable.
 
 **Linux (Debian/Ubuntu):**
+
 ```bash
 sudo apt install default-jdk
 ```
 
 **Linux (Fedora/RHEL):**
+
 ```bash
 sudo dnf install java-latest-openjdk-devel
 ```
