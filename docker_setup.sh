@@ -21,11 +21,11 @@ ENV_EXAMPLE_FILE="${CONTAINERS_DIR}/.env.example"
 #region Environment Setup
 echo -e "${CYAN}=== Environment Setup ===${NC}"
 
-ENV_FILE_MISSING=false
+ENV_FILE_WAS_CREATED=false
 
 # Create .env from .env.example if it doesn't exist
 if [[ ! -f "$ENV_FILE" ]]; then
-    ENV_FILE_MISSING=true
+    ENV_FILE_WAS_CREATED=true
     if [[ -f "$ENV_EXAMPLE_FILE" ]]; then
         echo -e "${YELLOW}Creating .env from .env.example...${NC}"
         cp "$ENV_EXAMPLE_FILE" "$ENV_FILE"
@@ -46,8 +46,17 @@ echo -e "\n${CYAN}=== WireMock Certificate Setup ===${NC}"
 WIREMOCK_KEYSTORE="${CERTS_DIR}/wiremock.jks"
 GENERATE_CERT_SCRIPT="${CERTS_DIR}/generate-wiremock-cert.sh"
 
+# Function to regenerate keystore
+regenerate_keystore() {
+    echo -e "${YELLOW}Regenerating WireMock keystore and updating .env...${NC}"
+    # Remove existing keystore and certificate
+    rm -f "$WIREMOCK_KEYSTORE"
+    rm -f "${CERTS_DIR}/wiremock.crt"
+    echo -e "${GRAY}Removed existing keystore and certificate.${NC}"
+}
+
 # Check for keystore/env mismatch scenario
-if [[ "$ENV_FILE_MISSING" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
+if [[ "$ENV_FILE_WAS_CREATED" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
     echo -e "${YELLOW}Warning: .env file was missing, but WireMock keystore already exists.${NC}"
     echo -e "${YELLOW}The keystore password in the newly created .env file may not match the existing keystore.${NC}"
     echo ""
@@ -56,18 +65,21 @@ if [[ "$ENV_FILE_MISSING" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
     echo -e "  2. Manually update .env with the correct WIREMOCK_KEYSTORE_PASSWORD"
     echo -e "  3. Continue with potential password mismatch (WireMock may fail to start)"
     echo ""
-    read -p "Choose option [1-3] (default: 1): " response
+    
+    # Check if running in interactive mode
+    if [[ -t 0 ]]; then
+        read -t 30 -p "Choose option [1-3] (default: 1): " response || response="1"
+    else
+        echo -e "${GRAY}Non-interactive mode detected. Defaulting to option 1 (regenerate).${NC}"
+        response="1"
+    fi
     
     # Default to option 1 if empty
     response=${response:-1}
     
     case "$response" in
         1)
-            echo -e "${YELLOW}Regenerating WireMock keystore and updating .env...${NC}"
-            # Remove existing keystore and certificate
-            rm -f "$WIREMOCK_KEYSTORE"
-            rm -f "${CERTS_DIR}/wiremock.crt"
-            echo -e "${GRAY}Removed existing keystore and certificate.${NC}"
+            regenerate_keystore
             ;;
         2)
             echo -e "${YELLOW}Skipping keystore regeneration.${NC}"
@@ -81,11 +93,7 @@ if [[ "$ENV_FILE_MISSING" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
             ;;
         *)
             echo -e "${RED}Invalid option. Defaulting to option 1 (regenerate).${NC}"
-            echo -e "${YELLOW}Regenerating WireMock keystore and updating .env...${NC}"
-            # Remove existing keystore and certificate
-            rm -f "$WIREMOCK_KEYSTORE"
-            rm -f "${CERTS_DIR}/wiremock.crt"
-            echo -e "${GRAY}Removed existing keystore and certificate.${NC}"
+            regenerate_keystore
             ;;
     esac
 fi
