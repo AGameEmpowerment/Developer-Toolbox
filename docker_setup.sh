@@ -45,14 +45,15 @@ echo -e "\n${CYAN}=== WireMock Certificate Setup ===${NC}"
 
 WIREMOCK_KEYSTORE="${CERTS_DIR}/wiremock.jks"
 GENERATE_CERT_SCRIPT="${CERTS_DIR}/generate-wiremock-cert.sh"
+USER_PROMPT_TIMEOUT=30
 
-# Function to regenerate keystore
-regenerate_keystore() {
-    echo -e "${YELLOW}Regenerating WireMock keystore and updating .env...${NC}"
-    # Remove existing keystore and certificate
+# Function to remove existing keystore files in preparation for regeneration
+remove_existing_keystore() {
+    echo -e "${YELLOW}Removing existing WireMock keystore and certificate...${NC}"
+    # Remove to ensure clean regeneration with new password
     rm -f "$WIREMOCK_KEYSTORE"
     rm -f "${CERTS_DIR}/wiremock.crt"
-    echo -e "${GRAY}Removed existing keystore and certificate.${NC}"
+    echo -e "${GRAY}Removed existing keystore and certificate files.${NC}"
 }
 
 # Check for keystore/env mismatch scenario
@@ -68,7 +69,13 @@ if [[ "$ENV_FILE_WAS_CREATED" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
     
     # Check if running in interactive mode
     if [[ -t 0 ]]; then
-        read -t 30 -p "Choose option [1-3] (default: 1): " response || response="1"
+        read -t "$USER_PROMPT_TIMEOUT" -p "Choose option [1-3] (default: 1): " response
+        read_status=$?
+        # Handle timeout (exit code 142) separately from empty input
+        if [[ $read_status -gt 128 ]]; then
+            echo -e "${GRAY}Timeout reached. Defaulting to option 1 (regenerate).${NC}"
+            response="1"
+        fi
     else
         echo -e "${GRAY}Non-interactive mode detected. Defaulting to option 1 (regenerate).${NC}"
         response="1"
@@ -79,7 +86,8 @@ if [[ "$ENV_FILE_WAS_CREATED" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
     
     case "$response" in
         1)
-            regenerate_keystore
+            echo -e "${YELLOW}Will regenerate WireMock keystore and update .env...${NC}"
+            remove_existing_keystore
             ;;
         2)
             echo -e "${YELLOW}Skipping keystore regeneration.${NC}"
@@ -93,7 +101,8 @@ if [[ "$ENV_FILE_WAS_CREATED" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
             ;;
         *)
             echo -e "${RED}Invalid option. Defaulting to option 1 (regenerate).${NC}"
-            regenerate_keystore
+            echo -e "${YELLOW}Will regenerate WireMock keystore and update .env...${NC}"
+            remove_existing_keystore
             ;;
     esac
 fi
