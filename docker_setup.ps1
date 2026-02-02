@@ -1,5 +1,9 @@
 # Setup Docker Services
 
+param(
+    [switch]$TrustCertificate = $false
+)
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
