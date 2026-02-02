@@ -21,12 +21,16 @@ ENV_EXAMPLE_FILE="${CONTAINERS_DIR}/.env.example"
 #region Environment Setup
 echo -e "${CYAN}=== Environment Setup ===${NC}"
 
+# Track if .env was just created to detect potential keystore password mismatch
+ENV_FILE_JUST_CREATED=false
+
 # Create .env from .env.example if it doesn't exist
 if [[ ! -f "$ENV_FILE" ]]; then
     if [[ -f "$ENV_EXAMPLE_FILE" ]]; then
         echo -e "${YELLOW}Creating .env from .env.example...${NC}"
         cp "$ENV_EXAMPLE_FILE" "$ENV_FILE"
         echo -e "${GREEN}.env file created.${NC}"
+        ENV_FILE_JUST_CREATED=true
     else
         echo -e "${RED}Error: .env.example not found. Cannot create .env file.${NC}"
         exit 1
@@ -74,7 +78,34 @@ if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then
         echo -e "${YELLOW}Warning: WireMock certificate script not found at: ${GENERATE_CERT_SCRIPT}${NC}"
     fi
 else
-    echo -e "${GRAY}WireMock keystore already exists. Skipping certificate generation.${NC}"
+    # Keystore exists - check for potential password mismatch
+    if [[ "$ENV_FILE_JUST_CREATED" == "true" ]]; then
+        echo -e "${YELLOW}WireMock keystore already exists, but .env was just created from .env.example.${NC}"
+        echo -e "${YELLOW}This may cause a password mismatch. Regenerating keystore to match .env password...${NC}"
+        
+        if [[ -f "$GENERATE_CERT_SCRIPT" ]]; then
+            # Read the password from the newly created .env file
+            ENV_PASSWORD=$(grep 'WIREMOCK_KEYSTORE_PASSWORD=' "$ENV_FILE" | sed 's/WIREMOCK_KEYSTORE_PASSWORD="\?\([^"]*\)"\?/\1/')
+            if [[ -z "$ENV_PASSWORD" ]]; then
+                ENV_PASSWORD="changeit"  # Default from .env.example
+            fi
+
+            # Regenerate keystore with the .env password
+            bash "$GENERATE_CERT_SCRIPT" -p "$ENV_PASSWORD" -f
+
+            if [[ -f "$WIREMOCK_KEYSTORE" ]]; then
+                echo -e "${GREEN}WireMock keystore regenerated to match .env password.${NC}"
+            else
+                echo -e "${YELLOW}Warning: Failed to regenerate WireMock keystore. HTTPS may not work.${NC}"
+                echo -e "${YELLOW}You can manually run: ${GENERATE_CERT_SCRIPT} -p \"${ENV_PASSWORD}\" -f${NC}"
+            fi
+        else
+            echo -e "${YELLOW}Warning: WireMock certificate script not found. Cannot regenerate keystore.${NC}"
+            echo -e "${YELLOW}Manual action needed: Either regenerate .env or regenerate the keystore.${NC}"
+        fi
+    else
+        echo -e "${GRAY}WireMock keystore already exists. Skipping certificate generation.${NC}"
+    fi
 fi
 
 # Import certificate to system trust store
