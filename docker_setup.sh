@@ -21,8 +21,11 @@ ENV_EXAMPLE_FILE="${CONTAINERS_DIR}/.env.example"
 #region Environment Setup
 echo -e "${CYAN}=== Environment Setup ===${NC}"
 
+ENV_FILE_MISSING=false
+
 # Create .env from .env.example if it doesn't exist
 if [[ ! -f "$ENV_FILE" ]]; then
+    ENV_FILE_MISSING=true
     if [[ -f "$ENV_EXAMPLE_FILE" ]]; then
         echo -e "${YELLOW}Creating .env from .env.example...${NC}"
         cp "$ENV_EXAMPLE_FILE" "$ENV_FILE"
@@ -42,6 +45,30 @@ echo -e "\n${CYAN}=== WireMock Certificate Setup ===${NC}"
 
 WIREMOCK_KEYSTORE="${CERTS_DIR}/wiremock.jks"
 GENERATE_CERT_SCRIPT="${CERTS_DIR}/generate-wiremock-cert.sh"
+
+# Check for keystore/env mismatch scenario
+if [[ "$ENV_FILE_MISSING" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
+    echo -e "${YELLOW}Warning: .env file was missing, but WireMock keystore already exists.${NC}"
+    echo -e "${YELLOW}The keystore password in the newly created .env file may not match the existing keystore.${NC}"
+    echo ""
+    echo -e "${CYAN}Options:${NC}"
+    echo -e "  1. Regenerate keystore and update .env (recommended for development)"
+    echo -e "  2. Manually update .env with the correct WIREMOCK_KEYSTORE_PASSWORD"
+    echo -e "  3. Continue with potential password mismatch (WireMock may fail to start)"
+    echo ""
+    read -p "Regenerate keystore? (Y/n) " response
+    
+    if [[ "$response" =~ ^[Nn]$ ]]; then
+        echo -e "${YELLOW}Skipping keystore regeneration. Ensure WIREMOCK_KEYSTORE_PASSWORD in .env is correct.${NC}"
+        echo -e "${GRAY}WireMock keystore exists at: ${WIREMOCK_KEYSTORE}${NC}"
+    else
+        echo -e "${YELLOW}Regenerating WireMock keystore and updating .env...${NC}"
+        # Remove existing keystore and certificate
+        rm -f "$WIREMOCK_KEYSTORE"
+        rm -f "${CERTS_DIR}/wiremock.crt"
+        echo -e "${GRAY}Removed existing keystore and certificate.${NC}"
+    fi
+fi
 
 if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then
     if [[ -f "$GENERATE_CERT_SCRIPT" ]]; then
