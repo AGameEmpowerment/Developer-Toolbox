@@ -419,3 +419,8 @@ FodyWeavers.xsd
 
 #merge files
 *.orig
+
+# WireMock TLS certificates (generated, contain private keys)
+containers/certs/*.jks
+containers/certs/*.crt
+containers/certs/truststore.*

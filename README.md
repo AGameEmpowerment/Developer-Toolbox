@@ -1,187 +1,169 @@
-# Developer Toolbox: Environment Setup Guide
+# Developer Toolbox: Project Template and Environment Setup
 
-A standardized toolkit like this delivers value for both management and developers: it ensures consistent, compliant environments that reduce onboarding time, minimize configuration errors, and support reliable software delivery. Management benefits from improved governance, easier tracking, and integrated security, while developers gain faster setup, fewer environment-related bugs, and streamlined workflows. This alignment accelerates productivity and quality across the team.
+This repository is a starter template for building developer-ready environments and baseline project scaffolding. It is intentionally biased toward Microsoft-centric, Azure-first workloads (ASP.NET, Azure Functions, SQL Server, Terraform, Docker, PowerShell) while still supporting Node.js/React and general polyglot tooling. It is best aligned with:
 
-## Quick Start: Local Development Environment
+- .NET and ASP.NET Core services and APIs
+- Azure-hosted solutions (Azure CLI, Azure Developer CLI, Bicep)
+- Containerized local dev dependencies (SQL Server, Service Bus, SMTP, WireMock)
+- CI/CD with Azure DevOps or GitHub workflows
+- Infrastructure-as-Code with Terraform
 
-Follow these steps to set up your development environment using the repository's project files. This guide covers both local and containerized workflows.
+If your project is not Azure/.NET-centric, you can still use this template, but you should selectively remove tooling, containers, and instructions that do not apply.
 
----
+## What this template includes
 
-### 1. Prerequisites
+- Dev Container configuration with common workloads: .NET 8/9, Node.js LTS, Azure CLI, Azure Developer CLI, Docker, Terraform, PowerShell, Python, Java (minimal), GitHub CLI, and a curated VS Code extension pack.
+- Containerized local dependencies via Docker Compose.
+- DevOps scaffolding, pipeline placeholders, and manifests.
+- Default repository standards (CODEOWNERS, CONTRIBUTING, CHANGELOG, LICENSE, .editorconfig, .gitattributes, .gitignore).
 
-- **Windows 10/11** (recommended)
-- **PowerShell (latest)**
-- **.NET 8/9 SDK**
-- **Visual Studio 2022 (any edition)**
-- **Git Client**
-- **Docker Desktop** (for container workflows)
-- **SQL Server Instance** (local or containerized)
+## Choose your setup path
 
-Optional but recommended:
-- Visual Studio Code
-- SQL Server Management Studio
-- Azure CLI & Functions Core Tools
-- Postman, Bruno, LINQPad, JetBrains Toolbox, Notepad++
+Use one of the options below based on your environment and preferences.
 
----
+Install command references:
 
-### 2. Clone the Repository
+- [INSTALL-WINDOWS-WINGET.md](INSTALL-WINDOWS-WINGET.md) – Windows-only winget commands for required and optional tools.
+- [INSTALL-LINUX-APT.md](INSTALL-LINUX-APT.md) – Linux-only apt and npm commands for required and optional tools.
 
-```pwsh
-git clone https://github.com/AGameEmpowerment/Developer-Toolbox.git
-cd Developer-Toolbox
-```
+### Option A: Dev Containers (recommended)
 
----
+Use this if you want a consistent, preconfigured environment without installing every tool locally.
 
-### 3. Configure PowerShell Script Execution
+1. Install Docker Desktop.
+2. Install Visual Studio Code and the Dev Containers extension.
+3. Open this repository in VS Code and select “Reopen in Container.”
+4. The container will run post-create setup and install the tools described in the dev container configuration.
 
-Run as administrator:
+This path follows the workloads defined in .devcontainer/devcontainer.json and includes Azure, .NET, Node.js, Terraform, and Docker tooling out of the box.
 
-```pwsh
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
-Set-ExecutionPolicy -ExecutionPolicy Unrestricted -Scope CurrentUser
-```
+### Option B: Local setup on Windows (winget)
 
----
+This is the fastest local setup for Windows 10/11.
 
-### 4. Install Required Tools (Windows)
+1. Clone the repository.
+2. Install tools using winget:
+    - .NET SDK 8, 9, 10
+    - OpenJDK
+    - PowerShell
+    - Git
+    - Docker Desktop
+    - Visual Studio 2022
+    - SQL Server Express (optional if using containers)
 
-Use `winget` to install dependencies:
+3. Start the containerized dependencies:
+    - Run docker_setup.ps1
 
-```pwsh
-winget install Microsoft.DotNet.SDK.8
-winget install Microsoft.DotNet.SDK.9
-winget install Microsoft.PowerShell
-winget install Git.Git
-winget install Docker.DockerDesktop
-winget install Microsoft.VisualStudio.2022.Community
-winget install Microsoft.SQLServer.2022.Express
-```
+4. Stop containers when finished:
+    - Run docker_down.ps1
 
----
+### Option C: Local setup on Linux (apt)
 
-### 5. Initialize Local Development Environment
+Use this if you want native tooling on Linux without Dev Containers.
 
-Run the setup script to start Docker containers and dependencies:
+1. Install prerequisites using apt:
+    - Git
+    - Docker Engine / Docker Compose
+    - PowerShell
+    - .NET SDK 8, 9, 10
+    - OpenJDK
+    - Node.js LTS (optional)
 
-```pwsh
-./docker_setup.ps1
-```
+2. Start the containerized dependencies:
+    - Run docker_setup.sh
 
-This will:
-- Build and start all containers defined in `containers/docker-compose-common.yml`
-- Set up SQL Server, Service Bus, smtp4dev, and other local services
-- Prepare example files and mappings for local use
+3. Stop containers when finished:
+    - Run docker_down.sh
 
-To stop containers:
-```pwsh
-./docker_down.ps1
-```
+### Option D: Node.js-focused setup (npm)
 
----
+Use this if you only need frontend tooling or Node.js-based automation.
 
-### 6. Database Initialization
+1. Install Node.js LTS (nvm or system package manager).
+2. Install project dependencies with npm.
+3. Run your Node.js workflow locally.
+4. Start containerized dependencies only if needed.
 
-Open the solution in Visual Studio and build to restore NuGet packages.
+## Database and local services
 
-This repository provides a local SQL Server instance via Docker (service name: `mssql`) that the init scripts will use to create the example database.
+The default Docker Compose setup runs a local SQL Server instance and other supporting services. The SQL Server container exposes localhost port 10433 and initializes a database named ProjectExample.
 
-To initialize the database using the provided compose setup:
+WireMock HTTPS certificate generation uses `keytool`, which is provided by a Java Development Kit (JDK). If you plan to generate WireMock certificates locally, install OpenJDK (recommended) and ensure `keytool` is available on your PATH.
 
-1. Ensure your environment contains the required variables (or copy `containers/.env.example` to `containers/.env`) and set `MSSQL_SA_PASSWORD`. The example file ships with a development-only password:
+Use the following example connection string for local development:
 
-	- `MSSQL_SA_PASSWORD="P@ssword123!"` (development only)
-
-2. The `mssql` service exposes SQL Server on localhost port `10433` (container port 1433). The database initialization script (`containers/mssql/db-init.sql`) creates a database named `ProjectExample` and the standard ASP.NET Core Identity tables.
-
-3. Example connection string for local development (use in `appsettings.json` or your project's secrets store):
-
-```text
 Server=127.0.0.1,10433;Database=ProjectExample;User Id=sa;Password=P@ssword123!;TrustServerCertificate=True;
-```
 
-> **⚠️ Security Warning**: The default password `P@ssword123!` is provided for **local development environments only** and must **never** be used in production. Keep secrets out of source control and use secure secret management solutions (for example, Azure Key Vault or HashiCorp Vault) for production deployments.
+Security note: the provided password is for local development only. Do not reuse it in production. Store secrets in your secret manager or environment configuration.
 
----
+## How to customize this template for your project
 
-### 7. Running Applications
+Use this checklist to adapt the template for your own repository.
 
-After building and initializing the database, you can run any application in the solution as needed.
+1. Update the root README and project metadata files.
+2. Keep or remove containers based on what your app needs.
+3. Keep or remove DevOps scaffolding based on your CI/CD platform.
+4. Decide whether to use Dev Containers or local tool installation.
+5. Update or replace the LICENSE and CODEOWNERS for your organization.
+6. Remove example content you do not want to maintain.
 
----
+Recommended priority for copying into a new repository:
 
-### 8. DevContainer Setup (VS Code)
+- High priority:
+    - .github (Copilot instructions, workflows, and repo automation)
+    - devops (pipelines, manifests, and structure)
+    - src (starting point for application code)
+    - .editorconfig, .gitattributes, .gitignore
+    - README, LICENSE, CODEOWNERS
+- Medium priority:
+    - containers and Docker scripts
+    - Visual Studio settings files
+    - authoring and contributing docs
+- Low priority:
+    - example content or sample solutions you do not need
 
-For reproducible environments and easy onboarding:
-1. Install Docker Desktop and Visual Studio Code.
-2. Install the VS Code extension: `ms-vscode-remote.remote-containers`.
-3. Open the project folder in VS Code and select "Reopen in Container".
-4. The devcontainer will build and start all required services automatically.
+## Dev Container workload summary
 
----
+The dev container is configured for the following workloads:
 
-### 9. Troubleshooting & Tips
+- .NET SDK 8/9 and wasm-tools workload
+- Node.js LTS with npm, yarn, and pnpm
+- Azure CLI, Azure Developer CLI, and Bicep
+- Docker-in-Docker for container workflows
+- Terraform and TFLint
+- PowerShell, Python, Git, GitHub CLI
+- Java 21 (minimal install for tooling)
 
-- If containers fail to start, ensure Docker Desktop is running and you have sufficient resources.
-- For database issues, check SQL Server logs in the container or local instance.
-- Use `Delete_Old_Git_Tags.ps1` to clean up old Git Repo tags if needed.
-- Use `Delete_Old_Docker_Tags.ps1` to clean up old Docker images/tags if needed.
-- For advanced configuration, review files in `containers/`, `devops/`, and `terraform/`.
+If you remove any of these tools from your project, update .devcontainer/devcontainer.json accordingly.
 
----
+## Documentation map
 
-### 10. Additional Resources
+Use the links below to find focused documentation in this repository. Each link includes a one-sentence description of what the document is for.
 
-- [Authors](AUTHORS.md)
-- [ChangeLog](CHANGELOG.md)
-- [Contributing](CONTRIBUTING.md)
-- [DevContainer Documentation](https://code.visualstudio.com/docs/devcontainers/containers)
+- [.github/readme.md](.github/readme.md) – Repository automation, Copilot configuration, and GitHub-specific guidance.
+- [containers/readme.md](containers/readme.md) – Docker Compose services and local dependency containers.
+- [containers/certs/readme.md](containers/certs/readme.md) – Certificate setup for HTTPS and WireMock scenarios.
+- [containers/extensions/readme.md](containers/extensions/readme.md) – VS Code extensions copied into container images.
+- [containers/mappings/readme.md](containers/mappings/readme.md) – Example mappings used by local container services.
+- [containers/\_\_files/readme.md](containers/__files/readme.md) – Example files used by local container services.
+- [devops/readme.md](devops/readme.md) – DevOps folder overview and how to use it in CI/CD.
+- [devops/manifest/readme.md](devops/manifest/readme.md) – Manifest templates and conventions for release artifacts.
+- [devops/pipelines/readme.md](devops/pipelines/readme.md) – CI/CD pipeline templates and conventions.
+- [devops/terraform/readme.md](devops/terraform/readme.md) – Terraform layout and infrastructure guidance.
+- [src/readme.md](src/readme.md) – Application source layout expectations and starter guidance.
 
----
+## Troubleshooting
 
-### 11. Resource Priority of inclusion in projects from the template repository
+- Ensure Docker Desktop or Docker Engine is running before starting containers.
+- If SQL Server does not start, check container logs and confirm the environment variables in containers/.env.
+- If WireMock certificate generation fails, verify OpenJDK is installed and `keytool` is available on PATH.
+- For script execution issues on Windows, set PowerShell execution policy to allow local scripts.
 
-The easiest option is to copy everything from this repository directly over into your new project repository. There should be little or no conflicts when doing this, be sure to exclude the `.git` folder. However, if you want to be more selective, here is the recommended priority order for including resources from this repository into your new project repository:
+## Additional resources
 
-1. **High Priority** (must include):
-   - `.github/` folder (GitHub Actions workflows and copilot configuration)
-      - `agents/` folder (Copilot configuration Select those configurations relevant to your project)
-      - `chatmodes/` folder (Copilot configuration Select those configurations relevant to your project)
-      - `collections/` folder (Copilot configuration Select those configurations relevant to your project)
-      - `instructions/` folder (Copilot configuration Select those configurations relevant to your project)
-      - `prompts/` folder (Copilot configuration Select those configurations relevant to your project)
-      - `workflows/copilot-setup-steps.yml` Copilot setup workflow
-      - `copilot-instructions.md` GitHub Copilot setup instructions (Based copilot instructions file, has redirect instructions to the `instructions/` folder)
-      - `dependabot.yml` for dependency updates
-   - `devops/` folder structure for (CI/CD pipelines and scripts)
-   - `src/` folder as starting point for application code
-   - `.editorconfig` standard coding styles
-   - `.gitattributes` file for consistent line endings across environments
-   - `.gitignore` file or latest from [github/gitignore](https://github.com/github/gitignore)
-   - `LICENSE` file (choose appropriate license for your project)
-   - `CODEOWNERS` file (Then update as needed for your team)
-   - `README.md` (customize for your project)
+- [AUTHORS.md](AUTHORS.md)
+- [CHANGELOG.md](CHANGELOG.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [Dev Containers documentation](https://code.visualstudio.com/docs/devcontainers/containers)
 
-2. **Medium Priority** (include as needed):
-   - `containers/` folder (Docker and container configurations for local development)
-   - `docker_setup.ps1` and `docker_down.ps1` scripts
-   - `.vsconfig` file (Visual Studio configuration)
-   - `Default-Visual-Studio-Settings.vssettings` file (Visual Studio settings)
-   - `setup_docker_container.ps1` script (if using Docker devcontainer setup)
-   - `Delete_Old_Git_Tags.ps1` and `Delete_Old_Docker_Tags.ps1` scripts
-   - `AUTHORS.md`, `CHANGELOG.md`, `CONTRIBUTING.md` files
-
-3. **Low Priority** (nice to have, include as needed):
-   - `.devcontainer/` folder (if using VS Code DevContainers)
-   - Any sample application code or configurations that are not relevant to your project
-     - Many of these will be found under the `.github/` folder for specific copilot configurations and instructions
-     - An Example project under the `src/` folder can also be excluded along with the two example solution files `Edu.Si.Example.sln` and `Edu.Si.Example.slnx`
-   - Documentation files that do not pertain to your specific project such as placement holder `README.md` files in subfolders
-
----
-
-## Summary
-
-This guide provides a clear, step-by-step process for setting up your development environment using the repository's scripts and container files. For further details, see documentation in the `devops/` and `containers/` folders.
+Built with accessibility in mind, but accessibility issues may still exist; please review and test with tools like Accessibility Insights.
