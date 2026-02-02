@@ -30,8 +30,13 @@ if (Get-Command dotnet -ErrorAction SilentlyContinue) {
 git config --global credential.useHttpPath true
 
 # Install Package Manager Support
-sudo apt install -y nuget
-# Uncomment the following line to install npm if Node.js development is required
+# Note: .NET SDK (already installed) includes NuGet functionality via 'dotnet' CLI
+# The standalone 'nuget' package is not needed for modern .NET development
+# If you need to install additional apt packages, run 'sudo apt-get update' first
+# because the devcontainer build clears /var/lib/apt/lists/* to reduce image size
+
+# Uncomment the following lines to install npm if Node.js development is required
+# sudo apt-get update
 # sudo apt install -y npm
 
 # Trust HTTPS developer certificate
