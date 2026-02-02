@@ -56,18 +56,38 @@ if [[ "$ENV_FILE_MISSING" == true ]] && [[ -f "$WIREMOCK_KEYSTORE" ]]; then
     echo -e "  2. Manually update .env with the correct WIREMOCK_KEYSTORE_PASSWORD"
     echo -e "  3. Continue with potential password mismatch (WireMock may fail to start)"
     echo ""
-    read -p "Regenerate keystore? (Y/n) " response
+    read -p "Choose option [1-3] (default: 1): " response
     
-    if [[ "$response" =~ ^[Nn]$ ]]; then
-        echo -e "${YELLOW}Skipping keystore regeneration. Ensure WIREMOCK_KEYSTORE_PASSWORD in .env is correct.${NC}"
-        echo -e "${GRAY}WireMock keystore exists at: ${WIREMOCK_KEYSTORE}${NC}"
-    else
-        echo -e "${YELLOW}Regenerating WireMock keystore and updating .env...${NC}"
-        # Remove existing keystore and certificate
-        rm -f "$WIREMOCK_KEYSTORE"
-        rm -f "${CERTS_DIR}/wiremock.crt"
-        echo -e "${GRAY}Removed existing keystore and certificate.${NC}"
-    fi
+    # Default to option 1 if empty
+    response=${response:-1}
+    
+    case "$response" in
+        1)
+            echo -e "${YELLOW}Regenerating WireMock keystore and updating .env...${NC}"
+            # Remove existing keystore and certificate
+            rm -f "$WIREMOCK_KEYSTORE"
+            rm -f "${CERTS_DIR}/wiremock.crt"
+            echo -e "${GRAY}Removed existing keystore and certificate.${NC}"
+            ;;
+        2)
+            echo -e "${YELLOW}Skipping keystore regeneration.${NC}"
+            echo -e "${CYAN}Please manually update WIREMOCK_KEYSTORE_PASSWORD in ${ENV_FILE}${NC}"
+            echo -e "${GRAY}WireMock keystore exists at: ${WIREMOCK_KEYSTORE}${NC}"
+            ;;
+        3)
+            echo -e "${YELLOW}Continuing with existing keystore and .env file.${NC}"
+            echo -e "${YELLOW}Warning: WireMock may fail to start if passwords don't match.${NC}"
+            echo -e "${GRAY}WireMock keystore exists at: ${WIREMOCK_KEYSTORE}${NC}"
+            ;;
+        *)
+            echo -e "${RED}Invalid option. Defaulting to option 1 (regenerate).${NC}"
+            echo -e "${YELLOW}Regenerating WireMock keystore and updating .env...${NC}"
+            # Remove existing keystore and certificate
+            rm -f "$WIREMOCK_KEYSTORE"
+            rm -f "${CERTS_DIR}/wiremock.crt"
+            echo -e "${GRAY}Removed existing keystore and certificate.${NC}"
+            ;;
+    esac
 fi
 
 if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then
