@@ -56,7 +56,12 @@ if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then
         if [[ -f "$WIREMOCK_KEYSTORE" ]]; then
             # Update .env with the generated password
             if grep -q 'WIREMOCK_KEYSTORE_PASSWORD=' "$ENV_FILE"; then
-                sed -i "s/WIREMOCK_KEYSTORE_PASSWORD=\"[^\"]*\"/WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"/" "$ENV_FILE"
+                # Use portable in-place edit (works on both GNU and BSD/macOS sed)
+                if [[ "$(uname)" == "Darwin" ]]; then
+                    sed -i '' "s/WIREMOCK_KEYSTORE_PASSWORD=\"[^\"]*\"/WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"/" "$ENV_FILE"
+                else
+                    sed -i "s/WIREMOCK_KEYSTORE_PASSWORD=\"[^\"]*\"/WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"/" "$ENV_FILE"
+                fi
             else
                 echo "WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"" >> "$ENV_FILE"
             fi

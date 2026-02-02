@@ -118,32 +118,40 @@ When you run `docker_down.sh --clean-certs` or `--clean-all`, the certificate is
 
 #### Windows (PowerShell)
 
+Run the following commands from the **repository root**:
+
 ```powershell
 # Import to CurrentUser (no admin required)
-Import-Certificate -FilePath .\certs\wiremock.crt -CertStoreLocation Cert:\CurrentUser\Root
+Import-Certificate -FilePath .\containers\certs\wiremock.crt -CertStoreLocation Cert:\CurrentUser\Root
 
 # Or import to LocalMachine (requires admin, trusts for all users)
-Import-Certificate -FilePath .\certs\wiremock.crt -CertStoreLocation Cert:\LocalMachine\Root
+Import-Certificate -FilePath .\containers\certs\wiremock.crt -CertStoreLocation Cert:\LocalMachine\Root
 ```
 
 #### Linux (Debian/Ubuntu)
 
+Run the following commands from the **repository root**:
+
 ```bash
-sudo cp ./certs/wiremock.crt /usr/local/share/ca-certificates/
+sudo cp ./containers/certs/wiremock.crt /usr/local/share/ca-certificates/
 sudo update-ca-certificates
 ```
 
 #### Linux (RHEL/CentOS/Fedora)
 
+Run the following commands from the **repository root**:
+
 ```bash
-sudo cp ./certs/wiremock.crt /etc/pki/ca-trust/source/anchors/
+sudo cp ./containers/certs/wiremock.crt /etc/pki/ca-trust/source/anchors/
 sudo update-ca-trust
 ```
 
 #### macOS
 
+Run the following command from the **repository root**:
+
 ```bash
-sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ./certs/wiremock.crt
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ./containers/certs/wiremock.crt
 ```
 
 ### .NET Applications
