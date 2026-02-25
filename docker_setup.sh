@@ -82,7 +82,7 @@ else
     if [[ "$ENV_FILE_JUST_CREATED" == "true" ]]; then
         echo -e "${YELLOW}WireMock keystore already exists, but .env was just created from .env.example.${NC}"
         echo -e "${YELLOW}This may cause a password mismatch. Regenerating keystore to match .env password...${NC}"
-        
+
         if [[ -f "$GENERATE_CERT_SCRIPT" ]]; then
             # Read the password from the newly created .env file
             ENV_PASSWORD=$(grep 'WIREMOCK_KEYSTORE_PASSWORD=' "$ENV_FILE" | sed 's/WIREMOCK_KEYSTORE_PASSWORD="\?\([^"]*\)"\?/\1/')
@@ -216,6 +216,7 @@ echo -e "Services available:"
 echo -e "${GRAY}  SQL Server:     localhost:10433${NC}"
 echo -e "${GRAY}  CosmosDB:       localhost:10081${NC}"
 echo -e "${GRAY}  Redis:          localhost:10120${NC}"
+echo -e "${GRAY}  RedisInsight:   http://localhost:${REDISINSIGHT_WEB_PORT:-10121}${NC}"
 echo -e "${GRAY}  SMTP4Dev:       http://localhost:${SMTP4DEV_WEB_PORT:-10140}${NC}"
 echo -e "${GRAY}  Seq (OTEL):     http://localhost:${SEQ_HTTP_PORT:-10150}${NC}"
 echo -e "${GRAY}  WireMock HTTP:  http://localhost:10080${NC}"

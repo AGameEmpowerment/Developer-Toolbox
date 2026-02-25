@@ -24,7 +24,18 @@ docker compose -f containers/docker-compose-common.yml up -d
 
 # Tail logs for SQL server
 docker compose -f containers/docker-compose-common.yml logs -f mssql
+
+# Tail logs for RedisInsight
+docker compose -f containers/docker-compose-common.yml logs -f redisinsight
 ```
+
+Redis and RedisInsight endpoints for local development:
+
+- Redis: `localhost:10120`
+- RedisInsight Web UI: `http://localhost:10121` (or value of `REDISINSIGHT_WEB_PORT` from `containers/.env`)
+
+RedisInsight is preconfigured to connect to the Redis service in Docker (`redis:6379`, DB `0`).
+If your app writes to another logical database (for example, DB `1`), switch the selected DB in RedisInsight after connecting.
 
 ## Backup & restore the SQL volume
 
@@ -62,6 +73,7 @@ Notes:
     Copy-Item .env.example .env
     ```
     The repository includes a `.env.example` which contains the necessary variables and sane defaults. Creating a local `.env` (or editing after copying) ensures the `docker_setup.ps1` and `docker compose` commands pick up required configuration.
+- If RedisInsight appears empty while cache is active, verify the selected Redis DB index in RedisInsight (the default preconfigured DB is `0`).
 - If you need to inspect the volume, use a temporary container and shell into it:
 
 ```pwsh

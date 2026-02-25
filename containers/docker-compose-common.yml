@@ -47,10 +47,50 @@ services:
     # Local Redis Cache Instance
     redis:
         image: redis:latest
+        command:
+            [
+                "redis-server",
+                "--appendonly",
+                "yes",
+                "--notify-keyspace-events",
+                "AKE",
+            ]
         ports:
             - "127.0.0.1:10120:6379" # Redis Cache Endpoint Port
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 5s
+        volumes:
+            - redis-data:/data
         #restart: unless-stopped
         container_name: RedisCache
+
+    # Local RedisInsight UI for Redis Cache
+    redisinsight:
+        image: redis/redisinsight:latest
+        ports:
+            - "127.0.0.1:${REDISINSIGHT_WEB_PORT:-10121}:5540" # RedisInsight Web UI
+        environment:
+            RI_REDIS_HOST0: "redis"
+            RI_REDIS_PORT0: "6379"
+            RI_REDIS_DB0: "0"
+            RI_REDIS_ALIAS0: "Local Redis Cache"
+        depends_on:
+            redis:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:5540/api/health/"]
+            interval: 15s
+            timeout: 5s
+            retries: 10
+            start_period: 20s
+        volumes:
+            - redisinsight-data:/data
+        #restart: unless-stopped
+        container_name: RedisInsight
 
     # Local Mail Trap
     smtp4dev:
@@ -169,6 +209,10 @@ networks:
 
 volumes:
     smtp4dev-data:
+        driver: local
+    redis-data:
+        driver: local
+    redisinsight-data:
         driver: local
     seq-data:
         driver: local

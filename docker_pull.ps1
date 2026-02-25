@@ -5,7 +5,6 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
 
     ## Pull the Docker images
     docker pull datalust/seq
-    docker pull docker.io/library/redis
     docker pull mcr.microsoft.com/azure-messaging/servicebus-emulator
     docker pull mcr.microsoft.com/azure-sql-edge
     docker pull mcr.microsoft.com/azure-storage/azurite
@@ -14,6 +13,7 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
     docker pull mcr.microsoft.com/dotnet/aspnet
     docker pull mcr.microsoft.com/mssql/server
     docker pull redis
+    docker pull redis/redisinsight
     docker pull rnwood/smtp4dev
     docker pull wiremock/wiremock
 

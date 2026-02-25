@@ -18,21 +18,22 @@ Copy and paste the following commands into PowerShell.
 ### Tier 1: Critical (required to build and run)
 
 ```pwsh
-winget install Microsoft.DotNet.SDK.10
-winget install Git.Git
 winget install Docker.DockerDesktop
-winget install OpenJS.NodeJS.LTS
+winget install Git.Git
+winget install Microsoft.DotNet.SDK.10
 winget install Microsoft.PowerShell
-winget install Microsoft.VisualStudioCode
 winget install Microsoft.VisualStudio.Community
+winget install Microsoft.VisualStudioCode
+winget install OpenJS.NodeJS.LTS
 ```
 
 ### Tier 2: Important (strongly recommended)
 
 ```pwsh
-winget install Microsoft.OpenJDK.25
 winget install Microsoft.AzureCLI
-winget install Microsoft.Azure.FunctionsCoreTools
+winget install Microsoft.OpenJDK.25
+winget install Microsoft.SQLServer.2025.Express
+winget install Microsoft.SQLServerManagementStudio.22
 ```
 
 OpenJDK is required for `keytool` if you generate WireMock HTTPS certificates locally.
@@ -40,12 +41,13 @@ OpenJDK is required for `keytool` if you generate WireMock HTTPS certificates lo
 ### Tier 3: Optional (nice to have)
 
 ```pwsh
-winget install Microsoft.SQLServer.2025.Express
-winget install Microsoft.SQLServerManagementStudio.22
 winget install Bruno.Bruno
-winget install JetBrains.Toolbox
-winget install Notepad++.Notepad++
 winget install GitHub.Copilot
-winget install OpenAI.Codex
 winget install GitHub.cli
+winget install JetBrains.Toolbox
+winget install Microsoft.Azure.FunctionsCoreTools
+winget install Microsoft.Azure.StorageEmulator
+winget install Microsoft.Azure.StorageExplorer
+winget install Notepad++.Notepad++
+winget install OpenAI.Codex
 ```
