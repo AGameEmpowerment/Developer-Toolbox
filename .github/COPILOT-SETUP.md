@@ -43,6 +43,13 @@ description: 'C# development guidelines'
 
 The `applyTo` field uses glob patterns to target specific file types, ensuring Copilot uses the right instructions for each context.
 
+### Skills Discovery
+
+Use `.github/skills/INDEX.md` as the canonical map for:
+
+- instruction-driven skills under `.github/skills/*/SKILL.md`
+- Skills CLI discovery and installation workflows (`npx skills find`, `npx skills add`)
+
 ### Custom Agents
 
 Agent files define specialized behaviors for different tasks:

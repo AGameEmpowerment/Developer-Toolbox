@@ -14,6 +14,9 @@ If any guidance in this file conflicts with the sources above, the more specific
 - Always load and follow `.github/copilot-instructions.md` before generating or modifying code.
 - When a domain applies (security, performance, accessibility, devops, architecture, etc.), consult the matching file in `.github/instructions/` first and follow it.
 - Mirror existing codebase patterns and versions discovered in project files; do not assume versions or introduce new frameworks.
+- For this repository only: prefer new, clean code and clear contracts over preserving legacy compatibility. Make breaking changes when they improve design clarity, and refactor impacted code/tests/configuration in the same change.
+- Use `.github/skills/INDEX.md` as the canonical map for available skills.
+- Prefer global Skills CLI discovery (`npx skills find <query>`) and the installed `find-skills` skill when searching for new capabilities.
 
 ## How To Choose Which Files To Consult First
 
@@ -32,6 +35,7 @@ If any guidance in this file conflicts with the sources above, the more specific
 - `.github/prompts/` (all `*.prompt.md` files)
 - `.github/collections/` (all `*.collection.yml` and `*.md` files)
 - `.github/skills/` (all skill folders and their `SKILL.md` files)
+- `.github/skills/INDEX.md` (canonical skill discovery map)
 - `.github/scripts/` (setup/validation scripts relevant to AI tooling)
 - `.github/workflows/` (AI-related workflows, if applicable)
 - `.github/COPILOT-SETUP.md`

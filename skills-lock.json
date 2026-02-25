@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "azure-ai": {
+      "source": "microsoft/github-copilot-for-azure",
+      "sourceType": "github",
+      "computedHash": "e4e399facd60d5b3a50d9376c65a43c96cd3658a782c63130d0ca75e85bd72d4"
+    }
+  }
+}
