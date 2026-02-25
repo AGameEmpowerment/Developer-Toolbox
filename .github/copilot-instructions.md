@@ -101,6 +101,7 @@ When the generated project contains actual source code:
 - For JS/TS use JSDoc only where complex behavior needs explanation.
 - Comment WHY not WHAT: design constraints, performance trade-offs, security assumptions.
 - Use annotation tags (`TODO`, `FIXME`, `SECURITY`, `PERF`) sparingly and purposefully.
+- **Do not automatically generate documentation. Only create documentation files when explicitly requested by the user. Always provide chat summaries of completed work.**
 
 ---
 ## Testing Approach (All)
