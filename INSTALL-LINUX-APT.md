@@ -1,6 +1,6 @@
 ---
 post_title: "Linux install commands (apt)"
-author1: "AGameEmpowerment"
+author1: "Michael Carey"
 post_slug: "install-linux-apt"
 microsoft_alias: "n/a"
 featured_image: "n/a"
@@ -43,24 +43,38 @@ $(lsb_release -cs) main" | \
 sudo apt update
 ```
 
-### Required tools
+### Tier 1: Critical (required to build and run)
 
 ```bash
 sudo apt install -y \
 	git \
 	docker.io \
 	docker-compose-plugin \
+	nodejs \
+	npm \
 	powershell \
+	dotnet-sdk-10.0
+```
+
+### Tier 2: Important (strongly recommended)
+
+```bash
+sudo apt install -y \
 	openjdk-25-jdk \
-	dotnet-sdk-8.0 \
-	dotnet-sdk-9.0 \
-	dotnet-sdk-10.0 \
 	azure-cli
 ```
 
 OpenJDK is required for `keytool` if you generate WireMock HTTPS certificates locally.
 
-### VS Code (optional)
+Azure Functions Core Tools (npm):
+
+```bash
+npm i -g azure-functions-core-tools@4 --unsafe-perm true
+```
+
+### Tier 3: Optional (nice to have)
+
+VS Code:
 
 ```bash
 sudo install -d -m 0755 /etc/apt/keyrings
@@ -74,30 +88,10 @@ sudo apt update
 sudo apt install -y code
 ```
 
-### Node.js LTS (optional)
-
-```bash
-sudo apt install -y nodejs npm
-```
-
-### Optional tools from README
-
-Azure Functions Core Tools (npm):
-
-```bash
-npm i -g azure-functions-core-tools@4 --unsafe-perm true
-```
-
 Bruno CLI (npm):
 
 ```bash
 npm i -g @usebruno/cli
-```
-
-Postman (snap):
-
-```bash
-sudo snap install postman
 ```
 
 JetBrains Toolbox (snap):
@@ -105,5 +99,3 @@ JetBrains Toolbox (snap):
 ```bash
 sudo snap install jetbrains-toolbox --classic
 ```
-
-Notepad++ is Windows-only. LINQPad is Windows-only.
