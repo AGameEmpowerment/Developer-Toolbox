@@ -424,3 +424,6 @@ FodyWeavers.xsd
 containers/certs/*.jks
 containers/certs/*.crt
 containers/certs/truststore.*
+
+# Copilot tracking files
+.copilot-tracking/*

@@ -9,8 +9,8 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
     docker pull mcr.microsoft.com/azure-sql-edge
     docker pull mcr.microsoft.com/azure-storage/azurite
     docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
-    docker pull mcr.microsoft.com/dotnet/sdk
     docker pull mcr.microsoft.com/dotnet/aspnet
+    docker pull mcr.microsoft.com/dotnet/sdk
     docker pull mcr.microsoft.com/mssql/server
     docker pull redis
     docker pull redis/redisinsight
