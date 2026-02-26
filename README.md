@@ -184,3 +184,56 @@ npx skills check
 Reference:
 
 - `.github/skills/INDEX.md` (canonical skill discovery map)
+
+### Install Shared Skills Globally (Codex + Copilot)
+
+These skills are useful for both Codex and Copilot in this repository. You can
+paste the whole block into a PowerShell terminal to install them globally.
+
+```powershell
+npx skills add microsoft/github-copilot-for-azure@appinsights-instrumentation -g -y
+npx skills add microsoft/github-copilot-for-azure@azure-resource-lookup -g -y
+npx skills add microsoft/github-copilot-for-azure@azure-resource-visualizer -g -y
+npx skills add microsoft/github-copilot-for-azure@microsoft-code-reference -g -y
+npx skills add microsoft/github-copilot-for-azure@microsoft-docs -g -y
+npx skills add anthropics/skills@webapp-testing -g -y
+```
+
+### Install Codex Skills Globally (Skills.sh)
+
+The following commands install Codex-focused skills discussed for this
+repository (excluding the shared skills listed above). You can paste the whole
+block into a PowerShell terminal to install them globally.
+
+```powershell
+npx skills add microsoft/github-copilot-for-azure@azure-ai -g -y
+npx skills add microsoft/github-copilot-for-azure@azure-diagnostics -g -y
+npx skills add microsoft/github-copilot-for-azure@azure-observability -g -y
+npx skills add microsoft/github-copilot-for-azure@azure-rbac -g -y
+npx skills add vercel-labs/skills@find-skills -g -y
+npx skills add microsoft/github-copilot-for-azure@microsoft-foundry -g -y
+```
+
+### Install Copilot Skills Globally (Skills.sh)
+
+The following commands install the Copilot-focused skills discussed for this
+repository (excluding the shared skills listed above). You can paste the whole
+block into a PowerShell terminal to install them globally.
+
+```powershell
+npx skills add microsoft/github-copilot-for-azure@azure-role-selector -g -y
+npx skills add microsoft/github-copilot-for-azure@azure-static-web-apps -g -y
+npx skills add microsoft/github-copilot-for-azure@github-issues -g -y
+npx skills add microsoft/github-copilot-for-azure@make-skill-template -g -y
+npx skills add microsoft/github-copilot-for-azure@nuget-manager -g -y
+npx skills add microsoft/github-copilot-for-azure@vscode-ext-commands -g -y
+npx skills add microsoft/github-copilot-for-azure@vscode-ext-localization -g -y
+npx skills add microsoft/github-copilot-for-azure@web-design-reviewer -g -y
+```
+
+Optional verification:
+
+```powershell
+npx skills list -g
+npx skills check
+```
