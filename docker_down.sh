@@ -1,7 +1,7 @@
 #!/bin/bash
 # Teardown Docker Services (Linux/Unix/WSL/Devcontainer)
 
-set -e
+set -euo pipefail
 
 # Colors for output
 RED='\033[0;31m'
@@ -59,9 +59,36 @@ echo -e "${CYAN}=== Docker Teardown ===${NC}"
 if command -v docker &> /dev/null; then
     echo -e "${YELLOW}Stopping and removing containers...${NC}"
 
-    # Teardown the vs multi-container
-    docker compose -f "${CONTAINERS_DIR}/docker-compose-common.yml" -p dev_common_shared down || true
-    #docker compose -f "${CONTAINERS_DIR}/docker-compose.yml" -p example down
+    # Teardown the shared development collection.
+    docker compose \
+        -f "${CONTAINERS_DIR}/docker-compose-common.yml" \
+        -p dev_common_shared \
+        down --remove-orphans || true
+
+    # Safety net: remove any leftover resources still labeled with this compose project.
+    PROJECT_NAMES=(
+        "dev_common_shared"
+    )
+
+    for project_name in "${PROJECT_NAMES[@]}"; do
+        mapfile -t container_ids < <(docker ps -aq --filter "label=com.docker.compose.project=${project_name}" || true)
+        if [[ ${#container_ids[@]} -gt 0 ]]; then
+            echo -e "${YELLOW}Removing leftover containers for project '${project_name}'...${NC}"
+            docker rm -f "${container_ids[@]}" >/dev/null || true
+        fi
+
+        mapfile -t network_ids < <(docker network ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
+        if [[ ${#network_ids[@]} -gt 0 ]]; then
+            echo -e "${YELLOW}Removing leftover networks for project '${project_name}'...${NC}"
+            docker network rm "${network_ids[@]}" >/dev/null || true
+        fi
+
+        mapfile -t volume_ids < <(docker volume ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
+        if [[ ${#volume_ids[@]} -gt 0 ]]; then
+            echo -e "${YELLOW}Removing leftover volumes for project '${project_name}'...${NC}"
+            docker volume rm "${volume_ids[@]}" >/dev/null || true
+        fi
+    done
 
     echo -e "${GREEN}Containers removed.${NC}"
 else

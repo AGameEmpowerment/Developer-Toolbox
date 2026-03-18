@@ -181,9 +181,12 @@ Write-Host "`n=== Docker Services ===" -ForegroundColor Cyan
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "Starting Docker containers..." -ForegroundColor Yellow
 
-    ## Start the vs multi-container
-    docker compose --env-file "$EnvFile" -f "$ContainersDir/docker-compose-common.yml" -p dev_common_shared up -d
-    #docker compose --env-file "$EnvFile" -f "$ContainersDir/docker-compose.yml" -p example up -d
+    ## Start the shared development collection.
+    docker compose `
+        --env-file "$EnvFile" `
+        -f "$ContainersDir/docker-compose-common.yml" `
+        -p dev_common_shared `
+        up -d
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Docker compose failed with exit code $LASTEXITCODE."

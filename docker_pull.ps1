@@ -1,22 +1,55 @@
 # Pull Docker images used in the setup
 
+[CmdletBinding()]
+param()
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "Docker images and container setup started."
 
-    ## Pull the Docker images
-    docker pull datalust/seq
-    docker pull mcr.microsoft.com/azure-messaging/servicebus-emulator
-    docker pull mcr.microsoft.com/azure-sql-edge
-    docker pull mcr.microsoft.com/azure-storage/azurite
-    docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
-    docker pull mcr.microsoft.com/dotnet/aspnet
-    docker pull mcr.microsoft.com/dotnet/sdk
-    docker pull mcr.microsoft.com/mssql/server
-    docker pull redis
-    docker pull redis/redisinsight
-    docker pull rnwood/smtp4dev
-    docker pull wiremock/wiremock
+    $images = @(
+        "datalust/seq",
+        "mcr.microsoft.com/azure-messaging/servicebus-emulator",
+        "mcr.microsoft.com/azure-sql-edge",
+        "mcr.microsoft.com/azure-storage/azurite",
+        "mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator",
+        "mcr.microsoft.com/dotnet/aspnet",
+        "mcr.microsoft.com/dotnet/sdk",
+        "mcr.microsoft.com/mssql/server",
+        "redis",
+        "redis/redisinsight",
+        "rnwood/smtp4dev",
+        "wiremock/wiremock"
+    )
 
+    $dockerInfo = docker info 2>$null
+    $registryMirrors = @($dockerInfo | Where-Object { $_ -match '^\s+https?://' } | ForEach-Object { $_.Trim() })
+    if ($registryMirrors.Count -gt 0) {
+        Write-Host "Docker registry mirrors detected:" -ForegroundColor Yellow
+        $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
+    }
+
+    foreach ($image in $images) {
+        Write-Host "Pulling $image..." -ForegroundColor Yellow
+        docker pull $image
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to pull '$image' (exit code $LASTEXITCODE)."
+
+            if ($registryMirrors.Count -gt 0) {
+                Write-Host "Docker is configured to use registry mirror(s). If one is unavailable, pulls will fail before reaching the upstream registry." -ForegroundColor Yellow
+                Write-Host "Configured mirror(s):" -ForegroundColor Yellow
+                $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
+                Write-Host "Check Docker Desktop > Settings > Docker Engine, or %APPDATA%\Docker\daemon.json, to remove or fix the mirror." -ForegroundColor Yellow
+            }
+
+            exit $LASTEXITCODE
+        }
+    }
+} else {
+    Write-Error "Docker is not installed or not in PATH."
+    exit 1
 }
 
 Write-Host "Docker images and container setup completed."

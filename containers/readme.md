@@ -22,11 +22,20 @@ From the repository root you can start the configured services with:
 # Or start the full development compose stack directly
 docker compose -f containers/docker-compose-common.yml up -d
 
+# Refresh the Docker images used by the development stack
+./docker_pull.ps1
+
 # Tail logs for SQL server
 docker compose -f containers/docker-compose-common.yml logs -f mssql
 
 # Tail logs for RedisInsight
 docker compose -f containers/docker-compose-common.yml logs -f redisinsight
+```
+
+```bash
+# Linux/macOS/WSL equivalents
+./docker_setup.sh
+./docker_pull.sh
 ```
 
 Redis and RedisInsight endpoints for local development:
