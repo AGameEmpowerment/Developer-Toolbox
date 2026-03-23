@@ -29,17 +29,23 @@ services:
 
     # CosmoDb Server Instance
     cosmosdb:
-        image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator
+        image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
         environment:
-            AZURE_COSMOS_EMULATOR_PARTITION_COUNT: "3"
-            AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+            # The current Microsoft guidance for the Linux emulator uses the
+            # vnext-preview image. HTTPS keeps it compatible with the .NET SDK.
+            PROTOCOL: "https"
+            ENABLE_EXPLORER: "true"
         ports:
             - "127.0.0.1:10081:8081"
-            - "127.0.0.1:10251:10251"
-            - "127.0.0.1:10252:10252"
-            - "127.0.0.1:10253:10253"
+            - "127.0.0.1:10181:1234"
         volumes:
             - cosmos-data:/data
+        healthcheck:
+            test: ["CMD-SHELL", "curl --insecure --fail --silent https://127.0.0.1:8081/ >/dev/null || exit 1"]
+            interval: 20s
+            timeout: 10s
+            retries: 15
+            start_period: 60s
         container_name: CosmoDb
         restart: unless-stopped
         hostname: cosmosdb
