@@ -23,7 +23,7 @@ services:
             - "127.0.0.1:10433:1433" # SQL Server Connection Port
         volumes:
             - mssql-data:/var/opt/mssql
-        #restart: unless-stopped
+        restart: unless-stopped
         container_name: SqlServer
         hostname: mssql
 
@@ -41,7 +41,7 @@ services:
         volumes:
             - cosmos-data:/data
         container_name: CosmoDb
-        #restart: unless-stopped
+        restart: unless-stopped
         hostname: cosmosdb
 
     # Local Redis Cache Instance
@@ -65,7 +65,7 @@ services:
             start_period: 5s
         volumes:
             - redis-data:/data
-        #restart: unless-stopped
+        restart: unless-stopped
         container_name: RedisCache
 
     # Local RedisInsight UI for Redis Cache
@@ -89,7 +89,7 @@ services:
             start_period: 20s
         volumes:
             - redisinsight-data:/data
-        #restart: unless-stopped
+        restart: unless-stopped
         container_name: RedisInsight
 
     # Local Mail Trap
@@ -106,7 +106,7 @@ services:
             # Container configuration (this binds within the container)
             - ServerOptions__Urls=http://*:80
             - ServerOptions__HostName=smtp4dev
-        #restart: unless-stopped
+        restart: unless-stopped
         container_name: Smtp4Dev
 
     # Local OpenTelemetry Collector with durable storage
@@ -118,7 +118,7 @@ services:
             SEQ_STORAGE_SECRETKEY: "${SEQ_STORAGE_SECRETKEY}"
         ports:
             - "127.0.0.1:10150:80" # Web UI and API port
-        #restart: unless-stopped
+        restart: unless-stopped
         container_name: OtelCollector
         volumes:
             - seq-data:/data
@@ -155,7 +155,7 @@ services:
             - "--global-response-templating"
             - "--disable-gzip"
             - "--verbose"
-        #restart: unless-stopped
+        restart: unless-stopped
         container_name: Wiremock
 
     # Local Azure Blob Storage
@@ -165,7 +165,7 @@ services:
             - "127.0.0.1:10000:10000" # Blob service
             - "127.0.0.1:10001:10001" # Queue service
             - "127.0.0.1:10002:10002" # Table service
-        #restart: unless-stopped
+        restart: unless-stopped
         container_name: Azurite
 
     # SQL Edge and Service Bus Emulator
@@ -178,7 +178,7 @@ services:
         environment:
             ACCEPT_EULA: "${ACCEPT_EULA}"
             MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
-        #restart: unless-stopped
+        restart: unless-stopped
         container_name: SqlEdge-ServiceBus
 
     # Service Bus Emulator using SQL Edge
@@ -201,7 +201,7 @@ services:
             sb-emulator:
                 aliases:
                     - sb-emulator
-        #restart: unless-stopped
+        restart: unless-stopped
         container_name: ServiceBus
 
 networks:
