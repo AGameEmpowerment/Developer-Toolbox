@@ -1,6 +1,6 @@
 ---
 post_title: "Windows install commands (winget)"
-author1: "AGameEmpowerment"
+author1: "Michael Carey"
 post_slug: "install-windows-winget"
 microsoft_alias: "n/a"
 featured_image: "n/a"
@@ -15,42 +15,39 @@ post_date: "2026-01-31"
 
 Copy and paste the following commands into PowerShell.
 
-### Required tools
+### Tier 1: Critical (required to build and run)
 
 ```pwsh
-winget install Microsoft.DotNet.SDK.8
-winget install Microsoft.DotNet.SDK.9
+winget install Docker.DockerDesktop
+winget install Git.Git
 winget install Microsoft.DotNet.SDK.10
 winget install Microsoft.PowerShell
+winget install Microsoft.VisualStudio.Community
+winget install Microsoft.VisualStudioCode
+winget install OpenJS.NodeJS.LTS
+```
+
+### Tier 2: Important (strongly recommended)
+
+```pwsh
+winget install Microsoft.AzureCLI
 winget install Microsoft.OpenJDK.25
-winget install Git.Git
-winget install Docker.DockerDesktop
-winget install Microsoft.VisualStudio.2022.Community
-winget install Microsoft.SQLServer.2022.Express
+winget install Microsoft.SQLServer.2025.Express
+winget install Microsoft.SQLServerManagementStudio.22
 ```
 
 OpenJDK is required for `keytool` if you generate WireMock HTTPS certificates locally.
 
-### Optional tools from README
+### Tier 3: Optional (nice to have)
 
 ```pwsh
-winget install Microsoft.VisualStudioCode
-winget install Microsoft.SQLServerManagementStudio
-winget install Microsoft.AzureCLI
 winget install Bruno.Bruno
-winget install Postman.Postman
-winget install LINQPad.LINQPad
+winget install GitHub.Copilot
+winget install GitHub.cli
 winget install JetBrains.Toolbox
+winget install Microsoft.Azure.FunctionsCoreTools
+winget install Microsoft.Azure.StorageEmulator
+winget install Microsoft.Azure.StorageExplorer
 winget install Notepad++.Notepad++
-```
-
-### Node.js LTS and npm tools (optional)
-
-```pwsh
-winget install OpenJS.NodeJS.LTS
-```
-
-```pwsh
-npm i -g azure-functions-core-tools@4 --unsafe-perm true
-npm i -g @usebruno/cli
+winget install OpenAI.Codex
 ```

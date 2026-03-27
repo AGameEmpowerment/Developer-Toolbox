@@ -1,39 +1,39 @@
-name: "Copilot Setup Validation"
+name: "Copilot Setup Steps"
 
 on:
     workflow_dispatch:
     push:
         paths:
-            - .github/**
             - .github/workflows/copilot-setup-steps.yml
     pull_request:
         paths:
-            - .github/**
             - .github/workflows/copilot-setup-steps.yml
 
-jobs:
-    validate-copilot-setup:
-        name: Validate Copilot Configuration
-        runs-on: ubuntu-latest
+permissions:
+    id-token: write
+    contents: read
 
-        permissions:
-            contents: read
+jobs:
+    copilot-setup-steps:
+        name: Copilot Configuration
+        runs-on: ubuntu-latest
+        #runs-on: [self-hosted, Linux]
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v5
+              uses: actions/checkout@v6
 
             - uses: actions/setup-dotnet@v5
               with:
-                  dotnet-version: |
-                      8.x
-                      9.x
-                      10.x
+                dotnet-version: |
+                    8.x
+                    9.x
+                    10.x
 
             - name: Setup Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@v6
               with:
-                  node-version: "24.x"
+                node-version: '24'
 
             - name: Validate Copilot setup
               run: node .github/scripts/validate-copilot-setup.js

@@ -24,9 +24,52 @@ Write-Host "=== Docker Teardown ===" -ForegroundColor Cyan
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "Stopping and removing containers..." -ForegroundColor Yellow
 
-    ## Teardown the vs multi-container
-    docker compose -f (Join-Path $ContainersDir "docker-compose-common.yml") -p dev_common_shared down
-    #docker compose -f (Join-Path $ContainersDir "docker-compose.yml") -p example down
+    ## Teardown the shared development collection.
+    docker compose `
+        -f (Join-Path $ContainersDir "docker-compose-common.yml") `
+        -p dev_common_shared `
+        down --remove-orphans
+
+    ## Safety net: remove any leftover resources still labeled with this compose project.
+    $projectNames = @("dev_common_shared")
+
+    foreach ($projectName in $projectNames) {
+        $containerIds = @()
+        try {
+            $containerIds = @(docker ps -aq --filter "label=com.docker.compose.project=$projectName")
+        } catch {
+            Write-Warning "Failed to query containers for project '$projectName': $($_.Exception.Message)"
+        }
+
+        if ($containerIds -and $containerIds.Count -gt 0) {
+            Write-Host "Removing leftover containers for project '$projectName'..." -ForegroundColor Yellow
+            docker rm -f $containerIds | Out-Null
+        }
+
+        $networkIds = @()
+        try {
+            $networkIds = @(docker network ls -q --filter "label=com.docker.compose.project=$projectName")
+        } catch {
+            Write-Warning "Failed to query networks for project '$projectName': $($_.Exception.Message)"
+        }
+
+        if ($networkIds -and $networkIds.Count -gt 0) {
+            Write-Host "Removing leftover networks for project '$projectName'..." -ForegroundColor Yellow
+            docker network rm $networkIds | Out-Null
+        }
+
+        $volumeIds = @()
+        try {
+            $volumeIds = @(docker volume ls -q --filter "label=com.docker.compose.project=$projectName")
+        } catch {
+            Write-Warning "Failed to query volumes for project '$projectName': $($_.Exception.Message)"
+        }
+
+        if ($volumeIds -and $volumeIds.Count -gt 0) {
+            Write-Host "Removing leftover volumes for project '$projectName'..." -ForegroundColor Yellow
+            docker volume rm $volumeIds | Out-Null
+        }
+    }
 
     Write-Host "Containers removed." -ForegroundColor Green
 } else {

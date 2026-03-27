@@ -181,9 +181,12 @@ Write-Host "`n=== Docker Services ===" -ForegroundColor Cyan
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "Starting Docker containers..." -ForegroundColor Yellow
 
-    ## Start the vs multi-container
-    docker compose --env-file "$EnvFile" -f "$ContainersDir/docker-compose-common.yml" -p dev_common_shared up -d
-    #docker compose --env-file "$EnvFile" -f "$ContainersDir/docker-compose.yml" -p example up -d
+    ## Start the shared development collection.
+    docker compose `
+        --env-file "$EnvFile" `
+        -f "$ContainersDir/docker-compose-common.yml" `
+        -p dev_common_shared `
+        up -d
 
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Docker compose failed with exit code $LASTEXITCODE."
@@ -201,6 +204,8 @@ Write-Host "Services available:" -ForegroundColor White
 Write-Host "  SQL Server:    localhost:10433" -ForegroundColor Gray
 Write-Host "  CosmosDB:      localhost:10081" -ForegroundColor Gray
 Write-Host "  Redis:         localhost:10120" -ForegroundColor Gray
+$redisInsightPort = if ($EnvValues.ContainsKey('REDISINSIGHT_WEB_PORT') -and $EnvValues['REDISINSIGHT_WEB_PORT']) { $EnvValues['REDISINSIGHT_WEB_PORT'] } else { '10121' }
+Write-Host "  RedisInsight:  http://localhost:$redisInsightPort" -ForegroundColor Gray
 $smtpWebPort = if ($EnvValues.ContainsKey('SMTP4DEV_WEB_PORT') -and $EnvValues['SMTP4DEV_WEB_PORT']) { $EnvValues['SMTP4DEV_WEB_PORT'] } else { '10140' }
 $seqPort = if ($EnvValues.ContainsKey('SEQ_HTTP_PORT') -and $EnvValues['SEQ_HTTP_PORT']) { $EnvValues['SEQ_HTTP_PORT'] } else { '10150' }
 Write-Host "  SMTP4Dev:      http://localhost:$smtpWebPort" -ForegroundColor Gray
