@@ -1,5 +1,6 @@
 #!/bin/bash
-# Pull Docker images used in the setup
+# Pull Docker images required by the shared development stack, including
+# base images referenced by repo-local Dockerfiles.
 
 set -euo pipefail
 
@@ -11,21 +12,23 @@ fi
 echo "Docker images and container setup started."
 
 images=(
-    "datalust/seq"
-    "mcr.microsoft.com/azure-messaging/servicebus-emulator"
-    "mcr.microsoft.com/azure-sql-edge"
+    "datalust/seq:latest"
+    "mcr.microsoft.com/azure-messaging/servicebus-emulator:latest"
+    "mcr.microsoft.com/azure-sql-edge:latest"
     "mcr.microsoft.com/azure-storage/azurite"
-    "mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
-    "mcr.microsoft.com/dotnet/aspnet"
-    "mcr.microsoft.com/dotnet/sdk"
-    "mcr.microsoft.com/mssql/server"
-    "redis"
-    "redis/redisinsight"
-    "rnwood/smtp4dev"
-    "wiremock/wiremock"
+    "mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview"
+    "mcr.microsoft.com/devcontainers/dotnet:1-10.0"
+    "mcr.microsoft.com/mssql/server:latest"
+    "redis:latest"
+    "redis/redisinsight:latest"
+    "rnwood/smtp4dev:latest"
+    "wiremock/wiremock:latest"
 )
 
-mapfile -t registry_mirrors < <(docker info 2>/dev/null | awk '/Registry Mirrors:/ { in_mirrors=1; next } in_mirrors && $0 ~ /^[[:space:]]+https?:\/\// { gsub(/^[[:space:]]+/, "", $0); print; next } in_mirrors { in_mirrors=0 }')
+registry_mirrors=()
+while IFS= read -r mirror; do
+    registry_mirrors+=("$mirror")
+done < <(docker info 2>/dev/null | awk '/Registry Mirrors:/ { in_mirrors=1; next } in_mirrors && $0 ~ /^[[:space:]]+https?:\/\// { gsub(/^[[:space:]]+/, "", $0); print; next } in_mirrors { in_mirrors=0 }')
 
 if [[ ${#registry_mirrors[@]} -gt 0 ]]; then
     echo "Docker registry mirrors detected:"

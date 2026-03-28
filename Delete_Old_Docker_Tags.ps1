@@ -47,7 +47,7 @@ NOTES
 	- Local image pruning uses `docker images` and `docker rmi` and will only remove images not referenced by running containers.
 
 AUTHOR
-	AGameEmpowerment (adapted)
+	Michael Carey (adapted)
 #>
 
 param(

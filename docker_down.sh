@@ -71,19 +71,34 @@ if command -v docker &> /dev/null; then
     )
 
     for project_name in "${PROJECT_NAMES[@]}"; do
-        mapfile -t container_ids < <(docker ps -aq --filter "label=com.docker.compose.project=${project_name}" || true)
+        container_ids=()
+        while IFS= read -r container_id; do
+            if [[ -n "$container_id" ]]; then
+                container_ids+=("$container_id")
+            fi
+        done < <(docker ps -aq --filter "label=com.docker.compose.project=${project_name}" || true)
         if [[ ${#container_ids[@]} -gt 0 ]]; then
             echo -e "${YELLOW}Removing leftover containers for project '${project_name}'...${NC}"
             docker rm -f "${container_ids[@]}" >/dev/null || true
         fi
 
-        mapfile -t network_ids < <(docker network ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
+        network_ids=()
+        while IFS= read -r network_id; do
+            if [[ -n "$network_id" ]]; then
+                network_ids+=("$network_id")
+            fi
+        done < <(docker network ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
         if [[ ${#network_ids[@]} -gt 0 ]]; then
             echo -e "${YELLOW}Removing leftover networks for project '${project_name}'...${NC}"
             docker network rm "${network_ids[@]}" >/dev/null || true
         fi
 
-        mapfile -t volume_ids < <(docker volume ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
+        volume_ids=()
+        while IFS= read -r volume_id; do
+            if [[ -n "$volume_id" ]]; then
+                volume_ids+=("$volume_id")
+            fi
+        done < <(docker volume ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
         if [[ ${#volume_ids[@]} -gt 0 ]]; then
             echo -e "${YELLOW}Removing leftover volumes for project '${project_name}'...${NC}"
             docker volume rm "${volume_ids[@]}" >/dev/null || true

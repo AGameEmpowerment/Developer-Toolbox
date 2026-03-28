@@ -29,6 +29,11 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
         -f (Join-Path $ContainersDir "docker-compose-common.yml") `
         -p dev_common_shared `
         down --remove-orphans
+    $composeExitCode = $LASTEXITCODE
+    if ($composeExitCode -ne 0) {
+        Write-Error "Failed to stop and remove containers via 'docker compose down'. Exit code: $composeExitCode. Skipping additional Docker cleanup steps."
+        return
+    }
 
     ## Safety net: remove any leftover resources still labeled with this compose project.
     $projectNames = @("dev_common_shared")

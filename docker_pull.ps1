@@ -1,4 +1,5 @@
-# Pull Docker images used in the setup
+# Pull Docker images required by the shared development stack, including
+# base images referenced by repo-local Dockerfiles.
 
 [CmdletBinding()]
 param()
@@ -10,18 +11,17 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "Docker images and container setup started."
 
     $images = @(
-        "datalust/seq",
-        "mcr.microsoft.com/azure-messaging/servicebus-emulator",
-        "mcr.microsoft.com/azure-sql-edge",
+        "datalust/seq:latest",
+        "mcr.microsoft.com/azure-messaging/servicebus-emulator:latest",
+        "mcr.microsoft.com/azure-sql-edge:latest",
         "mcr.microsoft.com/azure-storage/azurite",
-        "mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator",
-        "mcr.microsoft.com/dotnet/aspnet",
-        "mcr.microsoft.com/dotnet/sdk",
-        "mcr.microsoft.com/mssql/server",
-        "redis",
-        "redis/redisinsight",
-        "rnwood/smtp4dev",
-        "wiremock/wiremock"
+        "mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview",
+        "mcr.microsoft.com/devcontainers/dotnet:1-10.0",
+        "mcr.microsoft.com/mssql/server:latest",
+        "redis:latest",
+        "redis/redisinsight:latest",
+        "rnwood/smtp4dev:latest",
+        "wiremock/wiremock:latest"
     )
 
     $dockerInfo = docker info 2>$null

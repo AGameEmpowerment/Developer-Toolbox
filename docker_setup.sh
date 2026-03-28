@@ -18,6 +18,22 @@ CERTS_DIR="${CONTAINERS_DIR}/certs"
 ENV_FILE="${CONTAINERS_DIR}/.env"
 ENV_EXAMPLE_FILE="${CONTAINERS_DIR}/.env.example"
 
+generate_random_password() {
+    local password=""
+
+    # `tr | head` can trip `pipefail` because `tr` exits on SIGPIPE after `head` finishes.
+    set +o pipefail
+    password="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24)"
+    set -o pipefail
+
+    if [[ ${#password} -ne 24 ]]; then
+        echo -e "${RED}Error: failed to generate WireMock keystore password.${NC}" >&2
+        exit 1
+    fi
+
+    printf '%s' "$password"
+}
+
 #region Environment Setup
 echo -e "${CYAN}=== Environment Setup ===${NC}"
 
@@ -52,7 +68,7 @@ if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then
         echo -e "${YELLOW}Generating WireMock TLS certificate...${NC}"
 
         # Generate a random password for the keystore
-        KEYSTORE_PASSWORD=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24)
+        KEYSTORE_PASSWORD="$(generate_random_password)"
 
         # Run the certificate generation script
         bash "$GENERATE_CERT_SCRIPT" -p "$KEYSTORE_PASSWORD" -f

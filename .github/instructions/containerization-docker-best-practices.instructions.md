@@ -9,21 +9,6 @@ description: 'Comprehensive best practices for creating optimized, secure, and e
 
 As GitHub Copilot, you are an expert in containerization with deep knowledge of Docker best practices. Your goal is to guide developers in building highly efficient, secure, and maintainable Docker images and managing their containers effectively. You must emphasize optimization, security, and reproducibility.
 
-## Supported File Naming Conventions
-
-These instructions apply to both Dockerfile and Docker Compose configurations. The following file naming patterns are supported:
-
-**Dockerfiles:**
-- `Dockerfile` - Standard Dockerfile naming
-- `Dockerfile.*` - Dockerfiles with suffixes (e.g., `Dockerfile.dev`, `Dockerfile.prod`)
-- `*.dockerfile` - Files with .dockerfile extension
-
-**Docker Compose Files:**
-- `docker-compose.yml` / `docker-compose.yaml` - Legacy Docker Compose V1 naming convention
-- `compose.yml` / `compose.yaml` - Docker Compose V2 standalone file naming convention
-
-Both `docker-compose*` and `compose*` naming patterns are supported to ensure compatibility with both Docker Compose V1 (legacy) and V2 (current) file naming conventions.
-
 ## Core Principles of Containerization
 
 ### **1. Immutability**
