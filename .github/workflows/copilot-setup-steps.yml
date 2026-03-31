@@ -17,7 +17,6 @@ jobs:
     copilot-setup-steps:
         name: Copilot Configuration
         runs-on: ubuntu-latest
-        #runs-on: [self-hosted, Linux]
 
         steps:
             - name: Checkout code
@@ -26,57 +25,27 @@ jobs:
             - uses: actions/setup-dotnet@v5
               with:
                 dotnet-version: |
-                    8.x
-                    9.x
                     10.x
 
-            - name: Setup Node.js
+            - name: Set up JFrog CLI
+              uses: jfrog/setup-jfrog-cli@v4
+              env:
+                JF_URL: https://icseng.jfrog.io
+              with:
+                oidc-provider-name: jfrog
+
+            - name: Set up Node.js
               uses: actions/setup-node@v6
               with:
                 node-version: '24'
 
-            - name: Validate Copilot setup
-              run: node .github/scripts/validate-copilot-setup.js
-
-            - name: Check for required files
+            - name: Configure & install JavaScript dependencies
+              working-directory: src/Edu.Si.Example/Edu.Si.Example.Client
               run: |
-                  echo "Checking for required Copilot configuration files..."
+                jf npm-config --repo-resolve npm-ics
+                jf npm ci
 
-                  # Check main instructions file
-                  if [ ! -f .github/copilot-instructions.md ]; then
-                    echo "❌ Missing .github/copilot-instructions.md"
-                    exit 1
-                  fi
-                  echo "✓ .github/copilot-instructions.md exists"
-
-                  # Check instructions directory
-                  if [ ! -d .github/instructions ]; then
-                    echo "❌ Missing .github/instructions/ directory"
-                    exit 1
-                  fi
-                  echo "✓ .github/instructions/ directory exists"
-
-                  # Count instruction files
-                  INSTRUCTION_COUNT=$(find .github/instructions -name "*.md" | wc -l)
-                  echo "✓ Found $INSTRUCTION_COUNT instruction files"
-
-                  # Check for optional directories
-                  if [ -d .github/agents ]; then
-                    AGENT_COUNT=$(find .github/agents -name "*.md" | wc -l)
-                    echo "ℹ Found $AGENT_COUNT agent files"
-                  fi
-
-                  if [ -d .github/prompts ]; then
-                    PROMPT_COUNT=$(find .github/prompts -name "*.md" | wc -l)
-                    echo "ℹ Found $PROMPT_COUNT prompt files"
-                  fi
-
-                  if [ -d .github/collections ]; then
-                    COLLECTION_COUNT=$(find .github/collections -name "*.yml" -o -name "*.md" | wc -l)
-                    echo "ℹ Found $COLLECTION_COUNT collection files"
-                  fi
-
-                  echo ""
-                  echo "✅ All required Copilot configuration files are in place!"
-                  echo "Reference: https://gh.io/copilot-coding-agent-tips"
-
+            - name: Configure & restore dotnet dependencies
+              run: |
+                jf dotnet-config --repo-resolve nuget
+                dotnet restore Edu.Si.Example.sln

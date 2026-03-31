@@ -43,7 +43,7 @@ When updating a version, follow these steps:
     Using `jq`:
     `dotnet package search <PACKAGE_NAME> --exact-match --format json | jq -e '.searchResult[].packages[] | select(.version == "<VERSION>")'`
     Using PowerShell:
-    `(dotnet package search <PACKAGE_NAME> --exact-match --format json | ConvertFrom-Json).searchResult.packages | Where-Object { $_.version -eq "<VERSION>" }`
+    `(dotnet package search <PACKAGE_NAME> --exact-match --format json | ConvertFrom-Json).searchResult | ForEach-Object { $_.packages } | Where-Object { $_.version -eq "<VERSION>" }`
     
 2.  **Determine Version Management**:
     - Search for `Directory.Packages.props` in the solution root. If present, versions should be managed there via `<PackageVersion Include="Package.Name" Version="1.2.3" />`.
