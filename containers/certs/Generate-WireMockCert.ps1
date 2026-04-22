@@ -69,15 +69,7 @@ if (-not $ScriptDir) {
 # Output paths
 $KeystorePath = Join-Path $ScriptDir "wiremock.jks"
 $CertPath = Join-Path $ScriptDir "wiremock.crt"
-$ContainersDir = Split-Path -Parent $ScriptDir
-$EnvFile = Join-Path $ContainersDir ".env"
 $WireMockHttpsPort = "10443"
-if (Test-Path $EnvFile) {
-    $wireMockHttpsLine = Get-Content $EnvFile | Where-Object { $_ -match '^\s*WIREMOCK_HTTPS_PORT\s*=' } | Select-Object -First 1
-    if ($wireMockHttpsLine -and $wireMockHttpsLine -match '^\s*WIREMOCK_HTTPS_PORT\s*=\s*"?([^"]+)"?\s*$') {
-        $WireMockHttpsPort = $matches[1]
-    }
-}
 
 # Check for existing files
 if (-not $Force) {

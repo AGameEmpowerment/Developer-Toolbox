@@ -78,17 +78,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Output paths
 KEYSTORE_PATH="${SCRIPT_DIR}/wiremock.jks"
 CERT_PATH="${SCRIPT_DIR}/wiremock.crt"
-CONTAINERS_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
-ENV_FILE="${CONTAINERS_DIR}/.env"
 WIREMOCK_HTTPS_PORT="10443"
-if [[ -f "$ENV_FILE" ]]; then
-    while IFS= read -r line; do
-        if [[ "$line" =~ ^[[:space:]]*WIREMOCK_HTTPS_PORT[[:space:]]*=[[:space:]]*\"?([^\"]+)\"?[[:space:]]*$ ]]; then
-            WIREMOCK_HTTPS_PORT="${BASH_REMATCH[1]}"
-            break
-        fi
-    done < "$ENV_FILE"
-fi
 
 # Check for existing files
 if [[ "$FORCE" == false ]] && [[ -f "$KEYSTORE_PATH" ]]; then
