@@ -69,6 +69,15 @@ if (-not $ScriptDir) {
 # Output paths
 $KeystorePath = Join-Path $ScriptDir "wiremock.jks"
 $CertPath = Join-Path $ScriptDir "wiremock.crt"
+$ContainersDir = Split-Path -Parent $ScriptDir
+$EnvFile = Join-Path $ContainersDir ".env"
+$WireMockHttpsPort = "10443"
+if (Test-Path $EnvFile) {
+    $wireMockHttpsLine = Get-Content $EnvFile | Where-Object { $_ -match '^\s*WIREMOCK_HTTPS_PORT\s*=' } | Select-Object -First 1
+    if ($wireMockHttpsLine -and $wireMockHttpsLine -match '^\s*WIREMOCK_HTTPS_PORT\s*=\s*"?([^"]+)"?\s*$') {
+        $WireMockHttpsPort = $matches[1]
+    }
+}
 
 # Check for existing files
 if (-not $Force) {
@@ -212,11 +221,11 @@ Write-Host "  2. Start WireMock:" -ForegroundColor Gray
 Write-Host "     docker compose up wiremock" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  3. Test HTTPS endpoint:" -ForegroundColor Gray
-Write-Host "     curl -k https://localhost:10443/__admin/health" -ForegroundColor DarkGray
+Write-Host "     curl -k https://localhost:$WireMockHttpsPort/__admin/health" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "Client trust options:" -ForegroundColor White
 Write-Host "  - .NET: Import wiremock.crt or configure HttpClientHandler" -ForegroundColor Gray
 Write-Host "  - Java: keytool -importcert -file wiremock.crt -keystore truststore.jks" -ForegroundColor Gray
-Write-Host "  - curl: curl --cacert wiremock.crt https://localhost:10443/..." -ForegroundColor Gray
+Write-Host "  - curl: curl --cacert wiremock.crt https://localhost:$WireMockHttpsPort/..." -ForegroundColor Gray
 Write-Host "  - Postman: Settings > Certificates > Add CA Certificate" -ForegroundColor Gray
 Write-Host ""

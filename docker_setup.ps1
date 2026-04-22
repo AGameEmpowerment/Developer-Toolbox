@@ -216,9 +216,9 @@ $smtpWebPort = if ($EnvValues.ContainsKey('SMTP4DEV_WEB_PORT') -and $EnvValues['
 $seqPort = if ($EnvValues.ContainsKey('SEQ_HTTP_PORT') -and $EnvValues['SEQ_HTTP_PORT']) { $EnvValues['SEQ_HTTP_PORT'] } else { '10150' }
 $wireMockHttpPort = if ($EnvValues.ContainsKey('WIREMOCK_HTTP_PORT') -and $EnvValues['WIREMOCK_HTTP_PORT']) { $EnvValues['WIREMOCK_HTTP_PORT'] } else { '10080' }
 $wireMockHttpsPort = if ($EnvValues.ContainsKey('WIREMOCK_HTTPS_PORT') -and $EnvValues['WIREMOCK_HTTPS_PORT']) { $EnvValues['WIREMOCK_HTTPS_PORT'] } else { '10443' }
-$azuriteBlobPort = if ($EnvValues.ContainsKey('AZURITE_BLOB_PORT') -and $EnvValues['AZURITE_BLOB_PORT']) { $EnvValues['AZURITE_BLOB_PORT'] } else { '11000' }
-$azuriteQueuePort = if ($EnvValues.ContainsKey('AZURITE_QUEUE_PORT') -and $EnvValues['AZURITE_QUEUE_PORT']) { $EnvValues['AZURITE_QUEUE_PORT'] } else { '11001' }
-$azuriteTablePort = if ($EnvValues.ContainsKey('AZURITE_TABLE_PORT') -and $EnvValues['AZURITE_TABLE_PORT']) { $EnvValues['AZURITE_TABLE_PORT'] } else { '11002' }
+$azuriteBlobPort = if ($EnvValues.ContainsKey('AZURITE_BLOB_PORT') -and $EnvValues['AZURITE_BLOB_PORT']) { $EnvValues['AZURITE_BLOB_PORT'] } else { '10000' }
+$azuriteQueuePort = if ($EnvValues.ContainsKey('AZURITE_QUEUE_PORT') -and $EnvValues['AZURITE_QUEUE_PORT']) { $EnvValues['AZURITE_QUEUE_PORT'] } else { '10001' }
+$azuriteTablePort = if ($EnvValues.ContainsKey('AZURITE_TABLE_PORT') -and $EnvValues['AZURITE_TABLE_PORT']) { $EnvValues['AZURITE_TABLE_PORT'] } else { '10002' }
 $serviceBusPort = if ($EnvValues.ContainsKey('SERVICEBUS_AMQP_PORT') -and $EnvValues['SERVICEBUS_AMQP_PORT']) { $EnvValues['SERVICEBUS_AMQP_PORT'] } else { '10170' }
 $serviceBusAdminPort = if ($EnvValues.ContainsKey('SERVICEBUS_ADMIN_PORT') -and $EnvValues['SERVICEBUS_ADMIN_PORT']) { $EnvValues['SERVICEBUS_ADMIN_PORT'] } else { '10171' }
 Write-Host "  SQL Server:    localhost:$mssqlPort" -ForegroundColor Gray

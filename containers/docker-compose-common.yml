@@ -174,9 +174,9 @@ services:
     azurite:
         image: mcr.microsoft.com/azure-storage/azurite
         ports:
-            - "127.0.0.1:${AZURITE_BLOB_PORT:-11000}:10000" # Blob service
-            - "127.0.0.1:${AZURITE_QUEUE_PORT:-11001}:10001" # Queue service
-            - "127.0.0.1:${AZURITE_TABLE_PORT:-11002}:10002" # Table service
+            - "127.0.0.1:${AZURITE_BLOB_PORT:-10000}:10000" # Blob service
+            - "127.0.0.1:${AZURITE_QUEUE_PORT:-10001}:10001" # Queue service
+            - "127.0.0.1:${AZURITE_TABLE_PORT:-10002}:10002" # Table service
         restart: unless-stopped
         container_name: Azurite
 
