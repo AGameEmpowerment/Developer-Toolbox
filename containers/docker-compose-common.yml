@@ -16,13 +16,19 @@ services:
     mssql:
         build: ./mssql
         environment:
+            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
             SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
             ACCEPT_EULA: "${ACCEPT_EULA}"
             MSSQL_AGENT_ENABLED: "true"
         ports:
-            - "127.0.0.1:10433:1433" # SQL Server Connection Port
+            - "127.0.0.1:${MSSQL_PORT:-10433}:1433" # SQL Server Connection Port
         volumes:
             - mssql-data:/var/opt/mssql
+        networks:
+            default:
+            sb-emulator:
+                aliases:
+                    - mssql
         restart: unless-stopped
         container_name: SqlServer
         hostname: mssql
@@ -36,8 +42,8 @@ services:
             PROTOCOL: "https"
             ENABLE_EXPLORER: "true"
         ports:
-            - "127.0.0.1:10081:8081"
-            - "127.0.0.1:10181:1234"
+            - "127.0.0.1:${COSMOSDB_HTTPS_PORT:-10081}:8081"
+            - "127.0.0.1:${COSMOSDB_EXPLORER_PORT:-10181}:1234"
         volumes:
             - cosmos-data:/data
         healthcheck:
@@ -62,7 +68,7 @@ services:
                 "AKE",
             ]
         ports:
-            - "127.0.0.1:10120:6379" # Redis Cache Endpoint Port
+            - "127.0.0.1:${REDIS_PORT:-10120}:6379" # Redis Cache Endpoint Port
         healthcheck:
             test: ["CMD", "redis-cli", "ping"]
             interval: 10s
@@ -102,10 +108,10 @@ services:
     smtp4dev:
         image: rnwood/smtp4dev:latest
         ports:
-            - "127.0.0.1:10130:25" # smtp server
-            - "127.0.0.1:10131:110" # pop server
-            - "127.0.0.1:10132:143" # imap server
-            - "127.0.0.1:10140:80" # web ui
+            - "127.0.0.1:${SMTP4DEV_SMTP_PORT:-10130}:25" # smtp server
+            - "127.0.0.1:${SMTP4DEV_POP_PORT:-10131}:110" # pop server
+            - "127.0.0.1:${SMTP4DEV_IMAP_PORT:-10132}:143" # imap server
+            - "127.0.0.1:${SMTP4DEV_WEB_PORT:-10140}:80" # web ui
         volumes:
             - smtp4dev-data:/smtp4dev
         environment:
@@ -123,7 +129,7 @@ services:
             SEQ_FIRSTRUN_NOAUTHENTICATION: "${SEQ_FIRSTRUN_NOAUTHENTICATION}"
             SEQ_STORAGE_SECRETKEY: "${SEQ_STORAGE_SECRETKEY}"
         ports:
-            - "127.0.0.1:10150:80" # Web UI and API port
+            - "127.0.0.1:${SEQ_HTTP_PORT:-10150}:80" # Web UI and API port
         restart: unless-stopped
         container_name: OtelCollector
         volumes:
@@ -134,14 +140,14 @@ services:
     # WireMock configured with HTTPS support using a custom JKS keystore.
     # Prerequisites: From the repo root, run ./containers/certs/Generate-WireMockCert.ps1 (or ./certs/Generate-WireMockCert.ps1 from the containers/ folder), or run docker_setup.ps1/docker_setup.sh to create the keystore before first use.
     # Ports:
-    #   - 10080: HTTP (for backward compatibility)
-    #   - 10443: HTTPS (TLS with custom certificate)
+    #   - WIREMOCK_HTTP_PORT (default 10080): HTTP (for backward compatibility)
+    #   - WIREMOCK_HTTPS_PORT (default 10443): HTTPS (TLS with custom certificate)
     # For client trust, import ./containers/certs/wiremock.crt (from the repo root) into your application's trust store.
     wiremock:
         image: wiremock/wiremock:latest
         ports:
-            - "127.0.0.1:10080:8080" # WireMock HTTP Port for API routes
-            - "127.0.0.1:10443:8443" # WireMock HTTPS Port for API routes
+            - "127.0.0.1:${WIREMOCK_HTTP_PORT:-10080}:8080" # WireMock HTTP Port for API routes
+            - "127.0.0.1:${WIREMOCK_HTTPS_PORT:-10443}:8443" # WireMock HTTPS Port for API routes
         volumes:
             - ./extensions:/var/wiremock/extensions
             - ./__files:/home/wiremock/__files
@@ -168,41 +174,28 @@ services:
     azurite:
         image: mcr.microsoft.com/azure-storage/azurite
         ports:
-            - "127.0.0.1:10000:10000" # Blob service
-            - "127.0.0.1:10001:10001" # Queue service
-            - "127.0.0.1:10002:10002" # Table service
+            - "127.0.0.1:${AZURITE_BLOB_PORT:-11000}:10000" # Blob service
+            - "127.0.0.1:${AZURITE_QUEUE_PORT:-11001}:10001" # Queue service
+            - "127.0.0.1:${AZURITE_TABLE_PORT:-11002}:10002" # Table service
         restart: unless-stopped
         container_name: Azurite
 
-    # SQL Edge and Service Bus Emulator
-    SqlEdge-ServiceBus:
-        image: mcr.microsoft.com/azure-sql-edge:latest
-        networks:
-            sb-emulator:
-                aliases:
-                    - SqlEdge-ServiceBus
-        environment:
-            ACCEPT_EULA: "${ACCEPT_EULA}"
-            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
-        restart: unless-stopped
-        container_name: SqlEdge-ServiceBus
-
-    # Service Bus Emulator using SQL Edge
+    # Service Bus Emulator using the shared SQL Server Linux instance.
     service-bus:
         image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
         pull_policy: always
         volumes:
             - "./service-bus/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json"
         ports:
-            - "127.0.0.1:10170:5672" # Service Bus, Update port if needed
-            - "127.0.0.1:10171:5300" # Service Bus, Update port if needed
+            - "127.0.0.1:${SERVICEBUS_AMQP_PORT:-10170}:5672" # Service Bus AMQP
+            - "127.0.0.1:${SERVICEBUS_ADMIN_PORT:-10171}:5300" # Service Bus admin / management
         environment:
-            SQL_SERVER: "SqlEdge-ServiceBus"
-            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" # Password should be same as what is set for SQL Edge
+            SQL_SERVER: "mssql"
+            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" # Password must match the SQL Server Linux container
             ACCEPT_EULA: "${ACCEPT_EULA}"
             SQL_WAIT_INTERVAL: "15" # Optional: Time in seconds to wait for SQL to be ready (default is 15 seconds)
         depends_on:
-            - SqlEdge-ServiceBus
+            - mssql
         networks:
             sb-emulator:
                 aliases:

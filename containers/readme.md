@@ -40,11 +40,13 @@ docker compose -f containers/docker-compose-common.yml logs -f redisinsight
 
 Redis and RedisInsight endpoints for local development:
 
-- Redis: `localhost:10120`
-- RedisInsight Web UI: `http://localhost:10121` (or value of `REDISINSIGHT_WEB_PORT` from `containers/.env`)
+- Redis: `localhost:<REDIS_PORT>` (default `10120`)
+- RedisInsight Web UI: `http://localhost:<REDISINSIGHT_WEB_PORT>` (default `10121`)
 
 RedisInsight is preconfigured to connect to the Redis service in Docker (`redis:6379`, DB `0`).
 If your app writes to another logical database (for example, DB `1`), switch the selected DB in RedisInsight after connecting.
+
+All host-side ports are configured through `containers/.env` (or `containers/.env.example` before first run). Update the relevant `*_PORT` values there if you need to avoid local conflicts.
 
 ## Backup & restore the SQL volume
 

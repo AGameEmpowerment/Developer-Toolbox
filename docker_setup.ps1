@@ -204,20 +204,40 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
 
 Write-Host "`n=== Setup Complete ===" -ForegroundColor Green
 Write-Host "Services available:" -ForegroundColor White
-Write-Host "  SQL Server:    localhost:10433" -ForegroundColor Gray
-Write-Host "  CosmosDB:      localhost:10081" -ForegroundColor Gray
-Write-Host "  Redis:         localhost:10120" -ForegroundColor Gray
+$mssqlPort = if ($EnvValues.ContainsKey('MSSQL_PORT') -and $EnvValues['MSSQL_PORT']) { $EnvValues['MSSQL_PORT'] } else { '10433' }
+$cosmosDbHttpsPort = if ($EnvValues.ContainsKey('COSMOSDB_HTTPS_PORT') -and $EnvValues['COSMOSDB_HTTPS_PORT']) { $EnvValues['COSMOSDB_HTTPS_PORT'] } else { '10081' }
+$cosmosDbExplorerPort = if ($EnvValues.ContainsKey('COSMOSDB_EXPLORER_PORT') -and $EnvValues['COSMOSDB_EXPLORER_PORT']) { $EnvValues['COSMOSDB_EXPLORER_PORT'] } else { '10181' }
+$redisPort = if ($EnvValues.ContainsKey('REDIS_PORT') -and $EnvValues['REDIS_PORT']) { $EnvValues['REDIS_PORT'] } else { '10120' }
 $redisInsightPort = if ($EnvValues.ContainsKey('REDISINSIGHT_WEB_PORT') -and $EnvValues['REDISINSIGHT_WEB_PORT']) { $EnvValues['REDISINSIGHT_WEB_PORT'] } else { '10121' }
-Write-Host "  RedisInsight:  http://localhost:$redisInsightPort" -ForegroundColor Gray
+$smtpPort = if ($EnvValues.ContainsKey('SMTP4DEV_SMTP_PORT') -and $EnvValues['SMTP4DEV_SMTP_PORT']) { $EnvValues['SMTP4DEV_SMTP_PORT'] } else { '10130' }
+$smtpPopPort = if ($EnvValues.ContainsKey('SMTP4DEV_POP_PORT') -and $EnvValues['SMTP4DEV_POP_PORT']) { $EnvValues['SMTP4DEV_POP_PORT'] } else { '10131' }
+$smtpImapPort = if ($EnvValues.ContainsKey('SMTP4DEV_IMAP_PORT') -and $EnvValues['SMTP4DEV_IMAP_PORT']) { $EnvValues['SMTP4DEV_IMAP_PORT'] } else { '10132' }
 $smtpWebPort = if ($EnvValues.ContainsKey('SMTP4DEV_WEB_PORT') -and $EnvValues['SMTP4DEV_WEB_PORT']) { $EnvValues['SMTP4DEV_WEB_PORT'] } else { '10140' }
 $seqPort = if ($EnvValues.ContainsKey('SEQ_HTTP_PORT') -and $EnvValues['SEQ_HTTP_PORT']) { $EnvValues['SEQ_HTTP_PORT'] } else { '10150' }
-Write-Host "  SMTP4Dev:      http://localhost:$smtpWebPort" -ForegroundColor Gray
-Write-Host "  Seq (OTEL):    http://localhost:$seqPort" -ForegroundColor Gray
-Write-Host "  WireMock HTTP: http://localhost:10080" -ForegroundColor Gray
-Write-Host "  WireMock HTTPS: https://localhost:10443" -ForegroundColor Gray
-Write-Host "  Azurite:       localhost:10000-10002" -ForegroundColor Gray
+$wireMockHttpPort = if ($EnvValues.ContainsKey('WIREMOCK_HTTP_PORT') -and $EnvValues['WIREMOCK_HTTP_PORT']) { $EnvValues['WIREMOCK_HTTP_PORT'] } else { '10080' }
+$wireMockHttpsPort = if ($EnvValues.ContainsKey('WIREMOCK_HTTPS_PORT') -and $EnvValues['WIREMOCK_HTTPS_PORT']) { $EnvValues['WIREMOCK_HTTPS_PORT'] } else { '10443' }
+$azuriteBlobPort = if ($EnvValues.ContainsKey('AZURITE_BLOB_PORT') -and $EnvValues['AZURITE_BLOB_PORT']) { $EnvValues['AZURITE_BLOB_PORT'] } else { '11000' }
+$azuriteQueuePort = if ($EnvValues.ContainsKey('AZURITE_QUEUE_PORT') -and $EnvValues['AZURITE_QUEUE_PORT']) { $EnvValues['AZURITE_QUEUE_PORT'] } else { '11001' }
+$azuriteTablePort = if ($EnvValues.ContainsKey('AZURITE_TABLE_PORT') -and $EnvValues['AZURITE_TABLE_PORT']) { $EnvValues['AZURITE_TABLE_PORT'] } else { '11002' }
 $serviceBusPort = if ($EnvValues.ContainsKey('SERVICEBUS_AMQP_PORT') -and $EnvValues['SERVICEBUS_AMQP_PORT']) { $EnvValues['SERVICEBUS_AMQP_PORT'] } else { '10170' }
+$serviceBusAdminPort = if ($EnvValues.ContainsKey('SERVICEBUS_ADMIN_PORT') -and $EnvValues['SERVICEBUS_ADMIN_PORT']) { $EnvValues['SERVICEBUS_ADMIN_PORT'] } else { '10171' }
+Write-Host "  SQL Server:    localhost:$mssqlPort" -ForegroundColor Gray
+Write-Host "  CosmosDB:      https://localhost:$cosmosDbHttpsPort" -ForegroundColor Gray
+Write-Host "  Cosmos Explorer: http://localhost:$cosmosDbExplorerPort" -ForegroundColor Gray
+Write-Host "  Redis:         localhost:$redisPort" -ForegroundColor Gray
+Write-Host "  RedisInsight:  http://localhost:$redisInsightPort" -ForegroundColor Gray
+Write-Host "  SMTP4Dev SMTP: localhost:$smtpPort" -ForegroundColor Gray
+Write-Host "  SMTP4Dev POP:  localhost:$smtpPopPort" -ForegroundColor Gray
+Write-Host "  SMTP4Dev IMAP: localhost:$smtpImapPort" -ForegroundColor Gray
+Write-Host "  SMTP4Dev Web:  http://localhost:$smtpWebPort" -ForegroundColor Gray
+Write-Host "  Seq (OTEL):    http://localhost:$seqPort" -ForegroundColor Gray
+Write-Host "  WireMock HTTP: http://localhost:$wireMockHttpPort" -ForegroundColor Gray
+Write-Host "  WireMock HTTPS: https://localhost:$wireMockHttpsPort" -ForegroundColor Gray
+Write-Host "  Azurite Blob:  localhost:$azuriteBlobPort" -ForegroundColor Gray
+Write-Host "  Azurite Queue: localhost:$azuriteQueuePort" -ForegroundColor Gray
+Write-Host "  Azurite Table: localhost:$azuriteTablePort" -ForegroundColor Gray
 Write-Host "  Service Bus:   localhost:$serviceBusPort" -ForegroundColor Gray
+Write-Host "  Service Bus Admin: localhost:$serviceBusAdminPort" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Head back to README.md for deployment of the database and other services..."
 
