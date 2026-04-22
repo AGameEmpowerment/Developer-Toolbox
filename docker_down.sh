@@ -14,6 +14,7 @@ NC='\033[0m' # No Color
 # Parse arguments
 CLEAN_CERTS=false
 CLEAN_ENV=false
+CLEAN_VOLUMES=false
 CLEAN_ALL=false
 
 while [[ $# -gt 0 ]]; do
@@ -26,6 +27,10 @@ while [[ $# -gt 0 ]]; do
             CLEAN_ENV=true
             shift
             ;;
+        --clean-volumes|-v)
+            CLEAN_VOLUMES=true
+            shift
+            ;;
         --clean-all|-a)
             CLEAN_ALL=true
             shift
@@ -36,7 +41,8 @@ while [[ $# -gt 0 ]]; do
             echo "Options:"
             echo "  -c, --clean-certs  Remove WireMock certificates (wiremock.jks, wiremock.crt)"
             echo "  -e, --clean-env    Remove .env file (will be regenerated on next setup)"
-            echo "  -a, --clean-all    Remove all ephemeral files (certs + .env)"
+            echo "  -v, --clean-volumes Remove Docker named volumes for the compose project"
+            echo "  -a, --clean-all    Remove all ephemeral files and Docker named volumes"
             echo "  -h, --help         Show this help message"
             exit 0
             ;;
@@ -71,37 +77,24 @@ if command -v docker &> /dev/null; then
     )
 
     for project_name in "${PROJECT_NAMES[@]}"; do
-        container_ids=()
-        while IFS= read -r container_id; do
-            if [[ -n "$container_id" ]]; then
-                container_ids+=("$container_id")
-            fi
-        done < <(docker ps -aq --filter "label=com.docker.compose.project=${project_name}" || true)
+        mapfile -t container_ids < <(docker ps -aq --filter "label=com.docker.compose.project=${project_name}" || true)
         if [[ ${#container_ids[@]} -gt 0 ]]; then
             echo -e "${YELLOW}Removing leftover containers for project '${project_name}'...${NC}"
             docker rm -f "${container_ids[@]}" >/dev/null || true
         fi
 
-        network_ids=()
-        while IFS= read -r network_id; do
-            if [[ -n "$network_id" ]]; then
-                network_ids+=("$network_id")
-            fi
-        done < <(docker network ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
+        mapfile -t network_ids < <(docker network ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
         if [[ ${#network_ids[@]} -gt 0 ]]; then
             echo -e "${YELLOW}Removing leftover networks for project '${project_name}'...${NC}"
             docker network rm "${network_ids[@]}" >/dev/null || true
         fi
 
-        volume_ids=()
-        while IFS= read -r volume_id; do
-            if [[ -n "$volume_id" ]]; then
-                volume_ids+=("$volume_id")
+        if [[ "$CLEAN_VOLUMES" == true ]] || [[ "$CLEAN_ALL" == true ]]; then
+            mapfile -t volume_ids < <(docker volume ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
+            if [[ ${#volume_ids[@]} -gt 0 ]]; then
+                echo -e "${YELLOW}Removing leftover volumes for project '${project_name}'...${NC}"
+                docker volume rm "${volume_ids[@]}" >/dev/null || true
             fi
-        done < <(docker volume ls -q --filter "label=com.docker.compose.project=${project_name}" || true)
-        if [[ ${#volume_ids[@]} -gt 0 ]]; then
-            echo -e "${YELLOW}Removing leftover volumes for project '${project_name}'...${NC}"
-            docker volume rm "${volume_ids[@]}" >/dev/null || true
         fi
     done
 
@@ -190,10 +183,11 @@ fi
 
 echo -e "\n${GREEN}=== Teardown Complete ===${NC}"
 
-if [[ "$CLEAN_CERTS" == false ]] && [[ "$CLEAN_ENV" == false ]] && [[ "$CLEAN_ALL" == false ]]; then
+if [[ "$CLEAN_CERTS" == false ]] && [[ "$CLEAN_ENV" == false ]] && [[ "$CLEAN_VOLUMES" == false ]] && [[ "$CLEAN_ALL" == false ]]; then
     echo ""
     echo -e "${YELLOW}Tip: Use these flags to clean ephemeral files:${NC}"
     echo -e "${GRAY}  -c, --clean-certs  : Remove WireMock certificates (wiremock.jks, wiremock.crt)${NC}"
     echo -e "${GRAY}  -e, --clean-env    : Remove .env file (will be regenerated on next setup)${NC}"
-    echo -e "${GRAY}  -a, --clean-all    : Remove all ephemeral files (certs + .env)${NC}"
+    echo -e "${GRAY}  -v, --clean-volumes: Remove Docker named volumes for the compose project${NC}"
+    echo -e "${GRAY}  -a, --clean-all    : Remove all ephemeral files and Docker named volumes${NC}"
 fi

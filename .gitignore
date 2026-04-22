@@ -426,5 +426,8 @@ containers/certs/*.jks
 containers/certs/*.crt
 containers/certs/truststore.*
 
-# Copilot tracking files
+# AI temp files
+.codex-temp/
 .copilot-tracking/*
+tmp/
+.playwright-mcp/

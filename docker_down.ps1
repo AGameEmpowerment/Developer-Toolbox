@@ -9,6 +9,9 @@ param(
     [switch]$CleanEnv,
 
     [Parameter()]
+    [switch]$CleanVolumes,
+
+    [Parameter()]
     [switch]$CleanAll
 )
 
@@ -17,6 +20,9 @@ if (-not $ScriptDir) { $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.P
 
 $ContainersDir = Join-Path $ScriptDir "containers"
 $CertsDir = Join-Path $ContainersDir "certs"
+$isWindowsPlatform = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+    [System.Runtime.InteropServices.OSPlatform]::Windows
+)
 
 #region Docker Teardown
 Write-Host "=== Docker Teardown ===" -ForegroundColor Cyan
@@ -29,11 +35,6 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
         -f (Join-Path $ContainersDir "docker-compose-common.yml") `
         -p dev_common_shared `
         down --remove-orphans
-    $composeExitCode = $LASTEXITCODE
-    if ($composeExitCode -ne 0) {
-        Write-Error "Failed to stop and remove containers via 'docker compose down'. Exit code: $composeExitCode. Skipping additional Docker cleanup steps."
-        return
-    }
 
     ## Safety net: remove any leftover resources still labeled with this compose project.
     $projectNames = @("dev_common_shared")
@@ -63,16 +64,18 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
             docker network rm $networkIds | Out-Null
         }
 
-        $volumeIds = @()
-        try {
-            $volumeIds = @(docker volume ls -q --filter "label=com.docker.compose.project=$projectName")
-        } catch {
-            Write-Warning "Failed to query volumes for project '$projectName': $($_.Exception.Message)"
-        }
+        if ($CleanVolumes -or $CleanAll) {
+            $volumeIds = @()
+            try {
+                $volumeIds = @(docker volume ls -q --filter "label=com.docker.compose.project=$projectName")
+            } catch {
+                Write-Warning "Failed to query volumes for project '$projectName': $($_.Exception.Message)"
+            }
 
-        if ($volumeIds -and $volumeIds.Count -gt 0) {
-            Write-Host "Removing leftover volumes for project '$projectName'..." -ForegroundColor Yellow
-            docker volume rm $volumeIds | Out-Null
+            if ($volumeIds -and $volumeIds.Count -gt 0) {
+                Write-Host "Removing leftover volumes for project '$projectName'..." -ForegroundColor Yellow
+                docker volume rm $volumeIds | Out-Null
+            }
         }
     }
 
@@ -87,7 +90,7 @@ if ($CleanCerts -or $CleanAll) {
     Write-Host "`n=== Cleaning WireMock Certificates ===" -ForegroundColor Cyan
 
     # Remove certificate from Windows trusted root store
-    if ($IsWindows) {
+    if ($isWindowsPlatform) {
         Write-Host "Removing WireMock certificate from Windows trusted root store..." -ForegroundColor Yellow
         try {
             $store = [System.Security.Cryptography.X509Certificates.X509Store]::new("Root", "CurrentUser")
@@ -146,11 +149,12 @@ if ($CleanEnv -or $CleanAll) {
 
 Write-Host "`n=== Teardown Complete ===" -ForegroundColor Green
 
-if (-not $CleanCerts -and -not $CleanEnv -and -not $CleanAll) {
+if (-not $CleanCerts -and -not $CleanEnv -and -not $CleanVolumes -and -not $CleanAll) {
     Write-Host ""
     Write-Host "Tip: Use these flags to clean ephemeral files:" -ForegroundColor Yellow
     Write-Host "  -CleanCerts  : Remove WireMock certificates (*.pfx, *.crt, *.key, etc.)" -ForegroundColor Gray
     Write-Host "  -CleanEnv    : Remove .env file (will be regenerated on next setup)" -ForegroundColor Gray
-    Write-Host "  -CleanAll    : Remove all ephemeral files (certs + .env)" -ForegroundColor Gray
+    Write-Host "  -CleanVolumes: Remove Docker named volumes for the compose project" -ForegroundColor Gray
+    Write-Host "  -CleanAll    : Remove all ephemeral files and Docker named volumes" -ForegroundColor Gray
 }
 

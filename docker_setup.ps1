@@ -13,6 +13,9 @@ $ContainersDir = Join-Path $ScriptDir "containers"
 $CertsDir = Join-Path $ContainersDir "certs"
 $EnvFile = Join-Path $ContainersDir ".env"
 $EnvExampleFile = Join-Path $ContainersDir ".env.example"
+$isWindowsPlatform = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+    [System.Runtime.InteropServices.OSPlatform]::Windows
+)
 
 #region Environment Setup
 Write-Host "=== Environment Setup ===" -ForegroundColor Cyan
@@ -118,7 +121,7 @@ if (-not (Test-Path $WireMockKeystore)) {
 $WireMockCert = Join-Path $CertsDir "wiremock.crt"
 if (Test-Path $WireMockCert) {
     # Always attempt to import to Windows certificate store on Windows
-    if ($IsWindows) {
+    if ($isWindowsPlatform) {
         Write-Host "Importing WireMock certificate to Windows trusted root store..." -ForegroundColor Yellow
 
         try {

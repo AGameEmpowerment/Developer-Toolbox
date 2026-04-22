@@ -171,7 +171,7 @@ When the generated project contains actual source code:
 - Use `.github/skills/INDEX.md` as the canonical discovery map for skill usage.
 - Prefer Skills CLI (`npx skills`) for skill discovery and installation workflows.
 - Use `npx skills find <query>` for discovery and `npx skills add <owner/repo@skill> -g -y` for global install.
-- If a `find-skills` capability is available in the environment, prefer it for discovering relevant skills before inventing project-local automation; otherwise, fall back to `npx skills find` and `.github/skills/INDEX.md`.
+- Prefer the installed `find-skills` capability for discovering relevant skills before inventing project-local automation.
 
 ---
 ## Examples (Template Context)

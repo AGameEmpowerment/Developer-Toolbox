@@ -18,7 +18,7 @@
 #   WIREMOCK_KEYSTORE_PASSWORD=<your-password>
 #
 
-set -e
+set -euo pipefail
 
 # Colors for output
 RED='\033[0;31m'
