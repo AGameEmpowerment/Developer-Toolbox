@@ -1,10 +1,20 @@
 {
-  "request": {
-    "url": "/",
-    "method": "GET"
-  },
-  "response": {
-    "status": 200,
-    "body": "Welcome to WireMock!"
-  }
+  "mappings": [
+    {
+      "id": "C023A17C-C349-4F3C-B4B5-E0549DE47990",
+      "name": "Default Mapping",
+      "priority": 0,
+      "request": {
+        "url": "/",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "text/plain"
+        },
+        "body": "Welcome to WireMock!"
+      }
+    }
+  ]
 }

@@ -420,6 +420,8 @@ FodyWeavers.xsd
 #merge files
 *.sln.iml
 *.orig
+.jfrog/*
+nugetlibs/
 
 # WireMock TLS certificates (generated, contain private keys)
 containers/certs/*.jks
@@ -427,6 +429,7 @@ containers/certs/*.crt
 containers/certs/truststore.*
 
 # AI temp files
+.agent_work/
 .codex-temp/
 .copilot-tracking/*
 tmp/
