@@ -23,8 +23,8 @@ az extension add --name azure-devops
 ## Authentication
 
 ```bash
-# Login with PAT token
-az devops login --organization https://dev.azure.com/{org} --token YOUR_PAT_TOKEN
+# Login with a PAT via stdin to avoid leaking it in shell history or process args
+printf '%s' "$AZURE_DEVOPS_EXT_PAT" | az devops login --organization https://dev.azure.com/{org}
 
 # Set default organization and project (avoids repeating --org/--project)
 # Note: Legacy URL https://{org}.visualstudio.com should be replaced with https://dev.azure.com/{org}
@@ -33,6 +33,8 @@ az devops configure --defaults organization=https://dev.azure.com/{org} project=
 # List current configuration
 az devops configure --list
 ```
+
+Never pass PATs on the command line or paste them into shared logs. Set `AZURE_DEVOPS_EXT_PAT` securely in your shell or CI environment first, then pipe it to `az devops login`.
 
 ## CLI Structure
 
