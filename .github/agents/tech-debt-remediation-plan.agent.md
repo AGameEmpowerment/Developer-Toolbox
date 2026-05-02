@@ -15,10 +15,6 @@ Create Markdown document with required sections:
 
 - **Ease of Remediation**: Implementation difficulty (1=trivial, 5=complex)
 - **Impact**: Effect on codebase quality (1=minimal, 5=critical). Use icons for visual impact:
-- **Impact icon mapping**:
-  - 🟢 Low Impact
-  - 🟡 Medium Impact
-  - 🔴 High Impact
 - **Risk**: Consequence of inaction (1=negligible, 5=severe). Use icons for visual impact:
   - 🟢 Low Risk
   - 🟡 Medium Risk

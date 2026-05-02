@@ -1,7 +1,7 @@
 ---
 description: "Generate and refactor Go Terratest suites for Terraform modules, including CI-safe patterns, staged tests, and negative-path validation."
 model: "gpt-5"
-tools: ["codebase", "terminalCommand"]
+tools: ["codebase", "runCommands/*"]
 name: "Terratest Module Testing"
 ---
 

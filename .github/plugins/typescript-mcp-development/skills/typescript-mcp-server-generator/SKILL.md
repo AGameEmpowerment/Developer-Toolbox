@@ -10,9 +10,9 @@ Create a complete Model Context Protocol (MCP) server in TypeScript with the fol
 ## Requirements
 
 1. **Project Structure**: Create a new TypeScript/Node.js project with proper directory structure
-2. **NPM Packages**: Include `@modelcontextprotocol/sdk`, `zod@3`, and `express` only when building an HTTP server. For stdio servers, use the SDK's built-in `StdioServerTransport` with no extra transport package.
+2. **NPM Packages**: Include @modelcontextprotocol/sdk and zod@3; default to stdio support and only add Express or other HTTP transport dependencies when the user explicitly asks for HTTP
 3. **TypeScript Configuration**: Proper tsconfig.json with ES modules support
-4. **Server Type**: Choose between HTTP (with Streamable HTTP transport) or stdio-based server
+4. **Server Type**: Default to a stdio-based server; use HTTP (with Streamable HTTP transport) only when the user explicitly asks for it
 5. **Tools**: Create at least one useful tool with proper schema validation
 6. **Error Handling**: Include comprehensive error handling and validation
 
@@ -20,7 +20,7 @@ Create a complete Model Context Protocol (MCP) server in TypeScript with the fol
 
 ### Project Setup
 - Initialize with `npm init` and create package.json
-- Install dependencies: `@modelcontextprotocol/sdk`, `zod@3`, and any HTTP-only packages such as `express` when building an HTTP server
+- Install dependencies: `@modelcontextprotocol/sdk`, `zod@3`, and only the transport-specific packages required by the user's chosen transport
 - Configure TypeScript with ES modules: `"type": "module"` in package.json
 - Add dev dependencies: `tsx` or `ts-node` for development
 - Create proper .gitignore file
@@ -28,9 +28,9 @@ Create a complete Model Context Protocol (MCP) server in TypeScript with the fol
 ### Server Configuration
 - Use `McpServer` class for high-level implementation
 - Set server name and version
-- Choose appropriate transport (StreamableHTTPServerTransport or StdioServerTransport)
-- For HTTP: set up Express with proper middleware and error handling
-- For stdio: use `StdioServerTransport` directly from `@modelcontextprotocol/sdk/server/stdio.js` with no additional transport dependency
+- Choose appropriate transport (StdioServerTransport by default, or StreamableHTTPServerTransport when the user explicitly wants HTTP)
+- For HTTP: only add Express when the user explicitly wants an HTTP server, then set up middleware and error handling appropriately
+- For stdio: use StdioServerTransport directly
 
 ### Tool Implementation
 - Use `registerTool()` method with descriptive names

@@ -32,7 +32,7 @@ Your goal is to help me create well-structured ASP.NET Minimal API endpoints wit
 
 ## OpenAPI Documentation
 
-- Use the built-in OpenAPI document support added in .NET 9
+- Use the built-in OpenAPI document support when it is available in the configured ASP.NET Core version; otherwise follow the project's existing OpenAPI or Swagger approach
 - Define operation summary and description
 - Add operationIds using the `WithName` extension method
 - Add descriptions to properties and parameters with `[Description()]`

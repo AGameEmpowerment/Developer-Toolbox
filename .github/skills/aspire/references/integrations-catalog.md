@@ -1,12 +1,12 @@
 # Integrations Catalog
 
-Aspire has **144+ integrations** across 13 categories. Rather than maintaining a static list, use the MCP tools to get live, up-to-date integration data.
+Aspire has many integrations across multiple categories. Rather than maintaining static counts, use the MCP tools to get live, up-to-date integration data.
 
 ---
 
 ## Discovering integrations (MCP tools)
 
-The Aspire MCP server provides two tools for integration discovery — these work on **all CLI versions** (13.1+) and do **not** require a running AppHost.
+The Aspire MCP server provides two tools for integration discovery. Use them to get the current integration catalog without maintaining a static list, and do not assume a running AppHost is required unless the current tooling says otherwise.
 
 | Tool                   | What it does                                                                                             | When to use                                                                                 |
 | ---------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
@@ -16,10 +16,10 @@ The Aspire MCP server provides two tools for integration discovery — these wor
 ### Workflow
 
 1. **Browse** — Call `list_integrations` to see what's available. Filter results by category or keyword.
-2. **Deep dive** — Call `get_integration_docs` with the package ID (e.g., `Aspire.Hosting.Redis`) and version (e.g., `9.0.0`) to get full setup instructions.
+2. **Deep dive** — Call `get_integration_docs` with the package ID (e.g., `Aspire.Hosting.Redis`) and the package version you want to target to get full setup instructions.
 3. **Add** — Run `aspire add <integration>` to install the hosting package into your AppHost.
 
-> **Tip:** These tools return the same data as the [official integrations gallery](https://aspire.dev/integrations/gallery/). Prefer them over static docs — integrations are added frequently.
+> **Tip:** These tools mirror the [official integrations gallery](https://aspire.dev/integrations/gallery/). Prefer them over static docs because the available integrations change over time.
 
 ---
 
@@ -46,13 +46,13 @@ builder.AddRedisClient("cache");        // Aspire.StackExchange.Redis
 
 ## Categories at a glance
 
-Use `list_integrations` for the full live list. This summary covers the major categories:
+Use `list_integrations` for the full live list. This summary covers representative major categories:
 
 | Category            | Key integrations                                                                      | Example hosting package                  |
 | ------------------- | ------------------------------------------------------------------------------------- | ---------------------------------------- |
 | **AI**              | Azure OpenAI, OpenAI, GitHub Models, Ollama                                           | `Aspire.Hosting.Azure.CognitiveServices` |
 | **Caching**         | Redis, Garnet, Valkey, Azure Cache for Redis                                          | `Aspire.Hosting.Redis`                   |
-| **Cloud / Azure**   | Storage, Cosmos DB, Service Bus, Key Vault, Event Hubs, Functions, SQL, SignalR (25+) | `Aspire.Hosting.Azure.Storage`           |
+| **Cloud / Azure**   | Storage, Cosmos DB, Service Bus, Key Vault, Event Hubs, Functions, SQL, SignalR        | `Aspire.Hosting.Azure.Storage`           |
 | **Cloud / AWS**     | AWS SDK integration                                                                   | `Aspire.Hosting.AWS`                     |
 | **Databases**       | PostgreSQL, SQL Server, MongoDB, MySQL, Oracle, Elasticsearch, Milvus, Qdrant, SQLite | `Aspire.Hosting.PostgreSQL`              |
 | **DevTools**        | Data API Builder, Dev Tunnels, Mailpit, k6, Flagd, Ngrok, Stripe                      | `Aspire.Hosting.DevTunnels`              |

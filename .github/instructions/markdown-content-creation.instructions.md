@@ -1,6 +1,6 @@
 ---
 description: 'Markdown guidelines and content creation standards for blog posts'
-applyTo: '**/*.md'
+applyTo: 'INSTALL-*.md'
 ---
 
 ## Markdown Content Rules For Blog Posts

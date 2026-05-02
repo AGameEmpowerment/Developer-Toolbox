@@ -15,6 +15,8 @@ If any guidance in this file conflicts with the sources above, the more specific
 - When a domain applies (security, performance, accessibility, devops, architecture, etc.), consult the matching file in `.github/instructions/` first and follow it.
 - Mirror existing codebase patterns and versions discovered in project files; do not assume versions or introduce new frameworks.
 - For this repository only: prefer new, clean code and clear contracts over preserving legacy compatibility. Make breaking changes when they improve design clarity, and refactor impacted code/tests/configuration in the same change.
+- Before committing changes to the local git repository, ask the user for explicit approval.
+- Before pushing changes to any remote git repository, ask the user for explicit approval.
 - Use `.github/skills/INDEX.md` as the canonical map for available skills.
 - Prefer global Skills CLI discovery (`npx skills find <query>`) and the installed `find-skills` skill when searching for new capabilities.
 

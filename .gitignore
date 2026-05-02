@@ -432,5 +432,10 @@ containers/certs/truststore.*
 .agent_work/
 .codex-temp/
 .copilot-tracking/*
+.dotnet-runtime/*
+.dotnet-home/
+temp/
 tmp/
+.dotnet/
+.agent_work/
 .playwright-mcp/
