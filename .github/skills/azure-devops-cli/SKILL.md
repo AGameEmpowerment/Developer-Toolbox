@@ -7,7 +7,7 @@ description: Manage Azure DevOps resources via CLI including projects, repos, pi
 
 Manage Azure DevOps resources using the Azure CLI with the Azure DevOps extension.
 
-**CLI Version:** 2.81.0 (current as of 2025)
+**CLI Version:** Use the current Azure CLI version for your environment. Run `az version` and confirm the Azure DevOps extension is installed before using these commands.
 
 ## Prerequisites
 
