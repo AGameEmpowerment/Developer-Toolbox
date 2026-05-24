@@ -16,6 +16,7 @@ CLEAN_CERTS=false
 CLEAN_ENV=false
 CLEAN_VOLUMES=false
 CLEAN_ALL=false
+FORCE=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -35,14 +36,19 @@ while [[ $# -gt 0 ]]; do
             CLEAN_ALL=true
             shift
             ;;
+        --force|-f)
+            FORCE=true
+            shift
+            ;;
         --help|-h)
             echo "Usage: $0 [OPTIONS]"
             echo ""
             echo "Options:"
             echo "  -c, --clean-certs  Remove WireMock certificates (wiremock.jks, wiremock.crt)"
             echo "  -e, --clean-env    Remove .env file (will be regenerated on next setup)"
-            echo "  -v, --clean-volumes Remove Docker named volumes for the compose project"
-            echo "  -a, --clean-all    Remove all ephemeral files and Docker named volumes"
+            echo "  -v, --clean-volumes Remove Docker named volumes for the compose project (requires --force)"
+            echo "  -a, --clean-all    Remove all ephemeral files and Docker named volumes (requires --force)"
+            echo "  -f, --force        Confirm destructive cleanup that removes Docker named volumes"
             echo "  -h, --help         Show this help message"
             exit 0
             ;;
@@ -58,6 +64,11 @@ done
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONTAINERS_DIR="${SCRIPT_DIR}/containers"
 CERTS_DIR="${CONTAINERS_DIR}/certs"
+
+if [[ "$CLEAN_VOLUMES" == true || "$CLEAN_ALL" == true ]] && [[ "$FORCE" != true ]]; then
+    echo -e "${RED}Destructive cleanup requires --force. Re-run with --clean-volumes --force or --clean-all --force to remove Docker named volumes.${NC}" >&2
+    exit 1
+fi
 
 #region Docker Teardown
 echo -e "${CYAN}=== Docker Teardown ===${NC}"
@@ -188,6 +199,6 @@ if [[ "$CLEAN_CERTS" == false ]] && [[ "$CLEAN_ENV" == false ]] && [[ "$CLEAN_VO
     echo -e "${YELLOW}Tip: Use these flags to clean ephemeral files:${NC}"
     echo -e "${GRAY}  -c, --clean-certs  : Remove WireMock certificates (wiremock.jks, wiremock.crt)${NC}"
     echo -e "${GRAY}  -e, --clean-env    : Remove .env file (will be regenerated on next setup)${NC}"
-    echo -e "${GRAY}  -v, --clean-volumes: Remove Docker named volumes for the compose project${NC}"
-    echo -e "${GRAY}  -a, --clean-all    : Remove all ephemeral files and Docker named volumes${NC}"
+    echo -e "${GRAY}  -v, --clean-volumes --force: Remove Docker named volumes for the compose project${NC}"
+    echo -e "${GRAY}  -a, --clean-all --force    : Remove all ephemeral files and Docker named volumes${NC}"
 fi

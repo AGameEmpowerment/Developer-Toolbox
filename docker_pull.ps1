@@ -1,5 +1,9 @@
-# Pull Docker images required by the shared development stack, including
-# base images referenced by repo-local Dockerfiles.
+# Pull Docker images required by the shared development stack.
+#
+# Most services are declared as image-based services in
+# containers/docker-compose-common.yml, so we let docker compose pull those
+# directly. The local SQL Server service is built from containers/mssql, so we
+# also pull its base image explicitly.
 
 [CmdletBinding()]
 param()
@@ -7,22 +11,14 @@ param()
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$ScriptDir = $PSScriptRoot
+if (-not $ScriptDir) { $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path }
+
+$ComposeFile = Join-Path $ScriptDir "containers/docker-compose-common.yml"
+$sqlBaseImage = "mcr.microsoft.com/mssql/server:latest"
+
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "Docker images and container setup started."
-
-    $images = @(
-        "datalust/seq:latest",
-        "mcr.microsoft.com/azure-messaging/servicebus-emulator:latest",
-        "mcr.microsoft.com/azure-sql-edge:latest",
-        "mcr.microsoft.com/azure-storage/azurite",
-        "mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview",
-        "mcr.microsoft.com/devcontainers/dotnet:1-10.0",
-        "mcr.microsoft.com/mssql/server:latest",
-        "redis:latest",
-        "redis/redisinsight:latest",
-        "rnwood/smtp4dev:latest",
-        "wiremock/wiremock:latest"
-    )
 
     $dockerInfo = docker info 2>$null
     $registryMirrors = @($dockerInfo | Where-Object { $_ -match '^\s+https?://' } | ForEach-Object { $_.Trim() })
@@ -31,21 +27,34 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
         $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
     }
 
-    foreach ($image in $images) {
-        Write-Host "Pulling $image..." -ForegroundColor Yellow
-        docker pull $image
-        if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to pull '$image' (exit code $LASTEXITCODE)."
+    Write-Host "Pulling compose-managed images from $ComposeFile..." -ForegroundColor Yellow
+    docker compose -f $ComposeFile pull
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to pull compose-managed images (exit code $LASTEXITCODE)."
 
-            if ($registryMirrors.Count -gt 0) {
-                Write-Host "Docker is configured to use registry mirror(s). If one is unavailable, pulls will fail before reaching the upstream registry." -ForegroundColor Yellow
-                Write-Host "Configured mirror(s):" -ForegroundColor Yellow
-                $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
-                Write-Host "Check Docker Desktop > Settings > Docker Engine, or %APPDATA%\Docker\daemon.json, to remove or fix the mirror." -ForegroundColor Yellow
-            }
-
-            exit $LASTEXITCODE
+        if ($registryMirrors.Count -gt 0) {
+            Write-Host "Docker is configured to use registry mirror(s). If one is unavailable, pulls will fail before reaching the upstream registry." -ForegroundColor Yellow
+            Write-Host "Configured mirror(s):" -ForegroundColor Yellow
+            $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
+            Write-Host "Check Docker Desktop > Settings > Docker Engine, or %APPDATA%\Docker\daemon.json, to remove or fix the mirror." -ForegroundColor Yellow
         }
+
+        exit $LASTEXITCODE
+    }
+
+    Write-Host "Pulling SQL Server base image for containers/mssql/Dockerfile: $sqlBaseImage..." -ForegroundColor Yellow
+    docker pull $sqlBaseImage
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to pull '$sqlBaseImage' (exit code $LASTEXITCODE)."
+
+        if ($registryMirrors.Count -gt 0) {
+            Write-Host "Docker is configured to use registry mirror(s). If one is unavailable, pulls will fail before reaching the upstream registry." -ForegroundColor Yellow
+            Write-Host "Configured mirror(s):" -ForegroundColor Yellow
+            $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
+            Write-Host "Check Docker Desktop > Settings > Docker Engine, or %APPDATA%\Docker\daemon.json, to remove or fix the mirror." -ForegroundColor Yellow
+        }
+
+        exit $LASTEXITCODE
     }
 } else {
     Write-Error "Docker is not installed or not in PATH."

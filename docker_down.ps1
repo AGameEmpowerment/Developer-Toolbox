@@ -12,7 +12,10 @@ param(
     [switch]$CleanVolumes,
 
     [Parameter()]
-    [switch]$CleanAll
+    [switch]$CleanAll,
+
+    [Parameter()]
+    [switch]$Force
 )
 
 $ScriptDir = $PSScriptRoot
@@ -23,6 +26,11 @@ $CertsDir = Join-Path $ContainersDir "certs"
 $isWindowsPlatform = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
     [System.Runtime.InteropServices.OSPlatform]::Windows
 )
+
+if (($CleanVolumes -or $CleanAll) -and -not $Force) {
+    Write-Error "Destructive cleanup requires -Force. Re-run with -CleanVolumes -Force or -CleanAll -Force to remove Docker named volumes."
+    exit 1
+}
 
 #region Docker Teardown
 Write-Host "=== Docker Teardown ===" -ForegroundColor Cyan
@@ -154,7 +162,7 @@ if (-not $CleanCerts -and -not $CleanEnv -and -not $CleanVolumes -and -not $Clea
     Write-Host "Tip: Use these flags to clean ephemeral files:" -ForegroundColor Yellow
     Write-Host "  -CleanCerts  : Remove WireMock certificates (*.pfx, *.crt, *.key, etc.)" -ForegroundColor Gray
     Write-Host "  -CleanEnv    : Remove .env file (will be regenerated on next setup)" -ForegroundColor Gray
-    Write-Host "  -CleanVolumes: Remove Docker named volumes for the compose project" -ForegroundColor Gray
-    Write-Host "  -CleanAll    : Remove all ephemeral files and Docker named volumes" -ForegroundColor Gray
+    Write-Host "  -CleanVolumes -Force: Remove Docker named volumes for the compose project" -ForegroundColor Gray
+    Write-Host "  -CleanAll -Force    : Remove all ephemeral files and Docker named volumes" -ForegroundColor Gray
 }
 

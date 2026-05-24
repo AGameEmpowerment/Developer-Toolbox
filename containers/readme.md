@@ -11,6 +11,15 @@ A persistent Docker named volume is used for the local SQL Server service in `do
 
 This keeps the database files persisted across container restarts and recreations.
 
+## Local Azurite volume
+
+A persistent Docker named volume is used for the local Azurite service in `docker-compose-common.yml`:
+
+- Volume name: `azurite-data`
+- Container path: `/data`
+
+This keeps Azurite blob, queue, and table data persisted across container restarts and recreations.
+
 ## Run compose (development)
 
 From the repository root you can start the configured services with:
@@ -37,6 +46,8 @@ docker compose -f containers/docker-compose-common.yml logs -f redisinsight
 ./docker_setup.sh
 ./docker_pull.sh
 ```
+
+To stop the shared local stack without deleting persistent data, run `./docker_down.ps1` on Windows or `./docker_down.sh` on Linux/macOS/WSL. Deleting Docker named volumes now requires an explicit second confirmation flag: `-CleanVolumes -Force` or `--clean-volumes --force`.
 
 Redis and RedisInsight endpoints for local development:
 
@@ -71,6 +82,7 @@ docker run --rm \
 ```
 
 Notes:
+
 - Named volume in the compose file appears as `containers_mssql-data` on the host (Docker-managed). The exact name includes the compose project prefix which `docker compose` prints during `up`.
 - If you prefer direct host access to database files for debugging, consider switching the volume to a bind mount (e.g., `./mssql-data:/var/opt/mssql`) — be aware of permission differences between host and container filesystems.
 
@@ -78,9 +90,11 @@ Notes:
 
 - Ensure `MSSQL_SA_PASSWORD` and `ACCEPT_EULA` are set in your environment or an `.env` file when running the compose file.
   - If you don't already have a `.env` file, copy the provided example:
+
     ```pwsh
     Copy-Item .env.example .env
     ```
+
     The repository includes a `.env.example` which contains the necessary variables and sane defaults. Creating a local `.env` (or editing after copying) ensures the `docker_setup.ps1` and `docker compose` commands pick up required configuration.
 - If RedisInsight appears empty while cache is active, verify the selected Redis DB index in RedisInsight (the default preconfigured DB is `0`).
 - If you need to inspect the volume, use a temporary container and shell into it:

@@ -177,6 +177,8 @@ services:
             - "127.0.0.1:10000:10000" # Blob service
             - "127.0.0.1:10001:10001" # Queue service
             - "127.0.0.1:10002:10002" # Table service
+        volumes:
+            - azurite-data:/data
         restart: unless-stopped
         container_name: Azurite
 
@@ -218,4 +220,6 @@ volumes:
     cosmos-data:
         driver: local
     mssql-data:
+        driver: local
+    azurite-data:
         driver: local
