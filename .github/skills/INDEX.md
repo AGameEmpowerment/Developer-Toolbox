@@ -6,7 +6,7 @@ Skill usage in this repository is based on:
 
 - **Instruction skills**: `.github/skills/*/SKILL.md` (workflow guidance for Codex/Copilot)
 - **Global Skills CLI**: `npx skills` and `https://skills.sh/` (discovery/install ecosystem)
-- **Installed discovery skill**: `find-skills` (use it first when looking for new capabilities)
+- **Optional discovery helper**: the external `find-skills` skill (if installed via the Skills CLI) can help when looking for new capabilities; it is not included in this repository by default
 
 ## Instruction Skills (`.github/skills/*/SKILL.md`)
 
@@ -42,5 +42,6 @@ Browse catalog:
 ## Suggested Flow
 
 1. Find skill: `npx skills find <query>`
-2. Review skill details at `https://skills.sh/`
-3. Install globally: `npx skills add <owner/repo@skill> -g -y`
+2. If the external `find-skills` skill is already installed, you may also use it as an optional discovery helper.
+3. Review skill details at `https://skills.sh/`
+4. Install globally: `npx skills add <owner/repo@skill> -g -y`

@@ -1,6 +1,6 @@
 ---
-applyTo: "**"
 description: 'Instructions for customizing GitHub Copilot behavior for MS-SQL DBA chat mode.'
+applyTo: '**/ms-sql-dba.agent.md'
 ---
 
 # MS-SQL DBA Chat Mode Instructions

@@ -1,235 +1,139 @@
-# GitHub Copilot Setup Documentation
+# GitHub Copilot Setup
 
-This repository is configured with comprehensive GitHub Copilot instructions following the best practices outlined at https://gh.io/copilot-coding-agent-tips.
+This repository includes a large `.github` library intended to improve
+repository-aware AI assistance for Copilot, Codex, and similar tooling.
 
-## 📋 Configuration Overview
+## Current Structure
 
-### ✅ Required Components
+| Path | Purpose |
+| --- | --- |
+| `.github/copilot-instructions.md` | Primary repository guidance |
+| `.github/instructions/` | File- or domain-specific instruction set |
+| `.github/agents/` | Task-focused agent definitions |
+| `.github/prompts/` | Reusable prompt templates |
+| `.github/collections/` | Curated groupings of prompts, instructions, and agents |
+| `.github/skills/` | Local skill modules and discovery index |
+| `.github/workflows/` | Workflow automation related to Copilot setup |
+| `.github/dependabot.yml` | Automated dependency maintenance |
 
-All required components are properly configured:
+Current inventory at the time of the March 10, 2026 documentation refresh:
 
-- **Main Instructions**: `.github/copilot-instructions.md` - Primary instructions for Copilot
-- **Instructions Directory**: `.github/instructions/` - 42 specialized instruction files
-- **Validation Workflow**: `.github/workflows/copilot-setup-steps.yml` - Automated validation
+- 41 instruction files
+- 13 agent files
+- 40 prompt files
+- 14 collection manifests (13 `*.collection.yml` files plus `structured-autonomy-collection.yml`) plus companion markdown
+- 13 skill folders
 
-### 🎯 Optional Components
+## How It Works
 
-The repository includes these optional but recommended components:
+### Repository Instructions
 
-- **Custom Agents**: `.github/agents/` - 13 specialized agent definitions
-- **Prompts**: `.github/prompts/` - 40 reusable prompt templates
-- **Collections**: `.github/collections/` - 28 curated collections
-
-## 🛠️ How It Works
-
-### Main Instructions File
-
-The `.github/copilot-instructions.md` file contains:
-- Repository context and structure
-- Code quality standards
-- General development guidelines
-- References to specialized instructions
+`.github/copilot-instructions.md` provides the shared baseline for this
+repository. It describes the repository as a multi-language starter and points
+agents toward the more specific instruction files under `.github/instructions/`.
 
 ### Specialized Instructions
 
-Each file in `.github/instructions/` provides context-specific guidance:
+The instruction library covers:
 
-```yaml
----
-applyTo: '**/*.cs'
-description: 'C# development guidelines'
----
-```
+- Security and OWASP
+- Accessibility
+- Performance
+- DevOps and Docker
+- .NET and C#
+- React and Next.js
+- Terraform and Azure
+- Power Platform
+- Markdown, prompts, collections, and agent authoring
 
-The `applyTo` field uses glob patterns to target specific file types, ensuring Copilot uses the right instructions for each context.
+These files are intended to be consulted selectively based on the task being
+performed.
 
-### Skills Discovery
+### Agents
 
-Use `.github/skills/INDEX.md` as the canonical map for:
+The current agent set includes specialists for:
 
-- instruction-driven skills under `.github/skills/*/SKILL.md`
-- Skills CLI discovery and installation workflows (`npx skills find`, `npx skills add`)
-
-### Custom Agents
-
-Agent files define specialized behaviors for different tasks:
-- Code review specialists
-- Testing experts
-- Security auditors
-- Implementation planners
+- Accessibility
+- API architecture
+- Debugging
+- DevOps
+- Dynatrace
+- .NET
+- Next.js
+- React frontend work
+- JFrog security
+- SQL Server DBA work
+- Planning
+- Terraform
+- WinForms
 
 ### Prompts
 
-Reusable prompt templates help maintain consistency across:
-- Bug triage
-- Feature implementation
-- Code reviews
-- Documentation generation
+The prompt library is a reusable authoring and implementation toolkit. It
+contains templates for:
+
+- Architecture and ADR generation
+- API and container scaffolding
+- Documentation and README generation
+- Testing breakdowns
+- DevOps rollout planning
+- SQL review and optimization
+- Copilot instruction, prompt, and collection generation
 
 ### Collections
 
-Collections group related prompts, agents, and instructions for specific workflows:
-- Security best practices
-- Azure cloud development
-- Testing automation
-- DevOps operations
+Collections are higher-level bundles that group related prompts, instructions,
+and agents for scenarios such as Azure cloud work, DevOps on-call, testing
+automation, project planning, and security review.
 
-## 🔍 Validation
+Important note:
 
-### Manual Validation
+- Several collection manifests currently point at assets that are not present in
+  this repository. Treat collections as curation manifests, not guaranteed
+  self-contained bundles.
 
-Run the validation script locally:
+### Skills
 
-```bash
-node .github/scripts/validate-copilot-setup.js
-```
+`.github/skills/INDEX.md` is the canonical discovery map for local skill usage.
+The bundled skills cover areas like Application Insights, Azure resource
+visualization, GitHub issues, NuGet management, VS Code command helpers, and web
+application testing.
 
-### Automated Validation
+## Workflow Support
 
-The workflow `.github/workflows/copilot-setup-steps.yml` automatically validates:
-- Main instructions file exists and is not empty
-- Instructions directory contains files with proper frontmatter
-- Optional components (agents, prompts, collections) are properly formatted
+The current workflow support in `.github/workflows/copilot-setup-steps.yml`
+restores the example projects and exercises basic Copilot configuration paths in
+CI.
 
-The workflow runs on:
-- Push to `.github/**` paths
-- Pull requests affecting `.github/**`
-- Manual workflow dispatch
+Key behaviors:
 
-### Expected Output
+- Checks out the repository
+- Sets up .NET 10
+- Configures JFrog CLI
+- Sets up Node.js 24
+- Restores npm dependencies for the sample client
+- Restores .NET dependencies for the example solution
 
-A successful validation shows:
+## What Was Removed
 
-```
-🔍 Validating GitHub Copilot setup...
+The `.github/scripts/` folder was intentionally removed from this repository and
+is no longer part of the supported Copilot setup story. Documentation and wiki
+content should not reference local `.github/scripts` utilities.
 
-📊 Validation Results:
+## Recommended Usage
 
-ℹ️  Information:
-  ✓ Main instructions file exists (12221 bytes)
-  ✓ Found 42 instruction files
-    - 41 files with applyTo patterns
-    - 42 files with descriptions
-  ✓ Found 13 agent files
-    - 13 agents with proper frontmatter
-  ✓ Found 40 prompt files
-  ✓ Found 28 collection files
+Use this library in layers:
 
-✅ Copilot setup validation passed!
-```
+1. Start with `.github/copilot-instructions.md`.
+2. Pull in the relevant files from `.github/instructions/` for the task.
+3. Use agent files when a task benefits from a dedicated persona or workflow.
+4. Use prompt files as reusable starting points rather than ad hoc prompts.
+5. Use skills when the repository already has a task-specific module.
 
-## 📚 Instruction Files by Category
+## Repository Review Summary
 
-### Platform & Languages
-
-- `csharp.instructions.md` - C# development
-- `dotnet-framework.instructions.md` - .NET Framework specifics
-- `nodejs-javascript-vitest.instructions.md` - Node.js with Vitest
-- `typescript.instructions.md` - TypeScript development
-- `python.instructions.md` - Python development
-
-### Web Development
-
-- `reactjs.instructions.md` - React applications
-- `nextjs.instructions.md` - Next.js framework
-- `blazor.instructions.md` - Blazor applications
-- `aspnet-rest-apis.instructions.md` - ASP.NET REST APIs
-- `html-css-style-color-guide.instructions.md` - Frontend styling
-
-### Cloud & Infrastructure
-
-- `azure-*.instructions.md` - Azure services (Functions, Logic Apps, DevOps, etc.)
-- `terraform.instructions.md` - Infrastructure as Code
-- `containerization-docker-best-practices.instructions.md` - Docker & containers
-
-### Quality & Security
-
-- `security-and-owasp.instructions.md` - Security best practices
-- `a11y.instructions.md` - Accessibility guidelines
-- `performance-optimization.instructions.md` - Performance optimization
-- `code-review-generic.instructions.md` - Code review standards
-
-### DevOps & Tooling
-
-- `devops-core-principles.instructions.md` - DevOps fundamentals
-- `azure-devops-pipelines.instructions.md` - Azure DevOps YAML
-- `makefile.instructions.md` - Makefile development
-- `powershell.instructions.md` - PowerShell scripting
-
-### Documentation & Meta
-
-- `markdown.instructions.md` - Markdown formatting
-- `prompt.instructions.md` - Prompt file creation
-- `agents.instructions.md` - Agent file creation
-- `collections.instructions.md` - Collection management
-
-## 🎓 Using Copilot with This Setup
-
-### In Your IDE
-
-When you work on files in this repository, Copilot automatically:
-
-1. Loads the main instructions from `.github/copilot-instructions.md`
-2. Applies file-specific instructions based on `applyTo` patterns
-3. Makes custom agents available in the chat interface
-4. Provides context-aware suggestions
-
-### Chat Commands
-
-Use these patterns for best results:
-
-```
-# Use a specific agent
-@code-review Please review this PR
-
-# Reference a prompt
-Use the bug-triage prompt for this issue
-
-# Request specific guidance
-Follow the security instructions when implementing authentication
-```
-
-### Best Practices
-
-1. **Read the instructions**: Review `.github/copilot-instructions.md` for repository context
-2. **Use appropriate agents**: Select agents that match your task
-3. **Follow patterns**: Use existing prompts and collections as templates
-4. **Validate changes**: Run the validation script when modifying configuration
-
-## 🔧 Maintenance
-
-### Adding New Instructions
-
-1. Create a new file in `.github/instructions/`
-2. Add YAML frontmatter with `applyTo` and `description`
-3. Write clear, actionable instructions
-4. Run validation: `node .github/scripts/validate-copilot-setup.js`
-
-### Creating New Agents
-
-1. Create a new file in `.github/agents/` with `.agent.md` extension
-2. Add frontmatter with required fields
-3. Define agent behavior and capabilities
-4. Test with Copilot Chat
-
-### Updating Collections
-
-1. Edit files in `.github/collections/`
-2. Ensure references to prompts and agents are valid
-3. Update collection metadata as needed
-
-## 📖 References
-
-- **Best Practices Guide**: https://gh.io/copilot-coding-agent-tips
-- **Awesome Copilot Collection**: https://github.com/github/awesome-copilot
-- **Repository README**: `.github/readme.md`
-
-## ✅ Status
-
-This repository is **fully configured** with GitHub Copilot instructions and validated by automated checks.
-
-Last validated: See workflow runs in Actions tab
-
----
-
-For questions or issues with the Copilot setup, please open an issue in this repository.
+From a documentation and maintainability standpoint, the `.github` library is
+one of the strongest parts of this repository. Its main weakness is consistency:
+the high-level collections promise more assets than are actually present. That
+gap is documented in the root README and the wiki review page so consumers do
+not mistake placeholders for implemented capability.

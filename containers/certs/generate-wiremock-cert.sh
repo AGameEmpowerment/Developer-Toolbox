@@ -18,7 +18,7 @@
 #   WIREMOCK_KEYSTORE_PASSWORD=<your-password>
 #
 
-set -e
+set -euo pipefail
 
 # Colors for output
 RED='\033[0;31m'
@@ -78,6 +78,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Output paths
 KEYSTORE_PATH="${SCRIPT_DIR}/wiremock.jks"
 CERT_PATH="${SCRIPT_DIR}/wiremock.crt"
+WIREMOCK_HTTPS_PORT="10443"
 
 # Check for existing files
 if [[ "$FORCE" == false ]] && [[ -f "$KEYSTORE_PATH" ]]; then
@@ -199,11 +200,11 @@ echo -e "${GRAY}  2. Start WireMock:${NC}"
 echo -e "     docker compose up wiremock"
 echo ""
 echo -e "${GRAY}  3. Test HTTPS endpoint:${NC}"
-echo -e "     curl -k https://localhost:10443/__admin/health"
+echo -e "     curl -k https://localhost:${WIREMOCK_HTTPS_PORT}/__admin/health"
 echo ""
 echo -e "Client trust options:"
 echo -e "${GRAY}  - .NET: Trust wiremock.crt via the OS certificate store (for example, Windows 'Trusted Root Certification Authorities') or configure HttpClientHandler to trust this certificate${NC}"
 echo -e "${GRAY}  - Java: keytool -importcert -file wiremock.crt -keystore truststore.jks${NC}"
-echo -e "${GRAY}  - curl: curl --cacert wiremock.crt https://localhost:10443/...${NC}"
+echo -e "${GRAY}  - curl: curl --cacert wiremock.crt https://localhost:${WIREMOCK_HTTPS_PORT}/...${NC}"
 echo -e "${GRAY}  - Linux: sudo cp wiremock.crt /usr/local/share/ca-certificates/ && sudo update-ca-certificates${NC}"
 echo ""

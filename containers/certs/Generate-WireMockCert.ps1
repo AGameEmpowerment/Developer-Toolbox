@@ -19,6 +19,9 @@
 .PARAMETER Force
     Overwrite existing keystore and certificate files without prompting.
 
+.PARAMETER ShowPassword
+    Display the keystore password in the summary output.
+
 .EXAMPLE
     .\Generate-WireMockCert.ps1
     Creates keystore with default password "changeit"
@@ -26,6 +29,10 @@
 .EXAMPLE
     .\Generate-WireMockCert.ps1 -KeystorePassword "mypassword" -Force
     Creates keystore with custom password, overwriting existing files
+
+.EXAMPLE
+    .\Generate-WireMockCert.ps1 -ShowPassword
+    Creates keystore and prints the password in the summary output
 
 .NOTES
     After generation, update your .env file with:
@@ -44,7 +51,10 @@ param(
     [int]$ValidityDays = 3650,
 
     [Parameter()]
-    [switch]$Force
+    [switch]$Force,
+
+    [Parameter()]
+    [switch]$ShowPassword
 )
 
 Set-StrictMode -Version Latest
@@ -59,6 +69,7 @@ if (-not $ScriptDir) {
 # Output paths
 $KeystorePath = Join-Path $ScriptDir "wiremock.jks"
 $CertPath = Join-Path $ScriptDir "wiremock.crt"
+$WireMockHttpsPort = "10443"
 
 # Check for existing files
 if (-not $Force) {
@@ -184,21 +195,29 @@ Write-Host "Files created:" -ForegroundColor White
 Write-Host "  Keystore:    $KeystorePath" -ForegroundColor Gray
 Write-Host "  Certificate: $CertPath" -ForegroundColor Gray
 Write-Host ""
-Write-Host "Keystore password: $KeystorePassword" -ForegroundColor Yellow
+if ($ShowPassword) {
+    Write-Host "Keystore password: $KeystorePassword" -ForegroundColor Yellow
+} else {
+    Write-Host "Keystore password: hidden (use -ShowPassword to display it)" -ForegroundColor Yellow
+}
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor White
 Write-Host "  1. Add to your .env file:" -ForegroundColor Gray
-Write-Host "     WIREMOCK_KEYSTORE_PASSWORD=$KeystorePassword" -ForegroundColor DarkGray
+if ($ShowPassword) {
+    Write-Host "     WIREMOCK_KEYSTORE_PASSWORD=$KeystorePassword" -ForegroundColor DarkGray
+} else {
+    Write-Host "     WIREMOCK_KEYSTORE_PASSWORD=<your-keystore-password>" -ForegroundColor DarkGray
+}
 Write-Host ""
 Write-Host "  2. Start WireMock:" -ForegroundColor Gray
 Write-Host "     docker compose up wiremock" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  3. Test HTTPS endpoint:" -ForegroundColor Gray
-Write-Host "     curl -k https://localhost:10443/__admin/health" -ForegroundColor DarkGray
+Write-Host "     curl -k https://localhost:$WireMockHttpsPort/__admin/health" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "Client trust options:" -ForegroundColor White
 Write-Host "  - .NET: Import wiremock.crt or configure HttpClientHandler" -ForegroundColor Gray
 Write-Host "  - Java: keytool -importcert -file wiremock.crt -keystore truststore.jks" -ForegroundColor Gray
-Write-Host "  - curl: curl --cacert wiremock.crt https://localhost:10443/..." -ForegroundColor Gray
+Write-Host "  - curl: curl --cacert wiremock.crt https://localhost:$WireMockHttpsPort/..." -ForegroundColor Gray
 Write-Host "  - Postman: Settings > Certificates > Add CA Certificate" -ForegroundColor Gray
 Write-Host ""

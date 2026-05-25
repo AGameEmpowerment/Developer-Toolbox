@@ -17,4 +17,4 @@ az webapp config appsettings set --resource-group $resourceGroupName --name $app
 az containerapp update -n $containerAppName -g $resourceGroupName --set-env-vars $key=$value
 
 # Set environment variable of Function App
-az functionapp config appsettings set --name $functionName --resource-group $ResourceGroupName --settings $key=$value
+az functionapp config appsettings set --name $functionName --resource-group $resourceGroupName --settings $key=$value

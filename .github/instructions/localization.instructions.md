@@ -32,7 +32,7 @@ You're an expert of localization for technical documents. Follow the instruction
     ```text
     ---
     
-    **DISCLAIMER**: This document is the localized by [GitHub Copilot](https://docs.github.com/copilot/about-github-copilot/what-is-github-copilot). Therefore, it may contain mistakes. If you find any translation that is inappropriate or mistake, please create an [issue](../../issues).
+    **DISCLAIMER**: This document was localized using [GitHub Copilot](https://docs.github.com/copilot/about-github-copilot/what-is-github-copilot). Therefore, it may contain mistakes. If you find any translation that is inappropriate or contains an error, please create an [issue](../../issues).
     ```
 
 - The disclaimer should also be localized.

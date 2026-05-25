@@ -36,7 +36,6 @@ If any guidance in this file conflicts with the sources above, the more specific
 - `.github/collections/` (all `*.collection.yml` and `*.md` files)
 - `.github/skills/` (all skill folders and their `SKILL.md` files)
 - `.github/skills/INDEX.md` (canonical skill discovery map)
-- `.github/scripts/` (setup/validation scripts relevant to AI tooling)
 - `.github/workflows/` (AI-related workflows, if applicable)
 - `.github/COPILOT-SETUP.md`
 

@@ -18,6 +18,22 @@ CERTS_DIR="${CONTAINERS_DIR}/certs"
 ENV_FILE="${CONTAINERS_DIR}/.env"
 ENV_EXAMPLE_FILE="${CONTAINERS_DIR}/.env.example"
 
+generate_random_password() {
+    local password=""
+
+    # `tr | head` can trip `pipefail` because `tr` exits on SIGPIPE after `head` finishes.
+    set +o pipefail
+    password="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24)"
+    set -o pipefail
+
+    if [[ ${#password} -ne 24 ]]; then
+        echo -e "${RED}Error: failed to generate WireMock keystore password.${NC}" >&2
+        exit 1
+    fi
+
+    printf '%s' "$password"
+}
+
 #region Environment Setup
 echo -e "${CYAN}=== Environment Setup ===${NC}"
 
@@ -52,7 +68,7 @@ if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then
         echo -e "${YELLOW}Generating WireMock TLS certificate...${NC}"
 
         # Generate a random password for the keystore
-        KEYSTORE_PASSWORD=$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24)
+        KEYSTORE_PASSWORD="$(generate_random_password)"
 
         # Run the certificate generation script
         bash "$GENERATE_CERT_SCRIPT" -p "$KEYSTORE_PASSWORD" -f
@@ -217,14 +233,21 @@ fi
 echo -e "\n${GREEN}=== Setup Complete ===${NC}"
 echo -e "Services available:"
 echo -e "${GRAY}  SQL Server:     localhost:10433${NC}"
-echo -e "${GRAY}  CosmosDB:       localhost:10081${NC}"
+echo -e "${GRAY}  CosmosDB:       https://localhost:10081${NC}"
+echo -e "${GRAY}  Cosmos Explorer: http://localhost:10181${NC}"
 echo -e "${GRAY}  Redis:          localhost:10120${NC}"
-echo -e "${GRAY}  RedisInsight:   http://localhost:${REDISINSIGHT_WEB_PORT:-10121}${NC}"
-echo -e "${GRAY}  SMTP4Dev:       http://localhost:${SMTP4DEV_WEB_PORT:-10140}${NC}"
-echo -e "${GRAY}  Seq (OTEL):     http://localhost:${SEQ_HTTP_PORT:-10150}${NC}"
+echo -e "${GRAY}  RedisInsight:   http://localhost:10121${NC}"
+echo -e "${GRAY}  SMTP4Dev SMTP:  localhost:10130${NC}"
+echo -e "${GRAY}  SMTP4Dev POP:   localhost:10131${NC}"
+echo -e "${GRAY}  SMTP4Dev IMAP:  localhost:10132${NC}"
+echo -e "${GRAY}  SMTP4Dev Web:   http://localhost:10140${NC}"
+echo -e "${GRAY}  Seq (OTEL):     http://localhost:10150${NC}"
 echo -e "${GRAY}  WireMock HTTP:  http://localhost:10080${NC}"
 echo -e "${GRAY}  WireMock HTTPS: https://localhost:10443${NC}"
-echo -e "${GRAY}  Azurite:        localhost:10000-10002${NC}"
-echo -e "${GRAY}  Service Bus:    localhost:${SERVICEBUS_AMQP_PORT:-10170}${NC}"
+echo -e "${GRAY}  Azurite Blob:   localhost:10000${NC}"
+echo -e "${GRAY}  Azurite Queue:  localhost:10001${NC}"
+echo -e "${GRAY}  Azurite Table:  localhost:10002${NC}"
+echo -e "${GRAY}  Service Bus:    localhost:10170${NC}"
+echo -e "${GRAY}  Service Bus Admin: localhost:10171${NC}"
 echo ""
 echo "Head back to README.md for deployment of the database and other services..."

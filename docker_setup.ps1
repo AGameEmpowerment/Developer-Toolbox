@@ -13,6 +13,9 @@ $ContainersDir = Join-Path $ScriptDir "containers"
 $CertsDir = Join-Path $ContainersDir "certs"
 $EnvFile = Join-Path $ContainersDir ".env"
 $EnvExampleFile = Join-Path $ContainersDir ".env.example"
+$isWindowsPlatform = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+    [System.Runtime.InteropServices.OSPlatform]::Windows
+)
 
 #region Environment Setup
 Write-Host "=== Environment Setup ===" -ForegroundColor Cyan
@@ -118,7 +121,7 @@ if (-not (Test-Path $WireMockKeystore)) {
 $WireMockCert = Join-Path $CertsDir "wiremock.crt"
 if (Test-Path $WireMockCert) {
     # Always attempt to import to Windows certificate store on Windows
-    if ($IsWindows) {
+    if ($isWindowsPlatform) {
         Write-Host "Importing WireMock certificate to Windows trusted root store..." -ForegroundColor Yellow
 
         try {
@@ -202,19 +205,22 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
 Write-Host "`n=== Setup Complete ===" -ForegroundColor Green
 Write-Host "Services available:" -ForegroundColor White
 Write-Host "  SQL Server:    localhost:10433" -ForegroundColor Gray
-Write-Host "  CosmosDB:      localhost:10081" -ForegroundColor Gray
+Write-Host "  CosmosDB:      https://localhost:10081" -ForegroundColor Gray
+Write-Host "  Cosmos Explorer: http://localhost:10181" -ForegroundColor Gray
 Write-Host "  Redis:         localhost:10120" -ForegroundColor Gray
-$redisInsightPort = if ($EnvValues.ContainsKey('REDISINSIGHT_WEB_PORT') -and $EnvValues['REDISINSIGHT_WEB_PORT']) { $EnvValues['REDISINSIGHT_WEB_PORT'] } else { '10121' }
-Write-Host "  RedisInsight:  http://localhost:$redisInsightPort" -ForegroundColor Gray
-$smtpWebPort = if ($EnvValues.ContainsKey('SMTP4DEV_WEB_PORT') -and $EnvValues['SMTP4DEV_WEB_PORT']) { $EnvValues['SMTP4DEV_WEB_PORT'] } else { '10140' }
-$seqPort = if ($EnvValues.ContainsKey('SEQ_HTTP_PORT') -and $EnvValues['SEQ_HTTP_PORT']) { $EnvValues['SEQ_HTTP_PORT'] } else { '10150' }
-Write-Host "  SMTP4Dev:      http://localhost:$smtpWebPort" -ForegroundColor Gray
-Write-Host "  Seq (OTEL):    http://localhost:$seqPort" -ForegroundColor Gray
+Write-Host "  RedisInsight:  http://localhost:10121" -ForegroundColor Gray
+Write-Host "  SMTP4Dev SMTP: localhost:10130" -ForegroundColor Gray
+Write-Host "  SMTP4Dev POP:  localhost:10131" -ForegroundColor Gray
+Write-Host "  SMTP4Dev IMAP: localhost:10132" -ForegroundColor Gray
+Write-Host "  SMTP4Dev Web:  http://localhost:10140" -ForegroundColor Gray
+Write-Host "  Seq (OTEL):    http://localhost:10150" -ForegroundColor Gray
 Write-Host "  WireMock HTTP: http://localhost:10080" -ForegroundColor Gray
 Write-Host "  WireMock HTTPS: https://localhost:10443" -ForegroundColor Gray
-Write-Host "  Azurite:       localhost:10000-10002" -ForegroundColor Gray
-$serviceBusPort = if ($EnvValues.ContainsKey('SERVICEBUS_AMQP_PORT') -and $EnvValues['SERVICEBUS_AMQP_PORT']) { $EnvValues['SERVICEBUS_AMQP_PORT'] } else { '10170' }
-Write-Host "  Service Bus:   localhost:$serviceBusPort" -ForegroundColor Gray
+Write-Host "  Azurite Blob:  localhost:10000" -ForegroundColor Gray
+Write-Host "  Azurite Queue: localhost:10001" -ForegroundColor Gray
+Write-Host "  Azurite Table: localhost:10002" -ForegroundColor Gray
+Write-Host "  Service Bus:   localhost:10170" -ForegroundColor Gray
+Write-Host "  Service Bus Admin: localhost:10171" -ForegroundColor Gray
 Write-Host ""
 Write-Host "Head back to README.md for deployment of the database and other services..."
 

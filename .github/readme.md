@@ -5,23 +5,23 @@
 
 **Folders & Purpose**
 
-- **`agents`**: : Contains agent definition files used to declare high-level agent behavior or personas. These are typically `.agent.md` or similar descriptor files that define the role, capabilities, and conversational structure for an agent.
+- **`agents`**: Contains agent definition files used to declare high-level agent behavior or personas. These are typically `.agent.md` or similar descriptor files that define the role, capabilities, and conversational structure for an agent.
 	- **What to expect**: One or more `.agent.md` documents describing initialization steps, activation triggers, and role-specific rules.
 	- **Usage**: Use these files as templates when creating new agents for repository-specific automation, or as examples to bootstrap custom Copilot agents.
 
-- **`collections`**: : Stores curated collections of prompts, templates and small toolkits packaged together as a reusable set.
+- **`collections`**: Stores curated collections of prompts, templates and small toolkits packaged together as a reusable set.
 	- **What to expect**: `.collection.yml` files and metadata describing which prompts or snippets belong to a collection and how they should be used.
 	- **Usage**: Import collections into local Copilot/assistant tooling or reference them when organizing reusable prompt libraries.
 
-- **`instructions`**: : Host specialized instruction files that guide Copilot behavior for different concerns (security, accessibility, platform-specific best practices, etc.).
+- **`instructions`**: Host specialized instruction files that guide Copilot behavior for different concerns (security, accessibility, platform-specific best practices, etc.).
 	- **What to expect**: Markdown instruction files (for example: `security-and-owasp.instructions.md`, `a11y.instructions.md`, `performance-optimization.instructions.md`) that the repo uses to enforce consistent code generation and review policies.
 	- **Usage**: Treat these documents as authoritative policy for generated code and as a source of per-repo rules that Copilot or other automated agents should follow. They are intended to be machine-consumable guidance as well as human-readable policy.
 
-- **`prompts`**: : Contains prompt templates, examples and prompt engineering recipes.
+- **`prompts`**: Contains prompt templates, examples and prompt engineering recipes.
 	- **What to expect**: `.prompt.md` or plain `.md` files that include example prompt text, variants, and recommended usage notes.
 	- **Usage**: Copy or adapt prompt templates for new tasks; follow the documented constraints and examples to get predictable responses from the assistant.
 
-- **`skills`**: : Contains small skill modules, helper macros, or reusable capability descriptions that an agent can reference.
+- **`skills`**: Contains small skill modules, helper macros, or reusable capability descriptions that an agent can reference.
 	- **What to expect**: JSON/YAML or markdown descriptors for discrete capabilities (for example, a `ci-deploy.skill.yaml` or `code-review.skill.md`).
 	- **Usage**: Import or reference skills into agent definitions to compose higher-level behavior from tested, reusable pieces.
 

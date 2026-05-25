@@ -12,7 +12,7 @@ This skill helps you to contribute commands in VS Code extensions
 Use this skill when you need to:
 - Add or update commands to your VS Code extension
 
-# Instructions
+## Instructions
 
 VS Code commands must always define a `title`, independent of its category, visibility or location. We use a few patterns for each "kind" of command, with some characteristics, described below:
 

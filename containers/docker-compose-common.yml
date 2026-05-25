@@ -16,6 +16,7 @@ services:
     mssql:
         build: ./mssql
         environment:
+            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
             SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
             ACCEPT_EULA: "${ACCEPT_EULA}"
             MSSQL_AGENT_ENABLED: "true"
@@ -23,6 +24,11 @@ services:
             - "127.0.0.1:10433:1433" # SQL Server Connection Port
         volumes:
             - mssql-data:/var/opt/mssql
+        networks:
+            default:
+            sb-emulator:
+                aliases:
+                    - mssql
         restart: unless-stopped
         container_name: SqlServer
         hostname: mssql
@@ -78,7 +84,7 @@ services:
     redisinsight:
         image: redis/redisinsight:latest
         ports:
-            - "127.0.0.1:${REDISINSIGHT_WEB_PORT:-10121}:5540" # RedisInsight Web UI
+            - "127.0.0.1:10121:5540" # RedisInsight Web UI
         environment:
             RI_REDIS_HOST0: "redis"
             RI_REDIS_PORT0: "6379"
@@ -171,38 +177,27 @@ services:
             - "127.0.0.1:10000:10000" # Blob service
             - "127.0.0.1:10001:10001" # Queue service
             - "127.0.0.1:10002:10002" # Table service
+        volumes:
+            - azurite-data:/data
         restart: unless-stopped
         container_name: Azurite
 
-    # SQL Edge and Service Bus Emulator
-    SqlEdge-ServiceBus:
-        image: mcr.microsoft.com/azure-sql-edge:latest
-        networks:
-            sb-emulator:
-                aliases:
-                    - SqlEdge-ServiceBus
-        environment:
-            ACCEPT_EULA: "${ACCEPT_EULA}"
-            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
-        restart: unless-stopped
-        container_name: SqlEdge-ServiceBus
-
-    # Service Bus Emulator using SQL Edge
+    # Service Bus Emulator using the shared SQL Server Linux instance.
     service-bus:
         image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
         pull_policy: always
         volumes:
             - "./service-bus/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json"
         ports:
-            - "127.0.0.1:10170:5672" # Service Bus, Update port if needed
-            - "127.0.0.1:10171:5300" # Service Bus, Update port if needed
+            - "127.0.0.1:10170:5672" # Service Bus AMQP
+            - "127.0.0.1:10171:5300" # Service Bus admin / management
         environment:
-            SQL_SERVER: "SqlEdge-ServiceBus"
-            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" # Password should be same as what is set for SQL Edge
+            SQL_SERVER: "mssql"
+            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" # Password must match the SQL Server Linux container
             ACCEPT_EULA: "${ACCEPT_EULA}"
             SQL_WAIT_INTERVAL: "15" # Optional: Time in seconds to wait for SQL to be ready (default is 15 seconds)
         depends_on:
-            - SqlEdge-ServiceBus
+            - mssql
         networks:
             sb-emulator:
                 aliases:
@@ -225,4 +220,6 @@ volumes:
     cosmos-data:
         driver: local
     mssql-data:
+        driver: local
+    azurite-data:
         driver: local

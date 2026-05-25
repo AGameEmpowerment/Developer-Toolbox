@@ -10,6 +10,7 @@
 *.userosscache
 *.sln.docstates
 *.env
+.claude/settings.local.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -418,12 +419,24 @@ FodyWeavers.xsd
 *.msp
 
 #merge files
+*.sln.iml
 *.orig
+.jfrog/*
+nugetlibs/
 
 # WireMock TLS certificates (generated, contain private keys)
 containers/certs/*.jks
 containers/certs/*.crt
 containers/certs/truststore.*
 
-# Copilot tracking files
+# AI temp files
+.agent_work/
+.codex-temp/
 .copilot-tracking/*
+.dotnet-runtime/*
+.dotnet-home/
+temp/
+tmp/
+.dotnet/
+.agent_work/
+.playwright-mcp/
