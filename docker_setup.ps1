@@ -17,6 +17,99 @@ $isWindowsPlatform = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPl
     [System.Runtime.InteropServices.OSPlatform]::Windows
 )
 
+function Sync-DockerClientEnvironment {
+    if (-not $isWindowsPlatform) {
+        return
+    }
+
+    $persistedDockerHost = [Environment]::GetEnvironmentVariable('DOCKER_HOST', 'User')
+    if (-not $persistedDockerHost) {
+        $persistedDockerHost = [Environment]::GetEnvironmentVariable('DOCKER_HOST', 'Machine')
+    }
+
+    if (-not $env:DOCKER_HOST -and $persistedDockerHost) {
+        $env:DOCKER_HOST = $persistedDockerHost.Trim()
+    }
+
+    if ($env:DOCKER_CONTEXT -and [string]::IsNullOrWhiteSpace($env:DOCKER_CONTEXT)) {
+        Remove-Item Env:DOCKER_CONTEXT -ErrorAction SilentlyContinue
+    }
+}
+
+function Test-WslDockerHost {
+    if (-not $isWindowsPlatform) {
+        return $false
+    }
+
+    return $env:DOCKER_HOST -match '^tcp://(127\.0\.0\.1|localhost):2375/?$'
+}
+
+function Get-WslPath {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+
+    $resolvedPath = [System.IO.Path]::GetFullPath($Path)
+    $windowsPathMatch = [System.Text.RegularExpressions.Regex]::Match($resolvedPath, '^(?<drive>[A-Za-z]):(?<rest>.*)$')
+
+    if (-not $windowsPathMatch.Success) {
+        Write-Error "Failed to translate '$Path' to a WSL path."
+        exit 1
+    }
+
+    $driveLetter = $windowsPathMatch.Groups['drive'].Value.ToLowerInvariant()
+    $pathRemainder = $windowsPathMatch.Groups['rest'].Value -replace '\\', '/'
+
+    return "/mnt/$driveLetter$pathRemainder"
+}
+
+function Invoke-ComposeUp {
+    param(
+        [Parameter(Mandatory)]
+        [bool]$UseDockerComposePlugin,
+        [Parameter(Mandatory)]
+        [bool]$UseDockerComposeStandalone
+    )
+
+    if (Test-WslDockerHost) {
+        $wslContainersDir = Get-WslPath -Path $ContainersDir
+        $composeCommand = "cd '$wslContainersDir' && docker compose --env-file .env -f docker-compose-common.yml -p dev_common_shared up -d"
+        wsl.exe sh -lc $composeCommand
+        return
+    }
+
+    if ($UseDockerComposePlugin) {
+        docker compose -f "docker-compose-common.yml" -p dev_common_shared up -d
+    } else {
+        docker-compose -f "docker-compose-common.yml" -p dev_common_shared up -d
+    }
+}
+
+function Assert-LinuxContainerEngine {
+    $dockerOsType = docker info --format '{{.OSType}}' 2>$null
+    $dockerOperatingSystem = docker info --format '{{.OperatingSystem}}' 2>$null
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Unable to determine the Docker daemon container OS type."
+        exit 1
+    }
+
+    $dockerOsType = $dockerOsType.Trim()
+    $dockerOperatingSystem = $dockerOperatingSystem.Trim()
+
+    if ($dockerOsType -ne 'linux') {
+        Write-Error "This development stack requires Docker to run Linux containers. Current Docker daemon OSType: '$dockerOsType' ($dockerOperatingSystem)."
+
+        if ($isWindowsPlatform) {
+            Write-Host "If you are using Docker Desktop, switch to Linux containers and rerun this script." -ForegroundColor Yellow
+            Write-Host "Typical fix: Docker Desktop tray icon > Switch to Linux containers..." -ForegroundColor Gray
+        }
+
+        exit 1
+    }
+}
+
 #region Environment Setup
 Write-Host "=== Environment Setup ===" -ForegroundColor Cyan
 
@@ -186,6 +279,8 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
+Sync-DockerClientEnvironment
+
 docker info *> $null
 if ($LASTEXITCODE -ne 0) {
     Write-Error "Cannot access the Docker daemon. The current user likely does not have permission to the Docker API named pipe or the daemon is not running."
@@ -204,6 +299,8 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "  3. If using a non-Desktop Docker Engine, configure daemon access for your non-admin user." -ForegroundColor Gray
     exit 1
 }
+
+Assert-LinuxContainerEngine
 
 $useDockerComposePlugin = $false
 docker compose version *> $null
@@ -226,11 +323,7 @@ Write-Host "Starting Docker containers..." -ForegroundColor Yellow
 Push-Location $ContainersDir
 try {
     # Run from containers/ so compose automatically loads containers/.env across compose variants.
-    if ($useDockerComposePlugin) {
-        docker compose -f "docker-compose-common.yml" -p dev_common_shared up -d
-    } else {
-        docker-compose -f "docker-compose-common.yml" -p dev_common_shared up -d
-    }
+    Invoke-ComposeUp -UseDockerComposePlugin $useDockerComposePlugin -UseDockerComposeStandalone $useDockerComposeStandalone
 } finally {
     Pop-Location
 }

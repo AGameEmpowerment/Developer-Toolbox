@@ -18,8 +18,53 @@ $ContainersDir = Join-Path $ScriptDir "containers"
 $ComposeFile = Join-Path $ContainersDir "docker-compose-common.yml"
 $sqlBaseImage = "mcr.microsoft.com/mssql/server:latest"
 
+function Sync-DockerClientEnvironment {
+    if (-not [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+        return
+    }
+
+    $persistedDockerHost = [Environment]::GetEnvironmentVariable('DOCKER_HOST', 'User')
+    if (-not $persistedDockerHost) {
+        $persistedDockerHost = [Environment]::GetEnvironmentVariable('DOCKER_HOST', 'Machine')
+    }
+
+    if (-not $env:DOCKER_HOST -and $persistedDockerHost) {
+        $env:DOCKER_HOST = $persistedDockerHost.Trim()
+    }
+
+    if ($env:DOCKER_CONTEXT -and [string]::IsNullOrWhiteSpace($env:DOCKER_CONTEXT)) {
+        Remove-Item Env:DOCKER_CONTEXT -ErrorAction SilentlyContinue
+    }
+}
+
+function Assert-LinuxContainerEngine {
+    $dockerOsType = docker info --format '{{.OSType}}' 2>$null
+    $dockerOperatingSystem = docker info --format '{{.OperatingSystem}}' 2>$null
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Unable to determine the Docker daemon container OS type."
+        exit 1
+    }
+
+    $dockerOsType = $dockerOsType.Trim()
+    $dockerOperatingSystem = $dockerOperatingSystem.Trim()
+
+    if ($dockerOsType -ne 'linux') {
+        Write-Error "This development stack requires Docker to run Linux containers. Current Docker daemon OSType: '$dockerOsType' ($dockerOperatingSystem)."
+
+        if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+            Write-Host "If you are using Docker Desktop, switch to Linux containers and rerun this script." -ForegroundColor Yellow
+            Write-Host "Typical fix: Docker Desktop tray icon > Switch to Linux containers..." -ForegroundColor Gray
+        }
+
+        exit 1
+    }
+}
+
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "Docker images and container setup started."
+
+    Sync-DockerClientEnvironment
 
     docker info *> $null
     if ($LASTEXITCODE -ne 0) {
@@ -39,6 +84,8 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
         Write-Host "  3. If using a non-Desktop Docker Engine, configure daemon access for your non-admin user." -ForegroundColor Gray
         exit 1
     }
+
+    Assert-LinuxContainerEngine
 
     $dockerInfo = docker info 2>$null
     $registryMirrors = @($dockerInfo | Where-Object { $_ -match '^\s+https?://' } | ForEach-Object { $_.Trim() })
