@@ -186,6 +186,25 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
+docker info *> $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Cannot access the Docker daemon. The current user likely does not have permission to the Docker API named pipe or the daemon is not running."
+
+    $dockerService = Get-Service -Name "docker" -ErrorAction SilentlyContinue
+    if ($dockerService) {
+        Write-Host "Docker service status: $($dockerService.Status)" -ForegroundColor Yellow
+        if ($dockerService.Status -ne 'Running') {
+            Write-Host "Start it with: Start-Service docker" -ForegroundColor Gray
+        }
+    }
+
+    Write-Host "Try these fixes:" -ForegroundColor Yellow
+    Write-Host "  1. Start an elevated PowerShell and run this script again." -ForegroundColor Gray
+    Write-Host "  2. Ensure the Docker daemon service is running (Get-Service docker)." -ForegroundColor Gray
+    Write-Host "  3. If using a non-Desktop Docker Engine, configure daemon access for your non-admin user." -ForegroundColor Gray
+    exit 1
+}
+
 $useDockerComposePlugin = $false
 docker compose version *> $null
 if ($LASTEXITCODE -eq 0) {
