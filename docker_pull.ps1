@@ -32,7 +32,7 @@ function Sync-DockerClientEnvironment {
         $env:DOCKER_HOST = $persistedDockerHost.Trim()
     }
 
-    if ($env:DOCKER_CONTEXT -and [string]::IsNullOrWhiteSpace($env:DOCKER_CONTEXT)) {
+    if ((Test-Path Env:DOCKER_CONTEXT) -and [string]::IsNullOrWhiteSpace($env:DOCKER_CONTEXT)) {
         Remove-Item Env:DOCKER_CONTEXT -ErrorAction SilentlyContinue
     }
 }

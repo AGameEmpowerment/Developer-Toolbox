@@ -31,7 +31,7 @@ function Sync-DockerClientEnvironment {
         $env:DOCKER_HOST = $persistedDockerHost.Trim()
     }
 
-    if ($env:DOCKER_CONTEXT -and [string]::IsNullOrWhiteSpace($env:DOCKER_CONTEXT)) {
+    if ((Test-Path Env:DOCKER_CONTEXT) -and [string]::IsNullOrWhiteSpace($env:DOCKER_CONTEXT)) {
         Remove-Item Env:DOCKER_CONTEXT -ErrorAction SilentlyContinue
     }
 }
@@ -74,7 +74,8 @@ function Invoke-ComposeUp {
 
     if (Test-WslDockerHost) {
         $wslContainersDir = Get-WslPath -Path $ContainersDir
-        $composeCommand = "cd '$wslContainersDir' && docker compose --env-file .env -f docker-compose-common.yml -p dev_common_shared up -d"
+        $escapedWslContainersDir = $wslContainersDir.Replace('"', '\"')
+        $composeCommand = "cd `"$escapedWslContainersDir`" && docker compose --env-file .env -f docker-compose-common.yml -p dev_common_shared up -d"
         wsl.exe sh -lc $composeCommand
         return
     }

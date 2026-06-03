@@ -71,7 +71,7 @@ Example:
 
 ```pwsh
 # Expose only Seq and RedisInsight externally
-(Get-Content .env) -replace '^SEQ_BIND_HOST=.*$', 'SEQ_BIND_HOST="0.0.0.0"' \
+(Get-Content .env) -replace '^SEQ_BIND_HOST=.*$', 'SEQ_BIND_HOST="0.0.0.0"' `
            -replace '^REDISINSIGHT_BIND_HOST=.*$', 'REDISINSIGHT_BIND_HOST="0.0.0.0"' |
   Set-Content .env
 
