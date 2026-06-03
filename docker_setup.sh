@@ -230,24 +230,47 @@ else
 fi
 #endregion
 
+get_service_bind_label() {
+    local value="$1"
+
+    if [[ -z "$value" || "$value" == "127.0.0.1" ]]; then
+        echo "localhost"
+    elif [[ "$value" == "0.0.0.0" ]]; then
+        echo "<host-ip-or-dns>"
+    else
+        echo "$value"
+    fi
+}
+
+mssql_bind_host=$(get_service_bind_label "${MSSQL_BIND_HOST:-127.0.0.1}")
+cosmos_bind_host=$(get_service_bind_label "${COSMOSDB_BIND_HOST:-127.0.0.1}")
+redis_bind_host=$(get_service_bind_label "${REDIS_BIND_HOST:-127.0.0.1}")
+redisinsight_bind_host=$(get_service_bind_label "${REDISINSIGHT_BIND_HOST:-127.0.0.1}")
+smtp_bind_host=$(get_service_bind_label "${SMTP4DEV_BIND_HOST:-127.0.0.1}")
+seq_bind_host=$(get_service_bind_label "${SEQ_BIND_HOST:-127.0.0.1}")
+wiremock_bind_host=$(get_service_bind_label "${WIREMOCK_BIND_HOST:-127.0.0.1}")
+azurite_bind_host=$(get_service_bind_label "${AZURITE_BIND_HOST:-127.0.0.1}")
+servicebus_bind_host=$(get_service_bind_label "${SERVICEBUS_BIND_HOST:-127.0.0.1}")
+
 echo -e "\n${GREEN}=== Setup Complete ===${NC}"
 echo -e "Services available:"
-echo -e "${GRAY}  SQL Server:     localhost:10433${NC}"
-echo -e "${GRAY}  CosmosDB:       https://localhost:10081${NC}"
-echo -e "${GRAY}  Cosmos Explorer: http://localhost:10181${NC}"
-echo -e "${GRAY}  Redis:          localhost:10120${NC}"
-echo -e "${GRAY}  RedisInsight:   http://localhost:10121${NC}"
-echo -e "${GRAY}  SMTP4Dev SMTP:  localhost:10130${NC}"
-echo -e "${GRAY}  SMTP4Dev POP:   localhost:10131${NC}"
-echo -e "${GRAY}  SMTP4Dev IMAP:  localhost:10132${NC}"
-echo -e "${GRAY}  SMTP4Dev Web:   http://localhost:10140${NC}"
-echo -e "${GRAY}  Seq (OTEL):     http://localhost:10150${NC}"
-echo -e "${GRAY}  WireMock HTTP:  http://localhost:10080${NC}"
-echo -e "${GRAY}  WireMock HTTPS: https://localhost:10443${NC}"
-echo -e "${GRAY}  Azurite Blob:   localhost:10000${NC}"
-echo -e "${GRAY}  Azurite Queue:  localhost:10001${NC}"
-echo -e "${GRAY}  Azurite Table:  localhost:10002${NC}"
-echo -e "${GRAY}  Service Bus:    localhost:10170${NC}"
-echo -e "${GRAY}  Service Bus Admin: localhost:10171${NC}"
+echo -e "${GRAY}  SQL Server:     ${mssql_bind_host}:10433${NC}"
+echo -e "${GRAY}  CosmosDB:       https://${cosmos_bind_host}:10081${NC}"
+echo -e "${GRAY}  Cosmos Explorer: http://${cosmos_bind_host}:10181${NC}"
+echo -e "${GRAY}  Redis:          ${redis_bind_host}:10120${NC}"
+echo -e "${GRAY}  RedisInsight:   http://${redisinsight_bind_host}:10121${NC}"
+echo -e "${GRAY}  SMTP4Dev SMTP:  ${smtp_bind_host}:10130${NC}"
+echo -e "${GRAY}  SMTP4Dev POP:   ${smtp_bind_host}:10131${NC}"
+echo -e "${GRAY}  SMTP4Dev IMAP:  ${smtp_bind_host}:10132${NC}"
+echo -e "${GRAY}  SMTP4Dev Web:   http://${smtp_bind_host}:10140${NC}"
+echo -e "${GRAY}  Seq (OTEL):     http://${seq_bind_host}:10150${NC}"
+echo -e "${GRAY}  WireMock HTTP:  http://${wiremock_bind_host}:10080${NC}"
+echo -e "${GRAY}  WireMock HTTPS: https://${wiremock_bind_host}:10443${NC}"
+echo -e "${GRAY}  Azurite Blob:   ${azurite_bind_host}:10000${NC}"
+echo -e "${GRAY}  Azurite Queue:  ${azurite_bind_host}:10001${NC}"
+echo -e "${GRAY}  Azurite Table:  ${azurite_bind_host}:10002${NC}"
+echo -e "${GRAY}  Service Bus:    ${servicebus_bind_host}:10170${NC}"
+echo -e "${GRAY}  Service Bus Admin: ${servicebus_bind_host}:10171${NC}"
 echo ""
+echo -e "${GRAY}Set individual *_BIND_HOST values in containers/.env to 0.0.0.0 to expose selected services externally.${NC}"
 echo "Head back to README.md for deployment of the database and other services..."

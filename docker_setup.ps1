@@ -336,25 +336,58 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "Docker containers started." -ForegroundColor Green
 #endregion
 
+function Get-ServiceBindLabel {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Key
+    )
+
+    if (-not $EnvValues.ContainsKey($Key)) {
+        return 'localhost'
+    }
+
+    $configuredHost = $EnvValues[$Key].Trim()
+    if (-not $configuredHost -or $configuredHost -eq '127.0.0.1') {
+        return 'localhost'
+    }
+
+    if ($configuredHost -eq '0.0.0.0') {
+        return '<host-ip-or-dns>'
+    }
+
+    return $configuredHost
+}
+
+$mssqlBindHost = Get-ServiceBindLabel -Key 'MSSQL_BIND_HOST'
+$cosmosBindHost = Get-ServiceBindLabel -Key 'COSMOSDB_BIND_HOST'
+$redisBindHost = Get-ServiceBindLabel -Key 'REDIS_BIND_HOST'
+$redisInsightBindHost = Get-ServiceBindLabel -Key 'REDISINSIGHT_BIND_HOST'
+$smtpBindHost = Get-ServiceBindLabel -Key 'SMTP4DEV_BIND_HOST'
+$seqBindHost = Get-ServiceBindLabel -Key 'SEQ_BIND_HOST'
+$wiremockBindHost = Get-ServiceBindLabel -Key 'WIREMOCK_BIND_HOST'
+$azuriteBindHost = Get-ServiceBindLabel -Key 'AZURITE_BIND_HOST'
+$serviceBusBindHost = Get-ServiceBindLabel -Key 'SERVICEBUS_BIND_HOST'
+
 Write-Host "`n=== Setup Complete ===" -ForegroundColor Green
 Write-Host "Services available:" -ForegroundColor White
-Write-Host "  SQL Server:    localhost:10433" -ForegroundColor Gray
-Write-Host "  CosmosDB:      https://localhost:10081" -ForegroundColor Gray
-Write-Host "  Cosmos Explorer: http://localhost:10181" -ForegroundColor Gray
-Write-Host "  Redis:         localhost:10120" -ForegroundColor Gray
-Write-Host "  RedisInsight:  http://localhost:10121" -ForegroundColor Gray
-Write-Host "  SMTP4Dev SMTP: localhost:10130" -ForegroundColor Gray
-Write-Host "  SMTP4Dev POP:  localhost:10131" -ForegroundColor Gray
-Write-Host "  SMTP4Dev IMAP: localhost:10132" -ForegroundColor Gray
-Write-Host "  SMTP4Dev Web:  http://localhost:10140" -ForegroundColor Gray
-Write-Host "  Seq (OTEL):    http://localhost:10150" -ForegroundColor Gray
-Write-Host "  WireMock HTTP: http://localhost:10080" -ForegroundColor Gray
-Write-Host "  WireMock HTTPS: https://localhost:10443" -ForegroundColor Gray
-Write-Host "  Azurite Blob:  localhost:10000" -ForegroundColor Gray
-Write-Host "  Azurite Queue: localhost:10001" -ForegroundColor Gray
-Write-Host "  Azurite Table: localhost:10002" -ForegroundColor Gray
-Write-Host "  Service Bus:   localhost:10170" -ForegroundColor Gray
-Write-Host "  Service Bus Admin: localhost:10171" -ForegroundColor Gray
+Write-Host "  SQL Server:    ${mssqlBindHost}:10433" -ForegroundColor Gray
+Write-Host "  CosmosDB:      https://${cosmosBindHost}:10081" -ForegroundColor Gray
+Write-Host "  Cosmos Explorer: http://${cosmosBindHost}:10181" -ForegroundColor Gray
+Write-Host "  Redis:         ${redisBindHost}:10120" -ForegroundColor Gray
+Write-Host "  RedisInsight:  http://${redisInsightBindHost}:10121" -ForegroundColor Gray
+Write-Host "  SMTP4Dev SMTP: ${smtpBindHost}:10130" -ForegroundColor Gray
+Write-Host "  SMTP4Dev POP:  ${smtpBindHost}:10131" -ForegroundColor Gray
+Write-Host "  SMTP4Dev IMAP: ${smtpBindHost}:10132" -ForegroundColor Gray
+Write-Host "  SMTP4Dev Web:  http://${smtpBindHost}:10140" -ForegroundColor Gray
+Write-Host "  Seq (OTEL):    http://${seqBindHost}:10150" -ForegroundColor Gray
+Write-Host "  WireMock HTTP: http://${wiremockBindHost}:10080" -ForegroundColor Gray
+Write-Host "  WireMock HTTPS: https://${wiremockBindHost}:10443" -ForegroundColor Gray
+Write-Host "  Azurite Blob:  ${azuriteBindHost}:10000" -ForegroundColor Gray
+Write-Host "  Azurite Queue: ${azuriteBindHost}:10001" -ForegroundColor Gray
+Write-Host "  Azurite Table: ${azuriteBindHost}:10002" -ForegroundColor Gray
+Write-Host "  Service Bus:   ${serviceBusBindHost}:10170" -ForegroundColor Gray
+Write-Host "  Service Bus Admin: ${serviceBusBindHost}:10171" -ForegroundColor Gray
 Write-Host ""
+Write-Host "Set individual *_BIND_HOST values in containers/.env to 0.0.0.0 to expose selected services externally." -ForegroundColor DarkGray
 Write-Host "Head back to README.md for deployment of the database and other services..."
 
