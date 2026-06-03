@@ -21,7 +21,7 @@ services:
             ACCEPT_EULA: "${ACCEPT_EULA}"
             MSSQL_AGENT_ENABLED: "true"
         ports:
-            - "127.0.0.1:10433:1433" # SQL Server Connection Port
+            - "${MSSQL_BIND_HOST:-127.0.0.1}:10433:1433" # SQL Server Connection Port
         volumes:
             - mssql-data:/var/opt/mssql
         networks:
@@ -42,8 +42,8 @@ services:
             PROTOCOL: "https"
             ENABLE_EXPLORER: "true"
         ports:
-            - "127.0.0.1:10081:8081"
-            - "127.0.0.1:10181:1234"
+            - "${COSMOSDB_BIND_HOST:-127.0.0.1}:10081:8081"
+            - "${COSMOSDB_BIND_HOST:-127.0.0.1}:10181:1234"
         volumes:
             - cosmos-data:/data
         healthcheck:
@@ -68,7 +68,7 @@ services:
                 "AKE",
             ]
         ports:
-            - "127.0.0.1:10120:6379" # Redis Cache Endpoint Port
+            - "${REDIS_BIND_HOST:-127.0.0.1}:10120:6379" # Redis Cache Endpoint Port
         healthcheck:
             test: ["CMD", "redis-cli", "ping"]
             interval: 10s
@@ -84,7 +84,7 @@ services:
     redisinsight:
         image: redis/redisinsight:latest
         ports:
-            - "127.0.0.1:10121:5540" # RedisInsight Web UI
+            - "${REDISINSIGHT_BIND_HOST:-127.0.0.1}:10121:5540" # RedisInsight Web UI
         environment:
             RI_REDIS_HOST0: "redis"
             RI_REDIS_PORT0: "6379"
@@ -108,10 +108,10 @@ services:
     smtp4dev:
         image: rnwood/smtp4dev:latest
         ports:
-            - "127.0.0.1:10130:25" # smtp server
-            - "127.0.0.1:10131:110" # pop server
-            - "127.0.0.1:10132:143" # imap server
-            - "127.0.0.1:10140:80" # web ui
+            - "${SMTP4DEV_BIND_HOST:-127.0.0.1}:10130:25" # smtp server
+            - "${SMTP4DEV_BIND_HOST:-127.0.0.1}:10131:110" # pop server
+            - "${SMTP4DEV_BIND_HOST:-127.0.0.1}:10132:143" # imap server
+            - "${SMTP4DEV_BIND_HOST:-127.0.0.1}:10140:80" # web ui
         volumes:
             - smtp4dev-data:/smtp4dev
         environment:
@@ -129,7 +129,7 @@ services:
             SEQ_FIRSTRUN_NOAUTHENTICATION: "${SEQ_FIRSTRUN_NOAUTHENTICATION}"
             SEQ_STORAGE_SECRETKEY: "${SEQ_STORAGE_SECRETKEY}"
         ports:
-            - "127.0.0.1:10150:80" # Web UI and API port
+            - "${SEQ_BIND_HOST:-127.0.0.1}:10150:80" # Web UI and API port
         restart: unless-stopped
         container_name: OtelCollector
         volumes:
@@ -146,8 +146,8 @@ services:
     wiremock:
         image: wiremock/wiremock:latest
         ports:
-            - "127.0.0.1:10080:8080" # WireMock HTTP Port for API routes
-            - "127.0.0.1:10443:8443" # WireMock HTTPS Port for API routes
+            - "${WIREMOCK_BIND_HOST:-127.0.0.1}:10080:8080" # WireMock HTTP Port for API routes
+            - "${WIREMOCK_BIND_HOST:-127.0.0.1}:10443:8443" # WireMock HTTPS Port for API routes
         volumes:
             - ./extensions:/var/wiremock/extensions
             - ./__files:/home/wiremock/__files
@@ -174,9 +174,9 @@ services:
     azurite:
         image: mcr.microsoft.com/azure-storage/azurite
         ports:
-            - "127.0.0.1:10000:10000" # Blob service
-            - "127.0.0.1:10001:10001" # Queue service
-            - "127.0.0.1:10002:10002" # Table service
+            - "${AZURITE_BIND_HOST:-127.0.0.1}:10000:10000" # Blob service
+            - "${AZURITE_BIND_HOST:-127.0.0.1}:10001:10001" # Queue service
+            - "${AZURITE_BIND_HOST:-127.0.0.1}:10002:10002" # Table service
         volumes:
             - azurite-data:/data
         restart: unless-stopped
@@ -189,8 +189,8 @@ services:
         volumes:
             - "./service-bus/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json"
         ports:
-            - "127.0.0.1:10170:5672" # Service Bus AMQP
-            - "127.0.0.1:10171:5300" # Service Bus admin / management
+            - "${SERVICEBUS_BIND_HOST:-127.0.0.1}:10170:5672" # Service Bus AMQP
+            - "${SERVICEBUS_BIND_HOST:-127.0.0.1}:10171:5300" # Service Bus admin / management
         environment:
             SQL_SERVER: "mssql"
             MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" # Password must match the SQL Server Linux container

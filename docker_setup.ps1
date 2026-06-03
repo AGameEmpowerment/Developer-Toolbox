@@ -17,6 +17,100 @@ $isWindowsPlatform = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPl
     [System.Runtime.InteropServices.OSPlatform]::Windows
 )
 
+function Sync-DockerClientEnvironment {
+    if (-not $isWindowsPlatform) {
+        return
+    }
+
+    $persistedDockerHost = [Environment]::GetEnvironmentVariable('DOCKER_HOST', 'User')
+    if (-not $persistedDockerHost) {
+        $persistedDockerHost = [Environment]::GetEnvironmentVariable('DOCKER_HOST', 'Machine')
+    }
+
+    if (-not $env:DOCKER_HOST -and $persistedDockerHost) {
+        $env:DOCKER_HOST = $persistedDockerHost.Trim()
+    }
+
+    if ((Test-Path Env:DOCKER_CONTEXT) -and [string]::IsNullOrWhiteSpace($env:DOCKER_CONTEXT)) {
+        Remove-Item Env:DOCKER_CONTEXT -ErrorAction SilentlyContinue
+    }
+}
+
+function Test-WslDockerHost {
+    if (-not $isWindowsPlatform) {
+        return $false
+    }
+
+    return $env:DOCKER_HOST -match '^tcp://(127\.0\.0\.1|localhost):2375/?$'
+}
+
+function Get-WslPath {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+
+    $resolvedPath = [System.IO.Path]::GetFullPath($Path)
+    $windowsPathMatch = [System.Text.RegularExpressions.Regex]::Match($resolvedPath, '^(?<drive>[A-Za-z]):(?<rest>.*)$')
+
+    if (-not $windowsPathMatch.Success) {
+        Write-Error "Failed to translate '$Path' to a WSL path."
+        exit 1
+    }
+
+    $driveLetter = $windowsPathMatch.Groups['drive'].Value.ToLowerInvariant()
+    $pathRemainder = $windowsPathMatch.Groups['rest'].Value -replace '\\', '/'
+
+    return "/mnt/$driveLetter$pathRemainder"
+}
+
+function Invoke-ComposeUp {
+    param(
+        [Parameter(Mandatory)]
+        [bool]$UseDockerComposePlugin,
+        [Parameter(Mandatory)]
+        [bool]$UseDockerComposeStandalone
+    )
+
+    if (Test-WslDockerHost) {
+        $wslContainersDir = Get-WslPath -Path $ContainersDir
+        $escapedWslContainersDir = $wslContainersDir.Replace('"', '\"')
+        $composeCommand = "cd `"$escapedWslContainersDir`" && docker compose --env-file .env -f docker-compose-common.yml -p dev_common_shared up -d"
+        wsl.exe sh -lc $composeCommand
+        return
+    }
+
+    if ($UseDockerComposePlugin) {
+        docker compose -f "docker-compose-common.yml" -p dev_common_shared up -d
+    } else {
+        docker-compose -f "docker-compose-common.yml" -p dev_common_shared up -d
+    }
+}
+
+function Assert-LinuxContainerEngine {
+    $dockerOsType = docker info --format '{{.OSType}}' 2>$null
+    $dockerOperatingSystem = docker info --format '{{.OperatingSystem}}' 2>$null
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Unable to determine the Docker daemon container OS type."
+        exit 1
+    }
+
+    $dockerOsType = $dockerOsType.Trim()
+    $dockerOperatingSystem = $dockerOperatingSystem.Trim()
+
+    if ($dockerOsType -ne 'linux') {
+        Write-Error "This development stack requires Docker to run Linux containers. Current Docker daemon OSType: '$dockerOsType' ($dockerOperatingSystem)."
+
+        if ($isWindowsPlatform) {
+            Write-Host "If you are using Docker Desktop, switch to Linux containers and rerun this script." -ForegroundColor Yellow
+            Write-Host "Typical fix: Docker Desktop tray icon > Switch to Linux containers..." -ForegroundColor Gray
+        }
+
+        exit 1
+    }
+}
+
 #region Environment Setup
 Write-Host "=== Environment Setup ===" -ForegroundColor Cyan
 
@@ -181,46 +275,120 @@ if (Test-Path $WireMockCert) {
 #region Docker Services
 Write-Host "`n=== Docker Services ===" -ForegroundColor Cyan
 
-if (Get-Command docker -ErrorAction SilentlyContinue) {
-    Write-Host "Starting Docker containers..." -ForegroundColor Yellow
-
-    ## Start the shared development collection.
-    docker compose `
-        --env-file "$EnvFile" `
-        -f "$ContainersDir/docker-compose-common.yml" `
-        -p dev_common_shared `
-        up -d
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Docker compose failed with exit code $LASTEXITCODE."
-        exit $LASTEXITCODE
-    }
-    Write-Host "Docker containers started." -ForegroundColor Green
-} else {
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     Write-Error "Docker is not installed or not in PATH."
     exit 1
 }
+
+Sync-DockerClientEnvironment
+
+docker info *> $null
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Cannot access the Docker daemon. The current user likely does not have permission to the Docker API named pipe or the daemon is not running."
+
+    $dockerService = Get-Service -Name "docker" -ErrorAction SilentlyContinue
+    if ($dockerService) {
+        Write-Host "Docker service status: $($dockerService.Status)" -ForegroundColor Yellow
+        if ($dockerService.Status -ne 'Running') {
+            Write-Host "Start it with: Start-Service docker" -ForegroundColor Gray
+        }
+    }
+
+    Write-Host "Try these fixes:" -ForegroundColor Yellow
+    Write-Host "  1. Start an elevated PowerShell and run this script again." -ForegroundColor Gray
+    Write-Host "  2. Ensure the Docker daemon service is running (Get-Service docker)." -ForegroundColor Gray
+    Write-Host "  3. If using a non-Desktop Docker Engine, configure daemon access for your non-admin user." -ForegroundColor Gray
+    exit 1
+}
+
+Assert-LinuxContainerEngine
+
+$useDockerComposePlugin = $false
+docker compose version *> $null
+if ($LASTEXITCODE -eq 0) {
+    $useDockerComposePlugin = $true
+}
+
+$useDockerComposeStandalone = $false
+if (-not $useDockerComposePlugin -and (Get-Command docker-compose -ErrorAction SilentlyContinue)) {
+    $useDockerComposeStandalone = $true
+}
+
+if (-not $useDockerComposePlugin -and -not $useDockerComposeStandalone) {
+    Write-Error "Neither 'docker compose' nor 'docker-compose' is available. Install Docker Compose and try again."
+    exit 1
+}
+
+Write-Host "Starting Docker containers..." -ForegroundColor Yellow
+
+Push-Location $ContainersDir
+try {
+    # Run from containers/ so compose automatically loads containers/.env across compose variants.
+    Invoke-ComposeUp -UseDockerComposePlugin $useDockerComposePlugin -UseDockerComposeStandalone $useDockerComposeStandalone
+} finally {
+    Pop-Location
+}
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Docker compose failed with exit code $LASTEXITCODE."
+    exit $LASTEXITCODE
+}
+
+Write-Host "Docker containers started." -ForegroundColor Green
 #endregion
+
+function Get-ServiceBindLabel {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Key
+    )
+
+    if (-not $EnvValues.ContainsKey($Key)) {
+        return 'localhost'
+    }
+
+    $configuredHost = $EnvValues[$Key].Trim()
+    if (-not $configuredHost -or $configuredHost -eq '127.0.0.1') {
+        return 'localhost'
+    }
+
+    if ($configuredHost -eq '0.0.0.0') {
+        return '<host-ip-or-dns>'
+    }
+
+    return $configuredHost
+}
+
+$mssqlBindHost = Get-ServiceBindLabel -Key 'MSSQL_BIND_HOST'
+$cosmosBindHost = Get-ServiceBindLabel -Key 'COSMOSDB_BIND_HOST'
+$redisBindHost = Get-ServiceBindLabel -Key 'REDIS_BIND_HOST'
+$redisInsightBindHost = Get-ServiceBindLabel -Key 'REDISINSIGHT_BIND_HOST'
+$smtpBindHost = Get-ServiceBindLabel -Key 'SMTP4DEV_BIND_HOST'
+$seqBindHost = Get-ServiceBindLabel -Key 'SEQ_BIND_HOST'
+$wiremockBindHost = Get-ServiceBindLabel -Key 'WIREMOCK_BIND_HOST'
+$azuriteBindHost = Get-ServiceBindLabel -Key 'AZURITE_BIND_HOST'
+$serviceBusBindHost = Get-ServiceBindLabel -Key 'SERVICEBUS_BIND_HOST'
 
 Write-Host "`n=== Setup Complete ===" -ForegroundColor Green
 Write-Host "Services available:" -ForegroundColor White
-Write-Host "  SQL Server:    localhost:10433" -ForegroundColor Gray
-Write-Host "  CosmosDB:      https://localhost:10081" -ForegroundColor Gray
-Write-Host "  Cosmos Explorer: http://localhost:10181" -ForegroundColor Gray
-Write-Host "  Redis:         localhost:10120" -ForegroundColor Gray
-Write-Host "  RedisInsight:  http://localhost:10121" -ForegroundColor Gray
-Write-Host "  SMTP4Dev SMTP: localhost:10130" -ForegroundColor Gray
-Write-Host "  SMTP4Dev POP:  localhost:10131" -ForegroundColor Gray
-Write-Host "  SMTP4Dev IMAP: localhost:10132" -ForegroundColor Gray
-Write-Host "  SMTP4Dev Web:  http://localhost:10140" -ForegroundColor Gray
-Write-Host "  Seq (OTEL):    http://localhost:10150" -ForegroundColor Gray
-Write-Host "  WireMock HTTP: http://localhost:10080" -ForegroundColor Gray
-Write-Host "  WireMock HTTPS: https://localhost:10443" -ForegroundColor Gray
-Write-Host "  Azurite Blob:  localhost:10000" -ForegroundColor Gray
-Write-Host "  Azurite Queue: localhost:10001" -ForegroundColor Gray
-Write-Host "  Azurite Table: localhost:10002" -ForegroundColor Gray
-Write-Host "  Service Bus:   localhost:10170" -ForegroundColor Gray
-Write-Host "  Service Bus Admin: localhost:10171" -ForegroundColor Gray
+Write-Host "  SQL Server:    ${mssqlBindHost}:10433" -ForegroundColor Gray
+Write-Host "  CosmosDB:      https://${cosmosBindHost}:10081" -ForegroundColor Gray
+Write-Host "  Cosmos Explorer: http://${cosmosBindHost}:10181" -ForegroundColor Gray
+Write-Host "  Redis:         ${redisBindHost}:10120" -ForegroundColor Gray
+Write-Host "  RedisInsight:  http://${redisInsightBindHost}:10121" -ForegroundColor Gray
+Write-Host "  SMTP4Dev SMTP: ${smtpBindHost}:10130" -ForegroundColor Gray
+Write-Host "  SMTP4Dev POP:  ${smtpBindHost}:10131" -ForegroundColor Gray
+Write-Host "  SMTP4Dev IMAP: ${smtpBindHost}:10132" -ForegroundColor Gray
+Write-Host "  SMTP4Dev Web:  http://${smtpBindHost}:10140" -ForegroundColor Gray
+Write-Host "  Seq (OTEL):    http://${seqBindHost}:10150" -ForegroundColor Gray
+Write-Host "  WireMock HTTP: http://${wiremockBindHost}:10080" -ForegroundColor Gray
+Write-Host "  WireMock HTTPS: https://${wiremockBindHost}:10443" -ForegroundColor Gray
+Write-Host "  Azurite Blob:  ${azuriteBindHost}:10000" -ForegroundColor Gray
+Write-Host "  Azurite Queue: ${azuriteBindHost}:10001" -ForegroundColor Gray
+Write-Host "  Azurite Table: ${azuriteBindHost}:10002" -ForegroundColor Gray
+Write-Host "  Service Bus:   ${serviceBusBindHost}:10170" -ForegroundColor Gray
+Write-Host "  Service Bus Admin: ${serviceBusBindHost}:10171" -ForegroundColor Gray
 Write-Host ""
+Write-Host "Set individual *_BIND_HOST values in containers/.env to 0.0.0.0 to expose selected services externally." -ForegroundColor DarkGray
 Write-Host "Head back to README.md for deployment of the database and other services..."
 

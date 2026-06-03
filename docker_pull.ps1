@@ -14,11 +14,78 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = $PSScriptRoot
 if (-not $ScriptDir) { $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path }
 
-$ComposeFile = Join-Path $ScriptDir "containers/docker-compose-common.yml"
+$ContainersDir = Join-Path $ScriptDir "containers"
+$ComposeFile = Join-Path $ContainersDir "docker-compose-common.yml"
 $sqlBaseImage = "mcr.microsoft.com/mssql/server:latest"
+
+function Sync-DockerClientEnvironment {
+    if (-not [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+        return
+    }
+
+    $persistedDockerHost = [Environment]::GetEnvironmentVariable('DOCKER_HOST', 'User')
+    if (-not $persistedDockerHost) {
+        $persistedDockerHost = [Environment]::GetEnvironmentVariable('DOCKER_HOST', 'Machine')
+    }
+
+    if (-not $env:DOCKER_HOST -and $persistedDockerHost) {
+        $env:DOCKER_HOST = $persistedDockerHost.Trim()
+    }
+
+    if ((Test-Path Env:DOCKER_CONTEXT) -and [string]::IsNullOrWhiteSpace($env:DOCKER_CONTEXT)) {
+        Remove-Item Env:DOCKER_CONTEXT -ErrorAction SilentlyContinue
+    }
+}
+
+function Assert-LinuxContainerEngine {
+    $dockerOsType = docker info --format '{{.OSType}}' 2>$null
+    $dockerOperatingSystem = docker info --format '{{.OperatingSystem}}' 2>$null
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Unable to determine the Docker daemon container OS type."
+        exit 1
+    }
+
+    $dockerOsType = $dockerOsType.Trim()
+    $dockerOperatingSystem = $dockerOperatingSystem.Trim()
+
+    if ($dockerOsType -ne 'linux') {
+        Write-Error "This development stack requires Docker to run Linux containers. Current Docker daemon OSType: '$dockerOsType' ($dockerOperatingSystem)."
+
+        if ([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform([System.Runtime.InteropServices.OSPlatform]::Windows)) {
+            Write-Host "If you are using Docker Desktop, switch to Linux containers and rerun this script." -ForegroundColor Yellow
+            Write-Host "Typical fix: Docker Desktop tray icon > Switch to Linux containers..." -ForegroundColor Gray
+        }
+
+        exit 1
+    }
+}
 
 if (Get-Command docker -ErrorAction SilentlyContinue) {
     Write-Host "Docker images and container setup started."
+
+    Sync-DockerClientEnvironment
+
+    docker info *> $null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Cannot access the Docker daemon. The current user likely does not have permission to the Docker API named pipe or the daemon is not running."
+
+        $dockerService = Get-Service -Name "docker" -ErrorAction SilentlyContinue
+        if ($dockerService) {
+            Write-Host "Docker service status: $($dockerService.Status)" -ForegroundColor Yellow
+            if ($dockerService.Status -ne 'Running') {
+                Write-Host "Start it with: Start-Service docker" -ForegroundColor Gray
+            }
+        }
+
+        Write-Host "Try these fixes:" -ForegroundColor Yellow
+        Write-Host "  1. Start an elevated PowerShell and run this script again." -ForegroundColor Gray
+        Write-Host "  2. Ensure the Docker daemon service is running (Get-Service docker)." -ForegroundColor Gray
+        Write-Host "  3. If using a non-Desktop Docker Engine, configure daemon access for your non-admin user." -ForegroundColor Gray
+        exit 1
+    }
+
+    Assert-LinuxContainerEngine
 
     $dockerInfo = docker info 2>$null
     $registryMirrors = @($dockerInfo | Where-Object { $_ -match '^\s+https?://' } | ForEach-Object { $_.Trim() })
@@ -27,8 +94,36 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
         $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
     }
 
+    $useDockerComposePlugin = $false
+    docker compose version *> $null
+    if ($LASTEXITCODE -eq 0) {
+        $useDockerComposePlugin = $true
+    }
+
+    $useDockerComposeStandalone = $false
+    if (-not $useDockerComposePlugin -and (Get-Command docker-compose -ErrorAction SilentlyContinue)) {
+        $useDockerComposeStandalone = $true
+    }
+
+    if (-not $useDockerComposePlugin -and -not $useDockerComposeStandalone) {
+        Write-Error "Neither 'docker compose' nor 'docker-compose' is available. Install Docker Compose and try again."
+        exit 1
+    }
+
     Write-Host "Pulling compose-managed images from $ComposeFile..." -ForegroundColor Yellow
-    docker compose -f $ComposeFile pull
+
+    Push-Location $ContainersDir
+    try {
+        # Run from containers/ so compose automatically loads containers/.env across compose variants.
+        if ($useDockerComposePlugin) {
+            docker compose -f "docker-compose-common.yml" pull
+        } else {
+            docker-compose -f "docker-compose-common.yml" pull
+        }
+    } finally {
+        Pop-Location
+    }
+
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed to pull compose-managed images (exit code $LASTEXITCODE)."
 
