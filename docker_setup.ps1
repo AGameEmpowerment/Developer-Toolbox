@@ -181,25 +181,47 @@ if (Test-Path $WireMockCert) {
 #region Docker Services
 Write-Host "`n=== Docker Services ===" -ForegroundColor Cyan
 
-if (Get-Command docker -ErrorAction SilentlyContinue) {
-    Write-Host "Starting Docker containers..." -ForegroundColor Yellow
-
-    ## Start the shared development collection.
-    docker compose `
-        --env-file "$EnvFile" `
-        -f "$ContainersDir/docker-compose-common.yml" `
-        -p dev_common_shared `
-        up -d
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Docker compose failed with exit code $LASTEXITCODE."
-        exit $LASTEXITCODE
-    }
-    Write-Host "Docker containers started." -ForegroundColor Green
-} else {
+if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     Write-Error "Docker is not installed or not in PATH."
     exit 1
 }
+
+$useDockerComposePlugin = $false
+docker compose version *> $null
+if ($LASTEXITCODE -eq 0) {
+    $useDockerComposePlugin = $true
+}
+
+$useDockerComposeStandalone = $false
+if (-not $useDockerComposePlugin -and (Get-Command docker-compose -ErrorAction SilentlyContinue)) {
+    $useDockerComposeStandalone = $true
+}
+
+if (-not $useDockerComposePlugin -and -not $useDockerComposeStandalone) {
+    Write-Error "Neither 'docker compose' nor 'docker-compose' is available. Install Docker Compose and try again."
+    exit 1
+}
+
+Write-Host "Starting Docker containers..." -ForegroundColor Yellow
+
+Push-Location $ContainersDir
+try {
+    # Run from containers/ so compose automatically loads containers/.env across compose variants.
+    if ($useDockerComposePlugin) {
+        docker compose -f "docker-compose-common.yml" -p dev_common_shared up -d
+    } else {
+        docker-compose -f "docker-compose-common.yml" -p dev_common_shared up -d
+    }
+} finally {
+    Pop-Location
+}
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Docker compose failed with exit code $LASTEXITCODE."
+    exit $LASTEXITCODE
+}
+
+Write-Host "Docker containers started." -ForegroundColor Green
 #endregion
 
 Write-Host "`n=== Setup Complete ===" -ForegroundColor Green

@@ -14,7 +14,8 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = $PSScriptRoot
 if (-not $ScriptDir) { $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path }
 
-$ComposeFile = Join-Path $ScriptDir "containers/docker-compose-common.yml"
+$ContainersDir = Join-Path $ScriptDir "containers"
+$ComposeFile = Join-Path $ContainersDir "docker-compose-common.yml"
 $sqlBaseImage = "mcr.microsoft.com/mssql/server:latest"
 
 if (Get-Command docker -ErrorAction SilentlyContinue) {
@@ -27,8 +28,36 @@ if (Get-Command docker -ErrorAction SilentlyContinue) {
         $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
     }
 
+    $useDockerComposePlugin = $false
+    docker compose version *> $null
+    if ($LASTEXITCODE -eq 0) {
+        $useDockerComposePlugin = $true
+    }
+
+    $useDockerComposeStandalone = $false
+    if (-not $useDockerComposePlugin -and (Get-Command docker-compose -ErrorAction SilentlyContinue)) {
+        $useDockerComposeStandalone = $true
+    }
+
+    if (-not $useDockerComposePlugin -and -not $useDockerComposeStandalone) {
+        Write-Error "Neither 'docker compose' nor 'docker-compose' is available. Install Docker Compose and try again."
+        exit 1
+    }
+
     Write-Host "Pulling compose-managed images from $ComposeFile..." -ForegroundColor Yellow
-    docker compose -f $ComposeFile pull
+
+    Push-Location $ContainersDir
+    try {
+        # Run from containers/ so compose automatically loads containers/.env across compose variants.
+        if ($useDockerComposePlugin) {
+            docker compose -f "docker-compose-common.yml" pull
+        } else {
+            docker-compose -f "docker-compose-common.yml" pull
+        }
+    } finally {
+        Pop-Location
+    }
+
     if ($LASTEXITCODE -ne 0) {
         Write-Error "Failed to pull compose-managed images (exit code $LASTEXITCODE)."
 
