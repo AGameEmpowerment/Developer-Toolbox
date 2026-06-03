@@ -47,7 +47,7 @@ docker compose -f containers/docker-compose-common.yml logs -f redisinsight
 ./docker_pull.sh
 ```
 
-To stop the shared local stack without deleting persistent data, run `./docker_down.ps1` on Windows or `./docker_down.sh` on Linux/macOS/WSL. Deleting Docker named volumes now requires an explicit second confirmation flag: `-CleanVolumes -Force` or `--clean-volumes --force`.
+To stop the shared local stack without deleting persistent data, run `./docker_down.ps1` on Windows or `./docker_down.sh` on Linux/macOS/WSL. `-CleanAll` and `--clean-all` only remove ephemeral files and preserve Docker named volumes. Deleting stored emulator data requires the dedicated volume cleanup flag: `-CleanVolumes` or `--clean-volumes`.
 
 ## External exposure
 
