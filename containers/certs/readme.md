@@ -291,7 +291,7 @@ Use `--cacert ./certs/wiremock.crt` or `-k` to skip verification (dev only).
 
 ### keytool not found
 
-**Windows:** Install Java JDK from [Adoptium](https://adoptium.net/) or set `JAVA_HOME` environment variable.
+**Windows:** Install free Microsoft OpenJDK with `winget install Microsoft.OpenJDK.25` or set `JAVA_HOME` environment variable.
 
 **Linux (Debian/Ubuntu):**
 

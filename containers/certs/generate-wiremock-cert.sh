@@ -6,7 +6,7 @@
 # WireMock HTTPS development. It also exports the public certificate (.crt) for client trust.
 #
 # Prerequisites:
-#   - Java JDK must be installed and keytool must be available in PATH
+#   - Free OpenJDK must be installed and keytool must be available in PATH
 #   - Alternatively, set JAVA_HOME environment variable
 #
 # Usage:
@@ -17,6 +17,16 @@
 # After generation, update your .env file with:
 #   WIREMOCK_KEYSTORE_PASSWORD=<your-password>
 #
+
+if [ -z "${BASH_VERSION:-}" ]; then
+    echo "Missing dependency: Bash 3.2 or later is required. Run this script with bash, not sh." >&2
+    exit 1
+fi
+
+if (( BASH_VERSINFO[0] < 3 || (BASH_VERSINFO[0] == 3 && BASH_VERSINFO[1] < 2) )); then
+    echo "Missing dependency: Bash 3.2 or later is required. Current version: ${BASH_VERSION}." >&2
+    exit 1
+fi
 
 set -euo pipefail
 
@@ -114,7 +124,8 @@ if [[ -z "$KEYTOOL" ]]; then
     )
 
     for pattern in "${COMMON_PATHS[@]}"; do
-        found=$(compgen -G "$pattern" 2>/dev/null | head -n 1)
+        found="$(compgen -G "$pattern" 2>/dev/null || true)"
+        found="${found%%$'\n'*}"
         if [[ -n "$found" ]] && [[ -f "$found" ]]; then
             KEYTOOL="$found"
             break
@@ -123,11 +134,12 @@ if [[ -z "$KEYTOOL" ]]; then
 fi
 
 if [[ -z "$KEYTOOL" ]]; then
-    echo -e "${RED}Error: keytool not found. Please ensure Java JDK is installed and one of the following:${NC}"
+    echo -e "${RED}Missing dependency: Java JDK keytool was not found.${NC}"
+    echo "Please ensure free OpenJDK is installed and one of the following:"
     echo "  1. Add Java bin directory to PATH"
     echo "  2. Set JAVA_HOME environment variable"
-    echo "  3. Install Java JDK: sudo apt install default-jdk (Debian/Ubuntu)"
-    echo "                       sudo dnf install java-latest-openjdk-devel (Fedora)"
+    echo "  3. Install free OpenJDK on Debian/Ubuntu: sudo apt install default-jdk"
+    echo "     Fedora/RHEL alternative: sudo dnf install java-latest-openjdk-devel"
     exit 1
 fi
 

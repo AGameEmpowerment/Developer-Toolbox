@@ -7,7 +7,7 @@
     WireMock HTTPS development. It also exports the public certificate (.crt) for client trust.
 
     Prerequisites:
-    - Java JDK must be installed and keytool must be available in PATH
+    - Free OpenJDK must be installed and keytool must be available in PATH
     - Alternatively, set JAVA_HOME environment variable
 
 .PARAMETER KeystorePassword
@@ -56,6 +56,11 @@ param(
     [Parameter()]
     [switch]$ShowPassword
 )
+
+if ($PSVersionTable.PSVersion -lt [version]"5.1") {
+    Write-Error "Missing dependency: PowerShell 5.1 or later is required. Current version: $($PSVersionTable.PSVersion)."
+    exit 1
+}
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -116,10 +121,11 @@ if (-not $keytool) {
 
 if (-not $keytool) {
     Write-Error @"
-keytool not found. Please ensure Java JDK is installed and one of the following:
+Missing dependency: Java JDK keytool was not found.
+Please ensure free OpenJDK is installed and one of the following:
   1. Add Java bin directory to PATH
   2. Set JAVA_HOME environment variable
-  3. Install Java JDK from https://adoptium.net/
+  3. Install free Microsoft OpenJDK with: winget install Microsoft.OpenJDK.25
 "@
     exit 1
 }

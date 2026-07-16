@@ -11,3 +11,5 @@ RUN rm -f /etc/apt/sources.list.d/yarn.list \
     && rm -f /etc/apt/keyrings/yarn.gpg \
     && apt-get update \
     && rm -rf /var/lib/apt/lists/*
+
+USER vscode
