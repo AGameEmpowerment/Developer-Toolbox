@@ -1,0 +1,4 @@
+interface:
+  display_name: "GitHub CLI Access"
+  short_description: "Repo-grounded GitHub access with gh CLI"
+  default_prompt: "Use $gh-github-access when accessing this repo or an explicitly named GitHub repo through the gh CLI."
