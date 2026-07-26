@@ -1,0 +1,6 @@
+@SystemUptimeTracker.Api_HostAddress = https://localhost:7060
+
+GET {{SystemUptimeTracker.Api_HostAddress}}/_health
+Accept: application/json
+
+###

@@ -1,0 +1,261 @@
+trigger: none
+pr: none
+
+name: $(ReleaseVersion).$(date:yyyy).$(date:MMdd)$(rev:.r)
+
+resources:
+  pipelines:
+    - pipeline: productionBuild
+      source: System-Uptime-Tracker
+      trigger:
+        branches:
+          include:
+            - main
+
+parameters:
+  - name: buildId
+    displayName: Build ID (leave blank for the triggering build)
+    type: string
+    default: ""
+  - name: resetDatabase
+    displayName: Reset only the Docker SystemUptimeTracker database before deployment
+    type: boolean
+    default: false
+
+variables:
+  - group: System-Uptime-Tracker
+  - group: System-Uptime-Tracker-Dev
+  - name: artifactBuildId
+    ${{ if ne(parameters.buildId, '') }}:
+      value: ${{ parameters.buildId }}
+    ${{ else }}:
+      value: $(resources.pipeline.productionBuild.runID)
+  - name: dockerBuildDefinitionId
+    value: 0 # Template value: replace with the build pipeline definition ID.
+  - name: dockerArtifactName
+    value: System-Uptime-Tracker-docker
+  - name: packageRoot
+    value: $(DOCKER_RELEASE_ROOT)
+
+pool:
+  name: $(ADO_AGENT_POOL)
+  demands:
+    - Agent.Name -equals $(ADO_AGENT_NAME)
+
+stages:
+  - stage: DeployDocker
+    displayName: Deploy Docker template
+    jobs:
+      - deployment: DeploySystemUptimeTrackerDocker
+        displayName: Deploy SystemUptimeTracker Docker
+        environment: SystemUptimeTracker-Docker
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: none
+
+                - checkout: self
+                  clean: false
+
+                - pwsh: |
+                    & "$(Build.SourcesDirectory)/devops/docker/Install-SystemUptimeTrackerDockerCompose.ps1" `
+                      -Version "$(DOCKER_COMPOSE_VERSION)" `
+                      -InstallRoot "$(Agent.TempDirectory)/systemuptimetracker-compose"
+                  displayName: Ensure Docker Compose is installed
+
+                - task: DownloadBuildArtifacts@1
+                  displayName: Download Docker artifact
+                  inputs:
+                    buildType: specific
+                    project: $(System.TeamProject)
+                    pipeline: $(dockerBuildDefinitionId)
+                    buildVersionToDownload: specific
+                    buildId: $(artifactBuildId)
+                    downloadType: single
+                    artifactName: $(dockerArtifactName)
+                    downloadPath: $(Pipeline.Workspace)/build
+
+                - pwsh: |
+                    $packageRoot = "$(packageRoot)"
+                    $stagingRoot = "$packageRoot.staging"
+
+                    if (Test-Path -LiteralPath $stagingRoot) {
+                      Remove-Item -LiteralPath $stagingRoot -Recurse -Force
+                    }
+                    New-Item -ItemType Directory -Path $stagingRoot -Force | Out-Null
+                    Expand-Archive `
+                      -LiteralPath "$(Pipeline.Workspace)/build/$(dockerArtifactName)/docker-package.zip" `
+                      -DestinationPath $stagingRoot `
+                      -Force
+
+                    if (Test-Path -LiteralPath $packageRoot) {
+                      $previousRoot = "$packageRoot.previous"
+                      if (Test-Path -LiteralPath $previousRoot) {
+                        Remove-Item -LiteralPath $previousRoot -Recurse -Force
+                      }
+                      Move-Item -LiteralPath $packageRoot -Destination $previousRoot
+                    }
+                    Move-Item -LiteralPath $stagingRoot -Destination $packageRoot
+
+                    Copy-Item `
+                      -LiteralPath "$(Build.SourcesDirectory)/devops/docker/docker-compose.yml" `
+                      -Destination (Join-Path $packageRoot "docker-compose.production.yml") `
+                      -Force
+                    Copy-Item `
+                      -LiteralPath "$(Build.SourcesDirectory)/devops/docker/systemuptimetracker.production.env.example" `
+                      -Destination (Join-Path $packageRoot "systemuptimetracker.production.env.example") `
+                      -Force
+                  displayName: Stage Docker deployment package
+
+                - pwsh: |
+                    & "$(Build.SourcesDirectory)/devops/docker/New-SystemUptimeTrackerDockerEnvironment.ps1" `
+                      -TemplatePath "$(packageRoot)/systemuptimetracker.production.env.example" `
+                      -DestinationPath "$(packageRoot)/systemuptimetracker.production.env"
+                  displayName: Create protected Docker runtime environment
+                  env:
+                    SYSTEMUPTIMETRACKER_IMAGE_TAG: $(Build.BuildNumber)
+                    SYSTEMUPTIMETRACKER_SQL_SA_PASSWORD: $(SYSTEMUPTIMETRACKER_SQL_SA_PASSWORD)
+                    SYSTEMUPTIMETRACKER_SQL_APP_USERNAME: $(SYSTEMUPTIMETRACKER_SQL_APP_USERNAME)
+                    SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD: $(SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD)
+                    UI_APP_BASE_URL: $(DOCKER_APP_BASE_URL)
+                    UI_AUTH_COOKIE_SECRET: $(UI_AUTH_COOKIE_SECRET)
+                    UI_IMPERSONATE_ENCRYPTION_KEY: $(UI_IMPERSONATE_ENCRYPTION_KEY)
+                    UI_MICROSOFT_CLIENT_SECRET: $(UI_MICROSOFT_CLIENT_SECRET)
+                    UI_APP_OPENTELEMETRY_SEQ_API_KEY: $(OpenTelemetry.ApiKey)
+                    API_REDACTION_KEY: $(API_REDACTION_KEY)
+                    API_OPENTELEMETRY_APIKEY: $(OpenTelemetry.ApiKey)
+
+                - pwsh: |
+                    docker compose version *> $null
+                    if ($LASTEXITCODE -eq 0) {
+                      $composeExecutable = "docker"
+                      $composePrefix = @("compose")
+                    }
+                    elseif (Get-Command docker-compose -ErrorAction SilentlyContinue) {
+                      $composeExecutable = "docker-compose"
+                      $composePrefix = @()
+                    }
+                    else {
+                      throw "Neither 'docker compose' nor 'docker-compose' is available in PATH."
+                    }
+
+                    $composeFile = "$(packageRoot)/docker-compose.production.yml"
+                    $environmentFile = "$(packageRoot)/systemuptimetracker.production.env"
+                    $composeArguments = @(
+                      $composePrefix
+                      "--project-name", "systemuptimetracker-production"
+                      "--env-file", $environmentFile
+                      "-f", $composeFile
+                      "up", "--detach", "systemuptimetracker-sql"
+                    )
+                    & $composeExecutable @composeArguments
+                    if ($LASTEXITCODE -ne 0) {
+                      throw "The standalone SystemUptimeTracker SQL service failed to start."
+                    }
+
+                    $deadline = [DateTimeOffset]::UtcNow.AddSeconds(120)
+                    do {
+                      $containerId = (& $composeExecutable @(
+                        $composePrefix
+                        "--project-name", "systemuptimetracker-production"
+                        "--env-file", $environmentFile
+                        "-f", $composeFile
+                        "ps", "--quiet", "systemuptimetracker-sql"
+                      )).Trim()
+                      $health = if ($containerId) {
+                        (& docker inspect --format "{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}" $containerId).Trim()
+                      }
+                      if ($health -eq "healthy") {
+                        break
+                      }
+                      Start-Sleep -Seconds 5
+                    } while ([DateTimeOffset]::UtcNow -lt $deadline)
+
+                    if ($health -ne "healthy") {
+                      throw "The standalone SystemUptimeTracker SQL service did not become healthy. Last state: '$health'."
+                    }
+
+                    if ("${{ parameters.resetDatabase }}" -eq "True") {
+                      & "$(Build.SourcesDirectory)/devops/docker/Reset-SystemUptimeTrackerDockerDatabase.ps1" `
+                        -ComposeFile $composeFile `
+                        -EnvironmentFile $environmentFile `
+                        -ConfirmDatabaseName "SystemUptimeTracker" `
+                        -Confirm:$false
+                    }
+
+                    & "$(Build.SourcesDirectory)/devops/docker/Set-SystemUptimeTrackerSqlApplicationLogin.ps1" `
+                      -ComposeFile $composeFile `
+                      -EnvironmentFile $environmentFile `
+                      -ApplicationUsername $env:SYSTEMUPTIMETRACKER_SQL_APP_USERNAME `
+                      -ApplicationPassword $env:SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD
+
+                    & "$(Build.SourcesDirectory)/devops/docker/Backup-SystemUptimeTrackerDatabase.ps1" `
+                      -ComposeFile $composeFile `
+                      -EnvironmentFile $environmentFile
+                  displayName: Back up the production database
+                  env:
+                    SYSTEMUPTIMETRACKER_SQL_APP_USERNAME: $(SYSTEMUPTIMETRACKER_SQL_APP_USERNAME)
+                    SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD: $(SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD)
+
+                - pwsh: |
+                    & "$(Build.SourcesDirectory)/devops/docker/Deploy-SystemUptimeTrackerDockerPackage.ps1" `
+                      -Tag "$(Build.BuildNumber)" `
+                      -PackageRoot "$(packageRoot)" `
+                      -EnvironmentFile "$(packageRoot)/systemuptimetracker.production.env"
+                  displayName: Build images, migrate database, and deploy
+
+                - pwsh: |
+                    & "$(Build.SourcesDirectory)/devops/docker/Test-SystemUptimeTrackerDockerMigrations.ps1" `
+                      -ComposeFile "$(packageRoot)/docker-compose.production.yml" `
+                      -EnvironmentFile "$(packageRoot)/systemuptimetracker.production.env" `
+                      -MigrationSourceRoot "$(Build.SourcesDirectory)/src/SystemUptimeTracker/SystemUptimeTracker.Data" `
+                      -ApplicationUsername $env:SYSTEMUPTIMETRACKER_SQL_APP_USERNAME `
+                      -ApplicationPassword $env:SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD
+                  displayName: Verify Docker database migrations
+                  env:
+                    SYSTEMUPTIMETRACKER_SQL_APP_USERNAME: $(SYSTEMUPTIMETRACKER_SQL_APP_USERNAME)
+                    SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD: $(SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD)
+
+                - powershell: |
+                    & "$(Build.SourcesDirectory)/devops/docker/Configure-SystemUptimeTrackerDockerIisProxy.ps1" `
+                      -HostName ([Uri]"$(DOCKER_APP_BASE_URL)").Host
+                  displayName: Configure Docker public IIS proxy
+
+                - pwsh: |
+                    $healthUri = "$(DOCKER_APP_BASE_URL)/_health"
+                    $deadline = [DateTime]::UtcNow.AddSeconds(90)
+                    $lastStatusCode = 0
+                    do {
+                      try {
+                        $response = Invoke-WebRequest `
+                          -Uri $healthUri `
+                          -Headers @{ Accept = "application/json" } `
+                          -SkipHttpErrorCheck `
+                          -TimeoutSec 15
+                        $lastStatusCode = [int]$response.StatusCode
+                        if ($lastStatusCode -eq 200) {
+                          break
+                        }
+                      }
+                      catch {
+                        $lastStatusCode = 0
+                      }
+
+                      if ([DateTime]::UtcNow -lt $deadline) {
+                        Start-Sleep -Seconds 5
+                      }
+                    } while ([DateTime]::UtcNow -lt $deadline)
+
+                    if ($lastStatusCode -ne 200) {
+                      throw "Docker smoke check did not return HTTP 200 within 90 seconds. Last status: $lastStatusCode."
+                    }
+                  displayName: Run Docker smoke check
+
+                - pwsh: |
+                    $temporaryComposeRoot = "$(Agent.TempDirectory)/systemuptimetracker-compose"
+                    if (Test-Path -LiteralPath $temporaryComposeRoot) {
+                      Remove-Item -LiteralPath $temporaryComposeRoot -Recurse -Force
+                    }
+                  displayName: Remove temporary Docker Compose client
+                  condition: always()

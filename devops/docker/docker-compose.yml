@@ -1,0 +1,132 @@
+name: systemuptimetracker-production
+
+services:
+  systemuptimetracker-sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    shm_size: 1gb
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: ${SYSTEMUPTIMETRACKER_SQL_EDITION:-Express}
+      MSSQL_SA_PASSWORD: ${SYSTEMUPTIMETRACKER_SQL_SA_PASSWORD}
+    ports:
+      - "${SYSTEMUPTIMETRACKER_SQL_BIND_HOST:-127.0.0.1}:${SYSTEMUPTIMETRACKER_SQL_PUBLIC_PORT:-11433}:1433"
+    volumes:
+      - systemuptimetracker-sql-data:/var/opt/mssql
+      - systemuptimetracker-sql-backups:/var/opt/mssql/backup
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SET NOCOUNT ON; SELECT 1\" >/dev/null 2>&1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - systemuptimetracker
+
+  systemuptimetracker-backend:
+    image: systemuptimetracker-backend:${SYSTEMUPTIMETRACKER_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    # Local Docker Desktop named volumes are root-owned on first mount.
+    # Keep the local production-style stack writable unless the volume has been pre-provisioned.
+    user: "0"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:8002
+      SystemUptimeTracker__ApplyStartupMigrations: ${API_APPLY_STARTUP_MIGRATIONS:-true}
+      AllowedHosts: ${API_ALLOWED_HOSTS:-*}
+      ImpersonatingCookie: ${IMPERSONATING_COOKIE:-acting-as}
+      RedactionKey: ${API_REDACTION_KEY}
+      KeyVaultUri: ${API_KEYVAULT_URI:-}
+      ConnectionStrings__DefaultConnection: 'Server=systemuptimetracker-sql,1433;Database=SystemUptimeTracker;User Id=${SYSTEMUPTIMETRACKER_SQL_APP_USERNAME};Password="${SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD}";Encrypt=True;MultipleActiveResultSets=true;TrustServerCertificate=True'
+      ConnectionStrings__ApplicationInsights: ${API_APPLICATIONINSIGHTS_CONNECTION_STRING:-na}
+      FeatureManagement__AspireEnabled: ${API_FEATURE_ASPIRE_ENABLED:-false}
+      FeatureManagement__ConfigurationInfoEnabled: ${API_FEATURE_CONFIGURATIONINFO_ENABLED:-false}
+      FeatureManagement__InfoEndpointEnabled: ${API_FEATURE_INFOENDPOINT_ENABLED:-false}
+      FeatureManagement__OpenApiEnabled: ${API_FEATURE_OPENAPI_ENABLED:-false}
+      FeatureManagement__OpenTelemetryEnabled: ${API_FEATURE_OPENTELEMETRY_ENABLED:-false}
+      FeatureManagement__OpenTelemetrySeqEnabled: ${API_FEATURE_OPENTELEMETRY_SEQ_ENABLED:-false}
+      OpenTelemetry__Endpoint: "${API_OPENTELEMETRY_ENDPOINT:-http://host.docker.internal:10150/ingest/otlp/v1/logs}"
+      OpenTelemetry__ApiKey: ${API_OPENTELEMETRY_APIKEY}
+      OpenTelemetry__ExportDebugLogs: ${API_OPENTELEMETRY_EXPORTDEBUGLOGS:-false}
+      OpenTelemetry__IncludeScopes: ${API_OPENTELEMETRY_INCLUDESCOPES:-false}
+      OpenTelemetry__IncludeFormattedMessage: ${API_OPENTELEMETRY_INCLUDEFORMATTEDMESSAGE:-false}
+      OpenTelemetry__ParseStateValues: ${API_OPENTELEMETRY_PARSESTATEVALUES:-false}
+      Auth__Jwt__Enabled: ${API_AUTH_JWT_ENABLED:-false}
+      Auth__Jwt__Issuer: ${API_AUTH_JWT_ISSUER:-SystemUptimeTracker}
+      Auth__Jwt__Audience: ${API_AUTH_JWT_AUDIENCE:-SystemUptimeTracker.Api}
+      Auth__Jwt__SigningKey: ${API_AUTH_JWT_SIGNINGKEY:-__SET_IN_USER_SECRETS_OR_ENV__}
+      Auth__Jwt__ClockSkewSeconds: ${API_AUTH_JWT_CLOCKSKEW_SECONDS:-60}
+      Auth__LoginTimeInMinutes: ${API_AUTH_LOGIN_MINUTES:-20}
+      HttpClients__Resilience__TimeOutInSeconds: ${API_HTTP_RESILIENCE_TIMEOUT_SECONDS:-120}
+      Redis__LocalOverride: ${API_REDIS_LOCALOVERRIDE:-true}
+      Redis__InstanceName: ${API_REDIS_INSTANCENAME:-SystemUptimeTracker_docker}
+      Redis__Url: ${API_REDIS_URL:-}
+      Redis__DefaultCacheDurationMinutes: ${API_REDIS_CACHE_MINUTES:-120}
+      Cache__HealthMonitor__IntervalSeconds: ${API_CACHE_HEALTH_INTERVAL_SECONDS:-5}
+    depends_on:
+      systemuptimetracker-sql:
+        condition: service_healthy
+    networks:
+      - systemuptimetracker
+
+  systemuptimetracker-frontend:
+    image: systemuptimetracker-frontend:${SYSTEMUPTIMETRACKER_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      - systemuptimetracker-backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      APP_BASE_URL: ${UI_APP_BASE_URL:-http://localhost:8001}
+      API_BASE_URL: http://systemuptimetracker-backend:8002/
+      AUTH_COOKIE_SECRET: ${UI_AUTH_COOKIE_SECRET}
+      CONSOLE_ACCESSTOKEN: ${UI_CONSOLE_ACCESSTOKEN:-false}
+      APP_LOGGING_LEVEL: ${UI_APP_LOGGING_LEVEL:-Information}
+      APP_VERSION: ${UI_APP_VERSION:-0.1.0-docker}
+      APP_NAME: ${UI_APP_NAME:-SystemUptimeTracker}
+      APP_INSIGHTS_ENABLED: ${UI_APP_INSIGHTS_ENABLED:-false}
+      APP_INSIGHTS_KEY: ${UI_APP_INSIGHTS_KEY:-}
+      APP_INSIGHTS_CLOUD_ROLE: ${UI_APP_INSIGHTS_CLOUD_ROLE:-systemuptimetracker-web}
+      APP_OPEN_TELEMETRY_ENABLED: ${UI_APP_OPENTELEMETRY_ENABLED:-false}
+      APP_OPEN_TELEMETRY_SEQ_ENABLED: ${UI_APP_OPENTELEMETRY_SEQ_ENABLED:-false}
+      APP_OPEN_TELEMETRY_ASPIRE_ENABLED: ${UI_APP_OPENTELEMETRY_ASPIRE_ENABLED:-false}
+      APP_OPEN_TELEMETRY_SEQ_ENDPOINT: "${UI_APP_OPENTELEMETRY_SEQ_ENDPOINT:-http://host.docker.internal:10150/ingest/otlp/v1/logs}"
+      APP_OPEN_TELEMETRY_SEQ_API_KEY: ${UI_APP_OPENTELEMETRY_SEQ_API_KEY}
+      APP_OPEN_TELEMETRY_ASPIRE_ENDPOINT: ${UI_APP_OPENTELEMETRY_ASPIRE_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${UI_OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_SERVICE_NAME: ${UI_OTEL_SERVICE_NAME:-systemuptimetracker-web}
+      OTEL_RESOURCE_ATTRIBUTES: ${UI_OTEL_RESOURCE_ATTRIBUTES:-}
+      IMPERSONATING_COOKIE: ${IMPERSONATING_COOKIE:-acting-as}
+      NEXT_PUBLIC_IMPERSONATING_COOKIE: ${IMPERSONATING_COOKIE:-acting-as}
+      IMPERSONATE_ENCRYPTION_KEY: ${UI_IMPERSONATE_ENCRYPTION_KEY}
+      MICROSOFT_CLIENT_ID: ${UI_MICROSOFT_CLIENT_ID:-}
+      MICROSOFT_CLIENT_SECRET: ${UI_MICROSOFT_CLIENT_SECRET:-}
+      MICROSOFT_TENANT_ID: ${UI_MICROSOFT_TENANT_ID:-}
+      MICROSOFT_AUTHORITY: ${UI_MICROSOFT_AUTHORITY:-}
+      MICROSOFT_API_SCOPE: ${UI_MICROSOFT_API_SCOPE:-}
+      MICROSOFT_AUTH_SCOPES: ${UI_MICROSOFT_AUTH_SCOPES:-}
+      MICROSOFT_REDIRECT_PATH: ${UI_MICROSOFT_REDIRECT_PATH:-/auth/callback}
+      MICROSOFT_POST_LOGOUT_REDIRECT_URI: ${UI_MICROSOFT_POST_LOGOUT_REDIRECT_URI:-}
+    ports:
+      - "${UI_BIND_HOST:-0.0.0.0}:${UI_PUBLIC_PORT:-8001}:3001"
+    networks:
+      - systemuptimetracker
+
+networks:
+  systemuptimetracker:
+    name: ${SYSTEMUPTIMETRACKER_NETWORK_NAME:-systemuptimetracker}
+    driver: bridge
+
+volumes:
+  systemuptimetracker-sql-data:
+    name: ${SYSTEMUPTIMETRACKER_SQL_VOLUME_NAME:-systemuptimetracker-production-sql-data}
+  systemuptimetracker-sql-backups:
+    name: ${SYSTEMUPTIMETRACKER_SQL_BACKUP_VOLUME_NAME:-systemuptimetracker-production-sql-backups}

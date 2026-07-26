@@ -1,0 +1,32 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <LangVersion>latest</LangVersion>
+        <TargetFramework>net10.0</TargetFramework>
+        <AssemblyName>SystemUptimeTracker.AppHost</AssemblyName>
+        <RootNamespace>SystemUptimeTracker.AppHost</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsAspireHost>true</IsAspireHost>
+        <Configurations>Debug;Release;Development;Testing;Staging;Production</Configurations>
+        <UserSecretsId>e78cc5c5-3b2e-4079-a6c8-b096675ad6c4</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Aspire.Hosting.JavaScript" Version="13.4.6" />
+      <PackageReference Include="MessagePack" Version="3.1.8" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SystemUptimeTracker.Api\SystemUptimeTracker.Api.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="appsettings*.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+
+</Project>

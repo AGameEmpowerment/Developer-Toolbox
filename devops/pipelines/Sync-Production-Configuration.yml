@@ -1,0 +1,244 @@
+trigger: none
+pr: none
+
+name: configuration.$(date:yyyy).$(date:MMdd)$(rev:.r)
+
+variables:
+  - group: System-Uptime-Tracker
+
+pool:
+  name: Default
+
+steps:
+  - checkout: self
+    clean: false
+
+  - pwsh: |
+      $persistentComposePath = "C:\Apps\SystemUptimeTracker\tools\docker-compose.exe"
+      if (Test-Path -LiteralPath $persistentComposePath) {
+        Remove-Item -LiteralPath $persistentComposePath -Force
+        Write-Host "Removed the previously installed persistent Docker Compose client."
+      }
+      else {
+        Write-Host "No persistent Docker Compose client is installed by SystemUptimeTracker."
+      }
+    displayName: Remove persistent SystemUptimeTracker Docker Compose client
+
+  - pwsh: |
+      $dockerOsType = (& docker info --format "{{.OSType}}" 2>$null).Trim()
+      Write-Host "Docker daemon OS type: $dockerOsType"
+      Write-Host "Docker contexts:"
+      & docker context ls
+
+      $env:DOCKER_HOST = "tcp://127.0.0.1:2375"
+      Write-Host "SystemUptimeTracker WSL containers:"
+      & docker ps --all `
+        --filter "label=com.docker.compose.project=systemuptimetracker-production" `
+        --format "table {{.Names}}\t{{.Image}}\t{{.Status}}"
+
+      $systemUptimeTrackerContainers = & docker ps --all `
+        --quiet `
+        --filter "label=com.docker.compose.project=systemuptimetracker-production"
+      foreach ($containerId in $systemUptimeTrackerContainers) {
+        $containerName = (& docker inspect --format "{{.Name}}" $containerId).TrimStart("/")
+        Write-Host "Recent logs for $containerName"
+        & docker logs --tail 120 $containerId 2>&1
+      }
+
+      Write-Host "WSL and container services:"
+      Get-CimInstance Win32_Service |
+        Where-Object {
+          $_.Name -match "wsl|docker|container|vmcompute" -or
+          $_.PathName -match "Agent.Listener"
+        } |
+        Select-Object Name, State, StartName, PathName |
+        Format-Table -AutoSize
+
+      Write-Host "Listening Docker API ports:"
+      Get-NetTCPConnection -State Listen -ErrorAction SilentlyContinue |
+        Where-Object { $_.LocalPort -in 2375, 2376 } |
+        Select-Object LocalAddress, LocalPort, OwningProcess |
+        Format-Table -AutoSize
+
+      Write-Host "Available non-special user profiles:"
+      Get-CimInstance Win32_UserProfile |
+        Where-Object { -not $_.Special } |
+        Select-Object LocalPath, Loaded |
+        Format-Table -AutoSize
+
+      & wsl.exe --status
+      if ($LASTEXITCODE -ne 0) {
+        Write-Host "WSL status is unavailable (exit code $LASTEXITCODE)."
+      }
+
+      & wsl.exe --list --verbose
+      if ($LASTEXITCODE -ne 0) {
+        Write-Host "No WSL distribution inventory is available (exit code $LASTEXITCODE)."
+      }
+
+      $global:LASTEXITCODE = 0
+    displayName: Inspect configured container runtime
+    continueOnError: true
+
+  - powershell: |
+      Import-Module WebAdministration
+
+      Write-Host "IIS sites:"
+      Get-Website |
+        Select-Object Name, State, PhysicalPath, ApplicationPool |
+        Format-Table -AutoSize
+
+      Write-Host "System Uptime Tracker application pools:"
+      @(
+        foreach ($appPoolName in @("systemuptimetracker-api", "systemuptimetracker-web", "systemuptimetracker-web-docker")) {
+        if (Test-Path -LiteralPath "IIS:\AppPools\$appPoolName") {
+          [pscustomobject]@{
+            Name = $appPoolName
+            State = (Get-WebAppPoolState -Name $appPoolName).Value
+          }
+        }
+        }
+      ) | Format-Table -AutoSize
+
+      Write-Host "IIS bindings:"
+      Get-Website | ForEach-Object {
+        $siteName = $_.Name
+        Get-WebBinding -Name $siteName |
+          Select-Object `
+            @{ Name = "Site"; Expression = { $siteName } },
+            protocol,
+            bindingInformation,
+            certificateHash,
+            certificateStoreName
+      } | Format-Table -AutoSize
+
+      Write-Host "Valid local-machine server certificates:"
+      foreach ($storeName in @("My", "WebHosting")) {
+        Get-ChildItem -Path "Cert:\LocalMachine\$storeName" -ErrorAction SilentlyContinue |
+          Where-Object {
+            $_.NotAfter -gt [DateTime]::UtcNow -and
+            $_.HasPrivateKey
+          } |
+          Select-Object `
+            @{ Name = "Store"; Expression = { $storeName } },
+            Subject,
+            Thumbprint,
+            NotAfter,
+            @{ Name = "DnsNames"; Expression = { $_.DnsNameList.Unicode -join ", " } } |
+          Format-Table -AutoSize
+      }
+
+      Write-Host "SystemUptimeTracker web scheduled task:"
+      Get-ScheduledTask -TaskName "SystemUptimeTracker.Web" -ErrorAction SilentlyContinue |
+        Select-Object TaskName, State |
+        Format-Table -AutoSize
+
+      Write-Host "Recent IIS and ASP.NET Core application events:"
+      Get-WinEvent -FilterHashtable @{
+        LogName = "Application"
+        StartTime = (Get-Date).AddMinutes(-30)
+      } -ErrorAction SilentlyContinue |
+        Where-Object { $_.LevelDisplayName -in "Error", "Warning" } |
+        Select-Object -First 20 TimeCreated, ProviderName, Id, LevelDisplayName, Message |
+        Format-List
+    displayName: Inspect configured IIS runtime
+    continueOnError: true
+
+  - powershell: |
+      Write-Host "Native SQL Server services:"
+      Get-CimInstance Win32_Service |
+        Where-Object { $_.Name -match "^(MSSQL|SQLAgent)" } |
+        Select-Object Name, State, StartName, PathName |
+        Format-Table -AutoSize
+
+      $instanceKey = "HKLM:\SOFTWARE\Microsoft\Microsoft SQL Server\Instance Names\SQL"
+      $instances = if (Test-Path -LiteralPath $instanceKey) {
+        (Get-ItemProperty -LiteralPath $instanceKey).PSObject.Properties |
+          Where-Object { $_.Name -notmatch "^PS" } |
+          ForEach-Object {
+            [pscustomobject]@{
+              Name = $_.Name
+              InstanceId = [string]$_.Value
+              Server = if ($_.Name -eq "MSSQLSERVER") { "localhost" } else { "localhost\$($_.Name)" }
+            }
+          }
+      }
+
+      Write-Host "Registered native SQL instances:"
+      $instances | Format-Table -AutoSize
+
+      $sqlcmd = Get-Command sqlcmd.exe -ErrorAction SilentlyContinue
+      if (-not $sqlcmd) {
+        $sqlcmd = Get-ChildItem `
+          -Path "C:\Program Files\Microsoft SQL Server" `
+          -Filter sqlcmd.exe `
+          -Recurse `
+          -ErrorAction SilentlyContinue |
+          Select-Object -First 1
+      }
+      if (-not $sqlcmd) {
+        throw "sqlcmd.exe is not installed on the configured deployment host."
+      }
+      $sqlcmdPath = if ($sqlcmd.Source) { $sqlcmd.Source } else { $sqlcmd.FullName }
+
+      foreach ($instance in $instances) {
+        Write-Host "Integrated administrative probe for Native/$($instance.Name):"
+        & $sqlcmdPath `
+          -S $instance.Server `
+          -E `
+          -C `
+          -b `
+          -W `
+          -Q "SET NOCOUNT ON; SELECT SUSER_SNAME() AS LoginName, IS_SRVROLEMEMBER(N'sysadmin') AS IsSysadmin;"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "Integrated administrative probe failed with exit code $LASTEXITCODE."
+          $global:LASTEXITCODE = 0
+        }
+
+        Write-Host "Integrated SystemUptimeTracker database permissions for Native/$($instance.Name):"
+        & $sqlcmdPath `
+          -S $instance.Server `
+          -d "SystemUptimeTracker" `
+          -E `
+          -C `
+          -b `
+          -W `
+          -Q "SET NOCOUNT ON; SELECT USER_NAME() AS DatabaseUser, IS_ROLEMEMBER(N'db_owner') AS IsDatabaseOwner, HAS_PERMS_BY_NAME(N'database', N'database', N'CONTROL') AS HasDatabaseControl;"
+        if ($LASTEXITCODE -ne 0) {
+          Write-Host "Integrated SystemUptimeTracker database probe failed with exit code $LASTEXITCODE."
+          $global:LASTEXITCODE = 0
+        }
+      }
+
+    displayName: Inspect configured SQL targets
+    continueOnError: true
+
+  - pwsh: |
+      foreach ($probe in @(
+        @{ Name = "API internal"; Uri = "http://127.0.0.1:5101/_health"; Host = "localhost" },
+        @{ Name = "Web companion"; Uri = "http://127.0.0.1:3101/_health"; Host = "localhost" }
+      )) {
+        try {
+          $response = Invoke-WebRequest `
+            -Uri $probe.Uri `
+            -Headers @{ Host = $probe.Host; Accept = "application/json" } `
+            -SkipHttpErrorCheck `
+            -TimeoutSec 15
+          Write-Host "$($probe.Name): HTTP $([int]$response.StatusCode)"
+          Write-Host ($response.Content.Substring(0, [Math]::Min(8000, $response.Content.Length)))
+        }
+        catch {
+          Write-Host "$($probe.Name): $($_.Exception.Message)"
+        }
+      }
+    displayName: Probe SystemUptimeTracker internal runtimes
+    continueOnError: true
+
+  - pwsh: |
+      ./devops/pipelines/Sync-SystemUptimeTrackerVariableGroup.ps1 `
+        -AccessToken $env:SYSTEM_ACCESSTOKEN `
+        -LeaveSecretsUnlocked `
+        -WhatIf
+    displayName: Validate SystemUptimeTracker variable group layout
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)

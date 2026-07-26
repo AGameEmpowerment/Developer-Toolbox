@@ -1,0 +1,448 @@
+schedules:
+  - cron: "0 19 * * *"
+    displayName: Nightly build
+    branches:
+      include:
+        - main
+    always: true
+    batch: true
+
+pr:
+  autoCancel: true
+  branches:
+    include:
+      - "*"
+
+trigger:
+  branches:
+    include:
+      - main
+
+name: $(ReleaseVersion).$(date:yyyy).$(date:MMdd)$(rev:.r)
+
+variables:
+  - group: System-Uptime-Tracker
+  - name: BuildVersion
+    value: '$(Build.BuildNumber)'
+  - name: buildConfiguration
+    value: Production
+  - name: dotnetSdkVersion
+    value: $(DOTNET_VERSION)
+  - name: nodeVersion
+    value: $(NODE_VERSION)
+  - name: solution
+    value: SystemUptimeTracker.sln
+  - name: apiProject
+    value: src/SystemUptimeTracker/SystemUptimeTracker.Api/SystemUptimeTracker.Api.csproj
+  - name: dataProject
+    value: src/SystemUptimeTracker/SystemUptimeTracker.Data/SystemUptimeTracker.Data.csproj
+  - name: testProject
+    value: src/SystemUptimeTracker/SystemUptimeTracker.Tests/SystemUptimeTracker.Tests.csproj
+  - name: qaAutomationProject
+    value: src/SystemUptimeTracker/SystemUptimeTracker.Qa.Automation/SystemUptimeTracker.Qa.Automation.csproj
+  - name: webProjectDirectory
+    value: src/SystemUptimeTracker/SystemUptimeTracker.Web
+  - name: artifactLaneRoot
+    value: artifacts/publish/$(buildConfiguration)
+  - name: apiBuildArtifactName
+    value: $(APPLICATION_NAME)-Api
+  - name: webBuildArtifactName
+    value: $(APPLICATION_NAME)-Web
+  - name: dockerBuildArtifactName
+    value: $(APPLICATION_NAME)-docker
+  - name: npmCacheFolder
+    value: $(Pipeline.Workspace)/.npm
+  - name: nugetPackagesFolder
+    value: $(Pipeline.Workspace)/.nuget/packages
+  - name: runQaAutomation
+    value: false
+
+pool:
+  name: Default
+
+stages:
+  - stage: Build
+    displayName: Build, Test, And Package
+    jobs:
+      - job: BuildAndPackage
+        displayName: Build System Uptime Tracker
+        steps:
+          - checkout: self
+            clean: false
+            fetchDepth: 1
+
+          - task: UseDotNet@2
+            displayName: Use .NET SDK $(dotnetSdkVersion)
+            inputs:
+              packageType: sdk
+              version: $(dotnetSdkVersion)
+              includePreviewVersions: true
+
+          - task: NodeTool@0
+            displayName: Use Node.js $(nodeVersion)
+            inputs:
+              versionSpec: $(nodeVersion)
+
+          - pwsh: |
+              dotnet --info
+              node --version
+              npm --version
+            displayName: Show toolchain versions
+
+          - task: Cache@2
+            displayName: Cache NuGet packages
+            inputs:
+              key: 'nuget | "$(Agent.OS)" | $(Build.SourcesDirectory)/SystemUptimeTracker.sln'
+              restoreKeys: |
+                nuget | "$(Agent.OS)"
+              path: $(nugetPackagesFolder)
+
+          - task: Cache@2
+            displayName: Cache npm packages
+            inputs:
+              key: 'npm | "$(Agent.OS)" | $(Build.SourcesDirectory)/src/SystemUptimeTracker/SystemUptimeTracker.Web/package-lock.json'
+              restoreKeys: |
+                npm | "$(Agent.OS)"
+              path: $(npmCacheFolder)
+
+          - pwsh: |
+              npm ci --cache "$(npmCacheFolder)" --prefer-offline
+            displayName: Install web dependencies
+            workingDirectory: $(webProjectDirectory)
+
+          - task: DotNetCoreCLI@2
+            displayName: Restore solution
+            inputs:
+              command: restore
+              projects: $(solution)
+            env:
+              NUGET_PACKAGES: $(nugetPackagesFolder)
+
+          - task: DotNetCoreCLI@2
+            displayName: Build solution
+            inputs:
+              command: build
+              projects: $(solution)
+              arguments: >
+                --configuration $(buildConfiguration)
+                --no-restore
+                /p:BuildVersion=$(BuildVersion)
+            env:
+              NUGET_PACKAGES: $(nugetPackagesFolder)
+
+          - pwsh: |
+              npm run lint
+              npm run test:coverage:ci
+            displayName: Run web lint and tests
+            workingDirectory: $(webProjectDirectory)
+
+          - task: DotNetCoreCLI@2
+            displayName: Run SystemUptimeTracker .NET tests
+            inputs:
+              command: test
+              projects: $(testProject)
+              publishTestResults: false
+              arguments: >
+                --configuration $(buildConfiguration)
+                --no-build
+                --logger "trx;LogFileName=SystemUptimeTracker.Tests.trx"
+                --results-directory "$(Agent.TempDirectory)/TestResults/dotnet"
+                --collect "XPlat Code Coverage"
+            env:
+              NUGET_PACKAGES: $(nugetPackagesFolder)
+
+          - task: DotNetCoreCLI@2
+            displayName: Run QA automation tests
+            condition: and(succeeded(), eq(variables['runQaAutomation'], 'true'))
+            inputs:
+              command: test
+              projects: $(qaAutomationProject)
+              publishTestResults: false
+              arguments: >
+                --configuration $(buildConfiguration)
+                --no-build
+                --logger "trx;LogFileName=SystemUptimeTracker.Qa.Automation.trx"
+                --results-directory "$(Agent.TempDirectory)/TestResults/qa"
+            env:
+              NUGET_PACKAGES: $(nugetPackagesFolder)
+
+          - task: PublishTestResults@2
+            displayName: Publish web test results
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: JUnit
+              testResultsFiles: $(webProjectDirectory)/junit.xml
+              testRunTitle: SystemUptimeTracker.Web
+              failTaskOnFailedTests: true
+
+          - task: PublishTestResults@2
+            displayName: Publish .NET test results
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: VSTest
+              testResultsFiles: $(Agent.TempDirectory)/TestResults/**/*.trx
+              searchFolder: $(Agent.TempDirectory)/TestResults
+              testRunTitle: SystemUptimeTracker .NET
+              failTaskOnFailedTests: true
+
+          - task: PublishCodeCoverageResults@2
+            displayName: Publish .NET code coverage
+            condition: succeededOrFailed()
+            inputs:
+              summaryFileLocation: $(Agent.TempDirectory)/TestResults/**/coverage.cobertura.xml
+              failIfCoverageEmpty: false
+
+          - pwsh: |
+              $toolPath = "$(Agent.TempDirectory)/dotnet-tools"
+              New-Item -ItemType Directory -Path $toolPath -Force | Out-Null
+              dotnet tool install dotnet-ef --tool-path $toolPath --version 10.*
+              Write-Host "##vso[task.prependpath]$toolPath"
+            displayName: Install dotnet-ef
+
+          - pwsh: |
+              $databaseRoot = Join-Path "$(Build.SourcesDirectory)" "$(artifactLaneRoot)/database"
+              New-Item -ItemType Directory -Path $databaseRoot -Force | Out-Null
+
+              dotnet ef migrations script `
+                --project "$(dataProject)" `
+                --startup-project "$(apiProject)" `
+                --context "ApplicationDbContext" `
+                --idempotent `
+                --output (Join-Path $databaseRoot "ApplicationDbContext.sql")
+
+              dotnet ef migrations script `
+                --project "$(dataProject)" `
+                --startup-project "$(apiProject)" `
+                --context "SystemUptimeTrackerSchemaContext" `
+                --idempotent `
+                --output (Join-Path $databaseRoot "SystemUptimeTrackerSchemaContext.sql")
+            displayName: Generate database migration scripts
+            env:
+              NUGET_PACKAGES: $(nugetPackagesFolder)
+
+          - pwsh: |
+              ./devops/iis/Publish-SystemUptimeTrackerArtifacts.ps1 `
+                -Configuration "$(buildConfiguration)" `
+                -BuildVersion "$(BuildVersion)" `
+                -SkipDotnetRestore `
+                -SkipNpmCi
+            displayName: Package release artifacts
+            workingDirectory: $(Build.SourcesDirectory)
+            env:
+              NUGET_PACKAGES: $(nugetPackagesFolder)
+
+          - pwsh: |
+              ./devops/docker/Publish-SystemUptimeTrackerDockerArtifacts.ps1 `
+                -Configuration "$(buildConfiguration)" `
+                -BuildVersion "$(BuildVersion)" `
+                -SkipDotnetRestore `
+                -SkipNpmCi
+            displayName: Package Docker release artifacts
+            workingDirectory: $(Build.SourcesDirectory)
+            env:
+              NUGET_PACKAGES: $(nugetPackagesFolder)
+
+          - pwsh: |
+              $laneRoot = Join-Path "$(Build.SourcesDirectory)" "$(artifactLaneRoot)"
+              $releaseNotesPath = Join-Path $laneRoot "docker-release-notes.md"
+              $metadataZipPath = Join-Path $laneRoot "docker-release-metadata.zip"
+              $metadataRoot = Join-Path "$(Agent.TempDirectory)" "docker-release-metadata"
+
+              @"
+              # SystemUptimeTracker Docker Artifact Release Notes
+
+              - Build Number: $(BuildVersion)
+              - Source Branch: $(Build.SourceBranch)
+              - Commit: $(Build.SourceVersion)
+              - Commit Message: $(Build.SourceVersionMessage)
+              - Configuration: $(buildConfiguration)
+
+              The Docker artifact contains the buildable application contexts,
+              production compose configuration, persistent SQL volume configuration,
+              database backup tooling, and deployment scripts.
+              "@ | Set-Content -LiteralPath $releaseNotesPath
+
+              if (Test-Path -LiteralPath $metadataRoot) {
+                Remove-Item -LiteralPath $metadataRoot -Recurse -Force
+              }
+              if (Test-Path -LiteralPath $metadataZipPath) {
+                Remove-Item -LiteralPath $metadataZipPath -Force
+              }
+
+              New-Item -ItemType Directory -Path $metadataRoot -Force | Out-Null
+              Copy-Item -LiteralPath $releaseNotesPath `
+                -Destination (Join-Path $metadataRoot "docker-release-notes.md") `
+                -Force
+              Compress-Archive `
+                -Path (Join-Path $metadataRoot "*") `
+                -DestinationPath $metadataZipPath `
+                -CompressionLevel Optimal
+            displayName: Package Docker release metadata
+
+          - pwsh: |
+              $laneRoot = Join-Path "$(Build.SourcesDirectory)" "$(artifactLaneRoot)"
+              $releaseNotesPath = Join-Path $laneRoot "release-notes.md"
+              $manifestPath = Join-Path $laneRoot "release-manifest.json"
+              $templatePath = Join-Path "$(Build.SourcesDirectory)" "devops/pipelines/ReleaseNotes/ReleaseNotes-Template.md"
+
+              @"
+              # SystemUptimeTracker Release Notes
+
+              - Build Number: $(BuildVersion)
+              - Source Branch: $(Build.SourceBranch)
+              - Commit: $(Build.SourceVersion)
+              - Commit Message: $(Build.SourceVersionMessage)
+              - Configuration: $(buildConfiguration)
+              - Manifest: $manifestPath
+
+              ## Included Artifacts
+
+              - server-package.zip
+              - web-package.zip
+              - deployment-bundle.zip
+
+              ## Template Reference
+
+              The Azure DevOps release-notes template used by the team is stored at:
+              $templatePath
+              "@ | Set-Content -LiteralPath $releaseNotesPath
+
+              Copy-Item -LiteralPath $templatePath -Destination (Join-Path $laneRoot "ReleaseNotes-Template.md") -Force
+            displayName: Write release notes artifact
+
+          - pwsh: |
+              $laneRoot = Join-Path "$(Build.SourcesDirectory)" "$(artifactLaneRoot)"
+              $bundleZipPath = Join-Path $laneRoot "deployment-bundle.zip"
+              $bundleRoot = Join-Path "$(Agent.TempDirectory)" "deployment-bundle"
+
+              if (Test-Path -LiteralPath $bundleRoot) {
+                Remove-Item -LiteralPath $bundleRoot -Recurse -Force
+              }
+
+              if (Test-Path -LiteralPath $bundleZipPath) {
+                Remove-Item -LiteralPath $bundleZipPath -Force
+              }
+
+              New-Item -ItemType Directory -Path $bundleRoot -Force | Out-Null
+
+              $bundleItems = @(
+                "database",
+                "deployment-assets",
+                "release-manifest.json",
+                "release-notes.md",
+                "ReleaseNotes-Template.md"
+              )
+
+              foreach ($bundleItem in $bundleItems) {
+                $sourcePath = Join-Path $laneRoot $bundleItem
+                if (-not (Test-Path -LiteralPath $sourcePath)) {
+                  throw "Expected deployment bundle content was not found at '$sourcePath'."
+                }
+
+                Copy-Item -LiteralPath $sourcePath -Destination (Join-Path $bundleRoot $bundleItem) -Recurse -Force
+              }
+
+              Compress-Archive `
+                -Path (Join-Path $bundleRoot "*") `
+                -DestinationPath $bundleZipPath `
+                -CompressionLevel Optimal
+            displayName: Package deployment bundle
+
+          - pwsh: |
+              $sourceRoot = Join-Path "$(Build.SourcesDirectory)" "$(artifactLaneRoot)"
+              $stagingRoot = "$(Build.ArtifactStagingDirectory)"
+              $apiArtifactRoot = Join-Path $stagingRoot "$(apiBuildArtifactName)"
+              $webArtifactRoot = Join-Path $stagingRoot "$(webBuildArtifactName)"
+              $dockerArtifactRoot = Join-Path $stagingRoot "$(dockerBuildArtifactName)"
+
+              New-Item -ItemType Directory -Path $stagingRoot -Force | Out-Null
+              New-Item -ItemType Directory -Path $apiArtifactRoot -Force | Out-Null
+              New-Item -ItemType Directory -Path $webArtifactRoot -Force | Out-Null
+              New-Item -ItemType Directory -Path $dockerArtifactRoot -Force | Out-Null
+
+              $apiArtifactItems = @(
+                "server-package.zip",
+                "deployment-bundle.zip"
+              )
+
+              foreach ($artifactItem in $apiArtifactItems) {
+                $sourcePath = Join-Path $sourceRoot $artifactItem
+                if (-not (Test-Path -LiteralPath $sourcePath)) {
+                  throw "Expected build artifact path was not found at '$sourcePath'."
+                }
+
+                Copy-Item -LiteralPath $sourcePath -Destination (Join-Path $apiArtifactRoot $artifactItem) -Recurse -Force
+              }
+
+              $webArtifactItems = @(
+                "web-package.zip",
+                "Initialize-SystemUptimeTrackerWebEnvironment.ps1"
+              )
+
+              foreach ($artifactItem in $webArtifactItems) {
+                if ($artifactItem -eq "Initialize-SystemUptimeTrackerWebEnvironment.ps1") {
+                  $sourcePath = Join-Path "$(Build.SourcesDirectory)" "devops/iis/Initialize-SystemUptimeTrackerWebEnvironment.ps1"
+                }
+                else {
+                  $sourcePath = Join-Path $sourceRoot $artifactItem
+                }
+
+                if (-not (Test-Path -LiteralPath $sourcePath)) {
+                  throw "Expected build artifact path was not found at '$sourcePath'."
+                }
+
+                Copy-Item -LiteralPath $sourcePath -Destination (Join-Path $webArtifactRoot $artifactItem) -Recurse -Force
+              }
+
+              $dockerArtifactItems = @(
+                "docker-package.zip",
+                "docker-release-metadata.zip"
+              )
+
+              foreach ($artifactItem in $dockerArtifactItems) {
+                $sourcePath = Join-Path $sourceRoot $artifactItem
+                if (-not (Test-Path -LiteralPath $sourcePath)) {
+                  throw "Expected Docker build artifact path was not found at '$sourcePath'."
+                }
+
+                Copy-Item -LiteralPath $sourcePath -Destination (Join-Path $dockerArtifactRoot $artifactItem) -Force
+              }
+            displayName: Stage build artifacts
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publish API build artifacts
+            inputs:
+              PathtoPublish: $(Build.ArtifactStagingDirectory)/$(apiBuildArtifactName)
+              ArtifactName: $(apiBuildArtifactName)
+              publishLocation: Container
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publish web build artifacts
+            inputs:
+              PathtoPublish: $(Build.ArtifactStagingDirectory)/$(webBuildArtifactName)
+              ArtifactName: $(webBuildArtifactName)
+              publishLocation: Container
+
+          - task: PublishBuildArtifacts@1
+            displayName: Publish Docker build artifacts
+            inputs:
+              PathtoPublish: $(Build.ArtifactStagingDirectory)/$(dockerBuildArtifactName)
+              ArtifactName: $(dockerBuildArtifactName)
+              publishLocation: Container
+
+          - task: GitHubRelease@1
+            displayName: Tag the main branch on build
+            continueOnError: false
+            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'Schedule'))
+            inputs:
+              gitHubConnection: replace-with-github-service-connection
+              repositoryName: $(Build.Repository.Name)
+              action: create
+              tagSource: userSpecifiedTag
+              tag: $(BuildVersion)
+              title: $(BuildVersion)
+              assets: $(Build.ArtifactStagingDirectory)/*
+              changeLogCompareToRelease: lastFullRelease
+              changeLogType: commitBased
+
+

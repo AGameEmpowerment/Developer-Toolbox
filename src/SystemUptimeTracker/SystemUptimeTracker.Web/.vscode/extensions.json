@@ -1,0 +1,20 @@
+{
+  "recommendations": [
+    "sonarsource.sonarlint-vscode",
+    "github.codespaces",
+    "github.copilot-chat",
+    "github.vscode-pull-request-github",
+    "ms-vscode.hexeditor",
+    "visualstudioexptteam.vscodeintellicode",
+    "ritwickdey.liveserver",
+    "ms-vsliveshare.vsliveshare",
+    "davidanson.vscode-markdownlint",
+    "christian-kohler.npm-intellisense",
+    "ms-vscode.powershell",
+    "esbenp.prettier-vscode",
+    "ms-vscode-remote.remote-wsl",
+    "redhat.vscode-yaml",
+    "streetsidesoftware.code-spell-checker",
+    "editorconfig.editorconfig"
+  ]
+}

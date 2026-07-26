@@ -1,0 +1,179 @@
+trigger: none
+pr: none
+
+name: $(ReleaseVersion).$(date:yyyy).$(date:MMdd)$(rev:.r)
+
+resources:
+  pipelines:
+    - pipeline: productionBuild
+      source: System-Uptime-Tracker
+      trigger:
+        branches:
+          include:
+            - main
+
+parameters:
+  - name: buildId
+    displayName: Build ID (leave blank for the triggering main build)
+    type: string
+    default: ""
+
+variables:
+  - group: System-Uptime-Tracker
+  - group: System-Uptime-Tracker-Prod
+  - name: artifactBuildId
+    ${{ if ne(parameters.buildId, '') }}:
+      value: ${{ parameters.buildId }}
+    ${{ else }}:
+      value: $(resources.pipeline.productionBuild.runID)
+  - name: iisBuildDefinitionId
+    value: 0 # Template value: replace with the build pipeline definition ID.
+  - name: apiArtifactName
+    value: System-Uptime-Tracker-Api
+  - name: webArtifactName
+    value: System-Uptime-Tracker-Web
+  - name: packageRoot
+    value: $(Pipeline.Workspace)/systemuptimetracker-iis
+  - name: releaseRoot
+    value: $(IIS_RELEASE_ROOT)
+  - name: dataRoot
+    value: $(IIS_DATA_ROOT)
+
+pool:
+  name: $(ADO_AGENT_POOL)
+  demands:
+    - Agent.Name -equals $(ADO_AGENT_NAME)
+
+stages:
+  - stage: DeployIis
+    displayName: Deploy IIS template
+    jobs:
+      - deployment: DeploySystemUptimeTrackerIis
+        displayName: Deploy SystemUptimeTracker IIS
+        environment: SystemUptimeTracker-IIS
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: none
+
+                - checkout: self
+                  clean: false
+
+                - powershell: |
+                    & "$(Build.SourcesDirectory)/devops/iis/Install-SystemUptimeTrackerDotNetHostingBundle.ps1" `
+                      -DownloadRoot "$(Agent.TempDirectory)/systemuptimetracker-hosting-bundle"
+                  displayName: Ensure .NET 10 IIS Hosting Bundle is installed
+
+                - task: DownloadBuildArtifacts@1
+                  displayName: Download IIS API artifact
+                  inputs:
+                    buildType: specific
+                    project: $(System.TeamProject)
+                    pipeline: $(iisBuildDefinitionId)
+                    buildVersionToDownload: specific
+                    buildId: $(artifactBuildId)
+                    downloadType: single
+                    artifactName: $(apiArtifactName)
+                    downloadPath: $(Pipeline.Workspace)/build
+
+                - task: DownloadBuildArtifacts@1
+                  displayName: Download IIS web artifact
+                  inputs:
+                    buildType: specific
+                    project: $(System.TeamProject)
+                    pipeline: $(iisBuildDefinitionId)
+                    buildVersionToDownload: specific
+                    buildId: $(artifactBuildId)
+                    downloadType: single
+                    artifactName: $(webArtifactName)
+                    downloadPath: $(Pipeline.Workspace)/build
+
+                - pwsh: |
+                    $packageRoot = "$(packageRoot)"
+                    if (Test-Path -LiteralPath $packageRoot) {
+                      Remove-Item -LiteralPath $packageRoot -Recurse -Force
+                    }
+                    New-Item -ItemType Directory -Path $packageRoot -Force | Out-Null
+
+                    Expand-Archive `
+                      -LiteralPath "$(Pipeline.Workspace)/build/$(apiArtifactName)/server-package.zip" `
+                      -DestinationPath (Join-Path $packageRoot "server-package") `
+                      -Force
+                    Expand-Archive `
+                      -LiteralPath "$(Pipeline.Workspace)/build/$(webArtifactName)/web-package.zip" `
+                      -DestinationPath (Join-Path $packageRoot "web-package") `
+                      -Force
+                    Expand-Archive `
+                      -LiteralPath "$(Pipeline.Workspace)/build/$(apiArtifactName)/deployment-bundle.zip" `
+                      -DestinationPath $packageRoot `
+                      -Force
+                  displayName: Assemble IIS deployment package
+
+                - powershell: |
+                    & "$(Build.SourcesDirectory)/devops/iis/Test-SystemUptimeTrackerNativeSql.ps1" `
+                      -ServerInstance "$(IIS_SQL_SERVER)" `
+                      -ExpectedServerName ("$(IIS_SQL_SERVER)" -split ',')[0] `
+                      -ConfirmDatabaseName "$(IIS_SQL_DATABASE)" `
+                      -ApplicationUsername $env:SYSTEMUPTIMETRACKER_SQL_APP_USERNAME `
+                      -ApplicationPassword $env:SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD
+                  displayName: Validate configured IIS SQL target
+                  env:
+                    SYSTEMUPTIMETRACKER_SQL_APP_USERNAME: $(SYSTEMUPTIMETRACKER_SQL_APP_USERNAME)
+                    SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD: $(SYSTEMUPTIMETRACKER_SQL_APP_PASSWORD)
+
+                - powershell: |
+                    & "$(Build.SourcesDirectory)/devops/iis/Deploy-SystemUptimeTrackerIisPackage.ps1" `
+                      -PackageRoot "$(packageRoot)" `
+                      -ReleaseRoot "$(releaseRoot)" `
+                      -DataRoot "$(dataRoot)" `
+                      -PublicHostName ([Uri]"$(IIS_APP_BASE_URL)").Host `
+                      -PublicBaseUrl "$(IIS_APP_BASE_URL)" `
+                      -ApiBaseUrl "$(IIS_API_BASE_URL)" `
+                      -CertificateThumbprint "$(IIS_CERTIFICATE_THUMBPRINT)" `
+                      -ApiPublicHostName ([Uri]"$(IIS_API_BASE_URL)").Host `
+                      -ApiCertificateThumbprint "$(IIS_CERTIFICATE_THUMBPRINT)"
+                  displayName: Stage release and configure IIS bindings
+
+                - powershell: |
+                    $manifest = Get-Content `
+                      -LiteralPath "$(packageRoot)/release-manifest.json" `
+                      -Raw | ConvertFrom-Json
+                    $releasePath = Join-Path "$(releaseRoot)" $manifest.buildVersion
+
+                    & "$(Build.SourcesDirectory)/devops/iis/Set-SystemUptimeTrackerIisRuntime.ps1" `
+                      -ApiAppPoolName "systemuptimetracker-api" `
+                      -PublicAppPoolName "systemuptimetracker-web" `
+                      -WebDeploymentPath (Join-Path $releasePath "web") `
+                      -WebLauncherPath (Join-Path $releasePath "deployment/Start-SystemUptimeTrackerWeb.ps1") `
+                      -DataRoot "$(dataRoot)" `
+                      -AppBaseUrl "$(IIS_APP_BASE_URL)" `
+                      -ApiBaseUrl "$(IIS_API_BASE_URL)" `
+                      -AppVersion $manifest.buildVersion
+                  displayName: Configure runtime and start applications
+                  env:
+                    ConnectionStrings__DefaultConnection: $(ConnectionStrings.DefaultConnection)
+                    RedactionKey: $(API_REDACTION_KEY)
+                    UI_AUTH_COOKIE_SECRET: $(UI_AUTH_COOKIE_SECRET)
+                    UI_IMPERSONATE_ENCRYPTION_KEY: $(UI_IMPERSONATE_ENCRYPTION_KEY)
+                    API_OPENTELEMETRY_APIKEY: $(OpenTelemetry.ApiKey)
+
+                - pwsh: |
+                    & "$(packageRoot)/deployment-assets/Invoke-SystemUptimeTrackerSmokeChecks.ps1" `
+                      -ApiBaseUrl "$(IIS_API_BASE_URL)" `
+                      -PublicBaseUrl "$(IIS_APP_BASE_URL)" `
+                      -SkipUiAutomation
+                  displayName: Run IIS smoke checks
+
+                - powershell: |
+                    $manifest = Get-Content -LiteralPath "$(packageRoot)/release-manifest.json" -Raw | ConvertFrom-Json
+                    $logRoot = Join-Path "$(releaseRoot)" "$($manifest.buildVersion)\api\logs"
+                    Get-ChildItem -LiteralPath $logRoot -Filter "stdout*.log" -ErrorAction SilentlyContinue |
+                      Sort-Object LastWriteTime -Descending |
+                      Select-Object -First 2 |
+                      ForEach-Object {
+                        Write-Host "ASP.NET Core startup log: $($_.FullName)"
+                        Get-Content -LiteralPath $_.FullName -Tail 120
+                      }
+                  displayName: Report ASP.NET Core startup failures
+                  condition: failed()

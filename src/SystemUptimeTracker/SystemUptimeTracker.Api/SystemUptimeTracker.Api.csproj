@@ -1,0 +1,112 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <LangVersion>latest</LangVersion>
+        <TargetFramework>net10.0</TargetFramework>
+        <EnableDefaultContentItems>false</EnableDefaultContentItems>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <Configurations>Debug;Release;Development;Testing;Staging;Production</Configurations>
+        <RootNamespace>SystemUptimeTracker.Api</RootNamespace>
+        <SpaProxyLaunchCommand>npm install &amp;&amp; npm run devAndBrowser</SpaProxyLaunchCommand>
+        <SpaProxyServerUrl>https://localhost:3001</SpaProxyServerUrl>
+        <SpaRoot>..\SystemUptimeTracker.Web</SpaRoot>
+        <UserSecretsId>7ac81f03-72c8-44cb-bb46-8ee1730a07ca</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
+        <ProjectReference Include="..\SystemUptimeTracker.Web\SystemUptimeTracker.Web.esproj" ReferenceOutputAssembly="false" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Asp.Versioning.Mvc" Version="10.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
+        <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="9.0.0" />
+        <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.5.1" />
+        <PackageReference Include="Azure.Identity" Version="1.21.0" />
+        <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.5.0" />
+        <!-- <PackageReference Include="Cloud.AspNetCore.Authentication" Version="1.1.7" /> -->
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
+        <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="3.1.2" />
+        <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="10.0.10" />
+        <PackageReference Include="Microsoft.AspNetCore.SpaProxy">
+            <Version>10.0.10</Version>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.10" />
+        <PackageReference Include="Microsoft.Extensions.Compliance.Redaction" Version="10.8.0" />
+        <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.8.0" />
+        <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.8.0" />
+        <PackageReference Include="Microsoft.Extensions.Telemetry" Version="10.8.0" />
+        <PackageReference Include="Microsoft.Extensions.Telemetry.Abstractions" Version="10.8.0" />
+        <PackageReference Include="Microsoft.FeatureManagement" Version="4.6.0" />
+        <PackageReference Include="Microsoft.FeatureManagement.AspNetCore" Version="4.6.0" />
+        <PackageReference Include="Microsoft.OpenApi" Version="3.9.0" />
+        <PackageReference Include="Microsoft.VisualStudio.SlowCheetah" Version="4.0.50">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.17.0" />
+        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
+        <!-- AspNetCore 1.15.1 and Runtime 1.15.0 are the latest published instrumentation patches. -->
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.17.0" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.16.16" />
+        <PackageReference Include="StackExchange.Redis" Version="3.0.17" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SystemUptimeTracker.Common\SystemUptimeTracker.Common.csproj" />
+        <ProjectReference Include="..\SystemUptimeTracker.Data\SystemUptimeTracker.Data.csproj" />
+        <ProjectReference Include="..\SystemUptimeTracker.ServiceDefaults\SystemUptimeTracker.ServiceDefaults.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="wwwroot\**\*">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <None Update="appsettings.Debug.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.Automation.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.Development.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.Production.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.Release.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.Staging.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="appsettings.Testing.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="global.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="wwwroot\readme.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </None>
+    </ItemGroup>
+</Project>

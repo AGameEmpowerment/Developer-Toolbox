@@ -1,0 +1,10 @@
+services:
+  systemuptimetracker-backend:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Debug
+      DOTNET_EnableDiagnostics: "1"
+      FeatureManagement__ConfigurationInfoEnabled: "true"
+      FeatureManagement__InfoEndpointEnabled: "true"
+      FeatureManagement__OpenApiEnabled: "true"
+    ports:
+      - "${API_BIND_HOST:-127.0.0.1}:${API_PUBLIC_PORT:-8002}:8002"

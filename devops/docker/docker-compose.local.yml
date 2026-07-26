@@ -1,0 +1,25 @@
+name: systemuptimetracker
+
+services:
+  systemuptimetracker-sql:
+    container_name: systemuptimetracker-sql
+
+  systemuptimetracker-backend:
+    container_name: systemuptimetracker-backend
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DOTNET_ENVIRONMENT: Development
+      FeatureManagement__ConfigurationInfoEnabled: "true"
+      FeatureManagement__InfoEndpointEnabled: "true"
+      FeatureManagement__OpenApiEnabled: "true"
+    ports:
+      - "${API_BIND_HOST:-127.0.0.1}:${API_PUBLIC_PORT:-8002}:8002"
+
+  systemuptimetracker-frontend:
+    container_name: systemuptimetracker-frontend
+
+volumes:
+  systemuptimetracker-sql-data:
+    name: systemuptimetracker-sql-data
+  systemuptimetracker-sql-backups:
+    name: systemuptimetracker-sql-backups

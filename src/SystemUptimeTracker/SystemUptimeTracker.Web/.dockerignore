@@ -1,0 +1,14 @@
+npm-debug.log
+dist
+Dockerfile
+*.md
+.git
+.gitignore
+coverage
+
+# External build artifacts are intentionally available to docker build.
+node_modules
+.next
+.env
+.env.*
+.npmrc

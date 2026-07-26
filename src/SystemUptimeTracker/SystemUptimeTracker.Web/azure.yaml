@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: systemuptimetracker-web
+metadata:
+  template: azd-init@1.18.2
+services:
+  systemuptimetracker-web:
+    project: .
+    host: containerapp
+    language: js
+resources:
+  systemuptimetracker-web:
+    type: host.containerapp
+    port: 3001
