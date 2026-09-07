@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Repository-root convenience entry point. The installed Toolbox launcher owns
+# Setup-directory convenience entry point. The installed Toolbox launcher owns
 # all clone, update, and setup behavior.
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-exec bash "${SCRIPT_DIR}/setup/_toolbox.sh" "$@"
-
+exec bash "${SCRIPT_DIR}/_toolbox.sh" "$@"
 
