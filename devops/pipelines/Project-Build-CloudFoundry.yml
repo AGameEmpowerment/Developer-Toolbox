@@ -1,0 +1,60 @@
+# Local-development packaging template only. Add a platform connection and a
+# reviewed deployment stage in the consuming project; this example only builds
+# a portable application artifact with public npm dependencies.
+trigger: none
+pr: none
+
+name: developer-toolbox-package-$(Date:yyyyMMdd)$(Rev:.r)
+
+variables:
+  nodeVersion: 24.x
+  clientPath: src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client
+
+stages:
+  - stage: Package
+    displayName: Package the client for a buildpack platform
+    jobs:
+      - job: Client
+        displayName: Build and package client
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: NodeTool@0
+            displayName: Install Node.js
+            inputs:
+              versionSpec: $(nodeVersion)
+
+          - script: npm ci
+            displayName: Install public npm dependencies
+            workingDirectory: $(clientPath)
+
+          - script: npm run verify && npm run build && npm prune --omit=dev
+            displayName: Verify and build client artifact
+            workingDirectory: $(clientPath)
+
+          - task: CopyFiles@2
+            displayName: Stage deployable client files
+            inputs:
+              SourceFolder: $(clientPath)
+              Contents: |
+                .next/**
+                next.config.mjs
+                package.json
+                package-lock.json
+              TargetFolder: $(Build.ArtifactStagingDirectory)/buildpack-client
+              CleanTargetFolder: true
+
+          - task: ArchiveFiles@2
+            displayName: Archive client artifact
+            inputs:
+              rootFolderOrFile: $(Build.ArtifactStagingDirectory)/buildpack-client
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: $(Build.ArtifactStagingDirectory)/developer-toolbox-example-client.zip
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish client artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/developer-toolbox-example-client.zip
+              artifact: buildpack-client

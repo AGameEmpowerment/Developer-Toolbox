@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import tomllib
 import unittest
 from pathlib import Path
 
@@ -119,6 +120,30 @@ class CanonicalAiAssetTests(unittest.TestCase):
             if GENERATION_MARKER in path.read_text(encoding="utf-8-sig")
         }
         self.assertEqual(expected_commands, generated_commands)
+
+    def test_selected_agent_roles_have_matching_host_adapters(self) -> None:
+        claude_agents_root = REPOSITORY_ROOT / ".claude" / "agents"
+        codex_agents_root = REPOSITORY_ROOT / ".codex" / "agents"
+        generated_claude_agents = {
+            path.stem
+            for path in claude_agents_root.glob("*.md")
+            if GENERATION_MARKER in path.read_text(encoding="utf-8-sig")
+        }
+        generated_codex_agents = {
+            path.stem
+            for path in codex_agents_root.glob("*.toml")
+            if GENERATION_MARKER in path.read_text(encoding="utf-8-sig")
+        }
+
+        self.assertEqual(generated_claude_agents, generated_codex_agents)
+        for slug in sorted(generated_codex_agents):
+            with self.subTest(agent=slug):
+                canonical = REPOSITORY_ROOT / ".ai" / "agents" / f"{slug}.agent.md"
+                self.assertTrue(canonical.is_file(), f"Missing {canonical}")
+                codex_adapter = codex_agents_root / f"{slug}.toml"
+                metadata = tomllib.loads(codex_adapter.read_text(encoding="utf-8-sig"))
+                self.assertEqual(slug, metadata["name"])
+                self.assertIn(f".ai/agents/{slug}.agent.md", metadata["developer_instructions"])
 
     def test_collection_pairs_and_item_paths_resolve(self) -> None:
         collections_root = REPOSITORY_ROOT / ".ai" / "collections"

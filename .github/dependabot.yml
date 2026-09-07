@@ -14,7 +14,7 @@ updates:
           - patch
 
   - package-ecosystem: nuget
-    directory: /
+    directory: /src/DeveloperToolbox.Example/DeveloperToolbox.Example.Tests
     schedule:
       interval: monthly
     groups:
@@ -31,7 +31,7 @@ updates:
       interval: monthly
 
   - package-ecosystem: npm
-    directory: /
+    directory: /src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client
     schedule:
       interval: monthly
     groups:

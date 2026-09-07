@@ -1,0 +1,9 @@
+{
+  "welcome": "Bienvenido al ejemplo de Developer Toolbox",
+  "features": "Explore estos recursos públicos de desarrollo:",
+  "links": {
+    "toolbox": "Developer Toolbox",
+    "nextDocumentation": "Documentación de Next.js"
+  },
+  "seeMoreExamples": "Ver más ejemplos"
+}

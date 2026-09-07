@@ -1,0 +1,45 @@
+# Local-development template only. It creates a package artifact but never pushes it.
+trigger: none
+pr: none
+
+name: 0.1.$(Build.BuildId)
+
+variables:
+  buildConfiguration: Release
+  dotnetVersion: 10.x
+  packageVersion: $(Build.BuildNumber)
+  projectPath: src/DeveloperToolbox.Example/DeveloperToolbox.Example.Lib/DeveloperToolbox.Example.Lib.csproj
+  testProjectPath: src/DeveloperToolbox.Example/DeveloperToolbox.Example.Tests/DeveloperToolbox.Example.Tests.csproj
+
+stages:
+  - stage: Package
+    displayName: Build, test, and pack the example library
+    jobs:
+      - job: NuGet
+        displayName: Create SDK-style NuGet package
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Install .NET SDK
+            inputs:
+              packageType: sdk
+              version: $(dotnetVersion)
+
+          - script: dotnet restore DeveloperToolbox.Example.slnx --source https://api.nuget.org/v3/index.json
+            displayName: Restore public NuGet dependencies
+
+          - script: dotnet build DeveloperToolbox.Example.slnx --configuration $(buildConfiguration) --no-restore
+            displayName: Build solution
+
+          - script: dotnet test $(testProjectPath) --configuration $(buildConfiguration) --no-build
+            displayName: Run unit tests
+
+          - script: dotnet pack $(projectPath) --configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)/packages -p:PackageVersion=$(packageVersion)
+            displayName: Create package
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish package artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/packages
+              artifact: nuget-package

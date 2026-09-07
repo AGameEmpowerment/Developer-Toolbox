@@ -19,7 +19,7 @@ Usage: ./setup/_toolbox.sh [OPTIONS]
 
 Options:
   --path DIR        Toolbox checkout path. Defaults to $DEVELOPER_TOOLBOX_ROOT, then
-                    an Developer-Toolbox directory beside this repository.
+                    a Developer-Toolbox directory beside this repository.
   --branch NAME     Toolbox branch to clone or fast-forward. Default: main.
   --runtime VALUE   Container runtime: auto, docker, or podman. Default: auto.
   --skip-setup      Clone or update without starting the service stack.
@@ -201,5 +201,4 @@ echo "Starting the Toolbox service stack with runtime '$CONTAINER_RUNTIME'..."
 
 echo "Toolbox service stack is running."
 echo "Stop it with: '${TOOLBOX_PATH}/docker_down.sh' --runtime '$CONTAINER_RUNTIME'"
-
 

@@ -1,12 +1,12 @@
 ---
 name: 'QA Automation'
-description: 'QA automation role that plans and executes test passes across the System Uptime Tracker solution, its web client, and container-backed local services.'
+description: 'QA automation role that plans and executes test passes across the Developer Toolbox samples, scripts, and container-backed local services.'
 ---
 
 # QA Automation Agent Playbook
 
 This playbook supplements `AGENTS.md` and `.ai/constitution.md`. It applies to
-the .NET 10 System Uptime Tracker sample, its web client, container-backed
+the .NET 10 Developer Toolbox sample, its Next.js client, container-backed
 local services, and delivery examples in this repository.
 
 ## First Checks
@@ -20,10 +20,10 @@ local services, and delivery examples in this repository.
 
 ## Test Routing
 
-- .NET changes: build `SystemUptimeTracker.sln` and add the smallest appropriate test
+- .NET changes: build `DeveloperToolbox.Example.slnx` and add the smallest appropriate test
   project or test slice when behavior changes.
 - Web changes: work from
-  `src/SystemUptimeTracker/SystemUptimeTracker.Web` and use `npm run test`,
+  `src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client` and use `npm run test`,
   `npm run lint`, or `npm run verify` as appropriate.
 - Browser flows: prefer the Playwright skills under `.agents/skills/` and use
   accessible role/name selectors.
@@ -49,9 +49,10 @@ local services, and delivery examples in this repository.
 ## Baseline Commands
 
 ```powershell
-dotnet build .\SystemUptimeTracker.sln
+dotnet build .\DeveloperToolbox.Example.slnx
+dotnet test .\src\DeveloperToolbox.Example\DeveloperToolbox.Example.Tests\DeveloperToolbox.Example.Tests.csproj --no-build
 
-Push-Location .\src\SystemUptimeTracker\SystemUptimeTracker.Web
+Push-Location .\src\DeveloperToolbox.Example\DeveloperToolbox.Example.Client
 npm run test
 npm run lint
 Pop-Location

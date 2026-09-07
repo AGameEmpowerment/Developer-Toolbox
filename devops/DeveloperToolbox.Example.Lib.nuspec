@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<!--
+  Local-development template only. This package metadata targets the generic
+  sample library and publishes nowhere by itself.
+-->
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>DeveloperToolbox.Example.Lib</id>
+    <version>0.1.0</version>
+    <title>Developer Toolbox Example Library</title>
+    <authors>Developer Toolbox Contributors</authors>
+    <owners>Developer Toolbox Contributors</owners>
+    <projectUrl>https://github.com/AGameEmpowerment/Developer-Toolbox</projectUrl>
+    <license type="expression">MIT</license>
+    <readme>README.md</readme>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A generic library used to demonstrate public NuGet packaging.</description>
+    <dependencies>
+      <group targetFramework="net10.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\nugetlibs\net10.0\*.dll" target="lib/net10.0" exclude="**tests*" />
+    <file src="..\nugetlibs\net10.0\*.pdb" target="lib/net10.0" exclude="**tests*" />
+    <file src="..\src\DeveloperToolbox.Example\README.md" target="" />
+  </files>
+</package>

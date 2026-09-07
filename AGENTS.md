@@ -58,8 +58,9 @@ Files under `.github/instructions/` and `.claude/rules/` are generated adapters
 derived from canonical `.ai/instructions/*.md` files. Most entries under
 `.claude/skills/`, `.claude/agents/`, and `.claude/commands/` are generated
 redirects produced by `sync_ai_assets.ps1` from canonical sources in
-`.agents/skills/` and `.ai/`. Generated files carry a marker comment. Never edit
-them directly; change the canonical source and re-run the script.
+`.agents/skills/` and `.ai/`. Selected `.codex/agents/` definitions are generated
+from the same canonical roles. Generated files carry a marker comment. Never
+edit them directly; change the canonical source and re-run the script.
 
 Unless the user explicitly requests a global/user installation, treat skill
 creation or installation in this repository as repository-local. Codex must write

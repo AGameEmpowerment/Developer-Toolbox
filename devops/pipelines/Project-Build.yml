@@ -1,0 +1,57 @@
+# Local-development template only. It uses public SDKs and no service connections.
+trigger: none
+pr: none
+
+name: developer-toolbox-example-$(Date:yyyyMMdd)$(Rev:.r)
+
+variables:
+  buildConfiguration: Release
+  dotnetVersion: 10.x
+  nodeVersion: 24.x
+  clientPath: src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client
+
+stages:
+  - stage: BuildAndTest
+    displayName: Build and test public examples
+    jobs:
+      - job: DotNet
+        displayName: Build and test .NET example
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Install .NET SDK
+            inputs:
+              packageType: sdk
+              version: $(dotnetVersion)
+
+          - script: dotnet restore DeveloperToolbox.Example.slnx --source https://api.nuget.org/v3/index.json
+            displayName: Restore public NuGet dependencies
+
+          - script: dotnet build DeveloperToolbox.Example.slnx --configuration $(buildConfiguration) --no-restore
+            displayName: Build .NET example
+
+          - script: dotnet test src/DeveloperToolbox.Example/DeveloperToolbox.Example.Tests/DeveloperToolbox.Example.Tests.csproj --configuration $(buildConfiguration) --no-build
+            displayName: Run .NET unit tests
+
+      - job: Client
+        displayName: Verify and build Next.js example
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: NodeTool@0
+            displayName: Install Node.js
+            inputs:
+              versionSpec: $(nodeVersion)
+
+          - script: npm ci
+            displayName: Install public npm dependencies
+            workingDirectory: $(clientPath)
+
+          - script: npm run verify
+            displayName: Run client quality checks and tests
+            workingDirectory: $(clientPath)
+
+          - script: npm run build
+            displayName: Build client
+            workingDirectory: $(clientPath)

@@ -20,6 +20,9 @@
     roles as subagents, and exposes prompts as slash commands — without
     duplicating canonical content.
 
+    Codex subagent definitions under .codex/agents are generated from the same
+    selected canonical agent roles.
+
     The script is idempotent: it first removes previously generated wrappers
     (identified by the generation marker) and then regenerates everything.
     Hand-authored files under .claude/ without the marker are never touched.
@@ -46,13 +49,14 @@ $ClaudeRules      = Join-Path $RepoRoot '.claude/rules'
 $ClaudeSkills     = Join-Path $RepoRoot '.claude/skills'
 $ClaudeAgents     = Join-Path $RepoRoot '.claude/agents'
 $ClaudeCommands   = Join-Path $RepoRoot '.claude/commands'
+$CodexAgents      = Join-Path $RepoRoot '.codex/agents'
 
 # Agent roles promoted to native Claude Code subagents. Keep this list small:
 # every entry adds its description to Claude's context in each session.
 # Descriptions are delegation-oriented ("use when...") on purpose.
 $AgentRoles = @(
     @{ Slug = 'qa-automation';          Source = '.ai/agents/qa-automation.agent.md'
-       Description = 'QA automation role for this repository. Use to plan and execute test passes across the System Uptime Tracker solution, its web client, and container-backed local services.' }
+       Description = 'QA automation role for this repository. Use to plan and execute test passes across the Developer Toolbox samples, scripts, and container-backed local services.' }
     @{ Slug = 'debug';                  Source = '.ai/agents/debug.agent.md'
        Description = 'Systematic debugging role. Use to reproduce, isolate, and fix a reported bug end-to-end following the repository debugging workflow.' }
     @{ Slug = 'playwright-tester';      Source = '.ai/agents/playwright-tester.agent.md'
@@ -166,6 +170,7 @@ Remove-GeneratedWrappers -Root $ClaudeRules   -Filter '*.md'
 Remove-GeneratedWrappers -Root $ClaudeSkills   -Filter 'SKILL.md'
 Remove-GeneratedWrappers -Root $ClaudeAgents   -Filter '*.md'
 Remove-GeneratedWrappers -Root $ClaudeCommands -Filter '*.md'
+Remove-GeneratedWrappers -Root $CodexAgents    -Filter '*.toml'
 
 # --- Instructions: canonical rules -> Copilot and Claude scoped adapters -----
 $instructionCount = 0
@@ -297,6 +302,7 @@ foreach ($dir in Get-ChildItem -Path $SharedSkillsRoot -Directory | Sort-Object 
 
 # --- Agents: selected .ai/agents/*.agent.md -> .claude/agents/<slug>.md ------
 $agentCount = 0
+$codexAgentCount = 0
 foreach ($role in $AgentRoles) {
     $source = Join-Path $RepoRoot $role.Source
     if (-not (Test-Path $source)) {
@@ -328,6 +334,31 @@ foreach ($role in $AgentRoles) {
     New-Item -ItemType Directory -Force -Path $ClaudeAgents | Out-Null
     Set-Content -Path $targetFile -Value $content -NoNewline
     $agentCount++
+
+    $codexTargetFile = Join-Path $CodexAgents "$($role.Slug).toml"
+    if (Test-Path $codexTargetFile) {
+        Write-Warning "Skipping Codex agent '$($role.Slug)': hand-authored subagent already exists."
+        continue
+    }
+
+    $codexDescription = $role.Description -replace '\\', '\\' -replace '"', '\"'
+    $codexContent = @(
+        "name = `"$($role.Slug)`""
+        "description = `"$codexDescription`""
+        'developer_instructions = """'
+        "<!-- $Marker -->"
+        ''
+        "Adopt the role defined in ``$($role.Source)``. Read that file completely"
+        'before doing anything else, then follow `AGENTS.md` and'
+        '`.ai/constitution.md`. Ignore tool or model names in the role file'
+        'frontmatter; they target other AI tools. Use your normally available'
+        'tools, and report concrete results (files changed, commands run, test'
+        'output) back to the caller."""'
+    ) -join "`n"
+
+    New-Item -ItemType Directory -Force -Path $CodexAgents | Out-Null
+    Set-Content -Path $codexTargetFile -Value ($codexContent + "`n") -NoNewline
+    $codexAgentCount++
 }
 
 # --- Commands: .ai/prompts/*.prompt.md -> .claude/commands/<slug>.md ----------
@@ -374,7 +405,7 @@ foreach ($file in Get-ChildItem -Path $PromptsRoot -Filter '*.prompt.md' -File |
     $commandCount++
 }
 
-Write-Host "Generated $instructionCount instruction adapter pairs, $skillCount skill wrappers, $agentCount subagents, $commandCount commands."
+Write-Host "Generated $instructionCount instruction adapter pairs, $skillCount skill wrappers, $agentCount Claude subagents, $codexAgentCount Codex subagents, $commandCount commands."
 if ($skippedCommands.Count -gt 0) {
     Write-Host "Prompts covered by a same-named skill (no command generated): $($skippedCommands -join ', ')."
 }

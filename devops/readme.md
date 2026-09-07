@@ -1,12 +1,17 @@
 # DevOps
 
-> These files are local-development examples and delivery templates. Configure and review them before using them in any real environment.
+DevOps-related examples live here. These files are templates for the local
+Developer Toolbox and are not production-ready pipeline, infrastructure, or
+deployment configuration.
 
-DevOps related files would be created here and below are subfolders for specific types of DevOps configurations.
+Copy these examples into a real project only after replacing all sample names,
+service connections, variable groups, repositories, package metadata, and
+environment assumptions.
 
 - [Pipelines](pipelines/readme.md)
-- [IIS deployment template](iis/Deploy-Production-Iis.yml)
-- [Docker deployment template](docker/readme.md)
-- [Deployment validation](validation/Verify-SystemUptimeTrackerBaseline.ps1)
 - [Terraform](terraform/readme.md)
 - [Manifests](manifest/readme.md)
+
+`PrepNuget.ps1` and `DeveloperToolbox.Example.Lib.nuspec` provide a generic,
+public-feed-compatible packaging example for the sample library. Prefer the
+SDK-style `dotnet pack` pipeline unless a NuSpec file is specifically required.

@@ -41,7 +41,8 @@ Repository skills are separated by native discovery behavior:
   `.claude/rules/` from the same instructions using Claude `paths`, redirect
   wrappers under `.claude/skills/`, selected subagent roles under
   `.claude/agents/`, and slash commands for `.ai/prompts/` under
-  `.claude/commands/`. Re-run it after changing any canonical asset.
+  `.claude/commands/`. It also generates selected Codex subagent definitions
+  under `.codex/agents/`. Re-run it after changing any canonical asset.
 - `.ai/skills/` contains only the cross-tool registry, not installable skills.
 - `.codex/skills/` is not used because Codex does not discover it natively.
 

@@ -19,7 +19,7 @@ The root directory of the Git repository that will receive the bootstrap files.
 None.
 
 .NOTES
-Run this script from an Developer-Toolbox checkout. Git must be available on
+Run this script from a Developer-Toolbox checkout. Git must be available on
 PATH. The target must be the repository root, not a subdirectory inside it.
 #>
 [CmdletBinding(SupportsShouldProcess, ConfirmImpact = "Medium")]
@@ -244,4 +244,3 @@ foreach ($bootstrapFile in $bootstrapFiles) {
 Write-Output "Toolbox bootstrap files are ready in '$repositoryRoot'."
 Write-Output "Primary AI skill: toolbox-repository-bridge"
 Write-Output "Run '.\setup_toolbox.ps1' or 'bash ./setup_toolbox.sh' from the target repository."
-

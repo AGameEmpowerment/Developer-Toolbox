@@ -17,6 +17,7 @@ If your project is not Azure/.NET-centric, you can still use this template, but 
 - DevOps scaffolding, pipeline placeholders, and manifests.
 - Cross-platform, non-overwriting installers for adding Toolbox support to another Git repository.
 - Public Copilot, Codex, and Claude assets with generated cross-tool discovery adapters.
+- A generic .NET 10 and Next.js sample under `src/DeveloperToolbox.Example` with unit tests and public-only dependencies.
 - Default repository standards (CODEOWNERS, CONTRIBUTING, CHANGELOG, LICENSE, .editorconfig, .gitattributes, .gitignore).
 
 ## Choose your setup path
@@ -206,8 +207,9 @@ Use the links below to find focused documentation in this repository. Each link 
 
 Canonical policy, instructions, agents, prompts, and collections live under
 `.ai/`. Shared skill implementations live under `.agents/skills/`. GitHub
-Copilot adapters under `.github/instructions/` and Claude discovery files under
-`.claude/` are generated from those canonical sources.
+Copilot adapters under `.github/instructions/`, Claude discovery files under
+`.claude/`, and selected Codex subagents under `.codex/agents/` are generated
+from those canonical sources.
 
 After changing a canonical AI asset, run:
 

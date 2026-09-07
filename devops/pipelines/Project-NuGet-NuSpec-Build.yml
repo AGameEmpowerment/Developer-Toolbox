@@ -1,0 +1,56 @@
+# Local-development template only. It demonstrates NuSpec packaging without
+# configuring or pushing to a package feed.
+trigger: none
+pr: none
+
+name: 0.1.$(Build.BuildId)
+
+variables:
+  buildConfiguration: Release
+  dotnetVersion: 10.x
+  packageVersion: $(Build.BuildNumber)
+
+stages:
+  - stage: Package
+    displayName: Build, test, and package with a NuSpec
+    jobs:
+      - job: NuSpec
+        displayName: Create NuSpec package
+        pool:
+          vmImage: windows-latest
+        steps:
+          - task: UseDotNet@2
+            displayName: Install .NET SDK
+            inputs:
+              packageType: sdk
+              version: $(dotnetVersion)
+
+          - script: dotnet restore DeveloperToolbox.Example.slnx --source https://api.nuget.org/v3/index.json
+            displayName: Restore public NuGet dependencies
+
+          - script: dotnet build DeveloperToolbox.Example.slnx --configuration $(buildConfiguration) --no-restore
+            displayName: Build solution
+
+          - script: dotnet test src/DeveloperToolbox.Example/DeveloperToolbox.Example.Tests/DeveloperToolbox.Example.Tests.csproj --configuration $(buildConfiguration) --no-build
+            displayName: Run unit tests
+
+          - task: PowerShell@2
+            displayName: Stage library output
+            inputs:
+              targetType: filePath
+              filePath: devops/PrepNuget.ps1
+
+          - task: NuGetCommand@2
+            displayName: Create NuSpec package
+            inputs:
+              command: pack
+              packagesToPack: devops/DeveloperToolbox.Example.Lib.nuspec
+              packDestination: $(Build.ArtifactStagingDirectory)/packages
+              versioningScheme: byEnvVar
+              versionEnvVar: packageVersion
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish package artifact
+            inputs:
+              targetPath: $(Build.ArtifactStagingDirectory)/packages
+              artifact: nuspec-package

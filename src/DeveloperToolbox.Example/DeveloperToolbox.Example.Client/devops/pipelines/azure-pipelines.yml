@@ -1,0 +1,23 @@
+# Local-development template. Replace pool and publishing choices before reuse.
+trigger: none
+pr: none
+
+variables:
+  clientPath: src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: 24.x
+  - script: npm ci
+    displayName: Install public npm dependencies
+    workingDirectory: $(clientPath)
+  - script: npm run verify
+    displayName: Verify client
+    workingDirectory: $(clientPath)
+  - script: npm run build
+    displayName: Build client
+    workingDirectory: $(clientPath)
