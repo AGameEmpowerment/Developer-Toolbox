@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Repository-root convenience entry point. The installed Toolbox launcher owns
-# all clone, update, and setup behavior.
+# Installer template: install_toolbox_setup.sh copies this file to the consumer
+# repository root as setup_toolbox.sh. The installed Toolbox launcher owns all
+# clone, update, and setup behavior; this template is not run from this folder.
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 exec bash "${SCRIPT_DIR}/setup/_toolbox.sh" "$@"
-
 
