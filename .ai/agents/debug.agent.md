@@ -1,4 +1,5 @@
 ---
+name: Debug
 description: 'Debug your application to find and fix a bug'
 tools: ['edit/editFiles', 'search/codebase', 'search/searchResults', 'search/usages', 'read/problems', 'runCommands', 'runTests', 'testFailure', 'terminalLastCommand', 'web/fetch', 'web/githubRepo']
 ---

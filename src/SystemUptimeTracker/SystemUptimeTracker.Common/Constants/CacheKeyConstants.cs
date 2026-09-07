@@ -34,15 +34,4 @@ public static class CacheKeyConstants
             return $"UserRights:Account:{normalizedAccountId}";
         }
     }
-
-    /// <summary>
-    /// Cache keys for authentication infrastructure data.
-    /// </summary>
-    public static class Authentication
-    {
-        /// <summary>
-        /// Cache key for the client-credentials bearer token.
-        /// </summary>
-        public const string CLIENT_CREDENTIAL_TOKEN = "Authentication:ClientCredentialToken";
-    }
 }

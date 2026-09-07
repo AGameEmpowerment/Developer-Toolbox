@@ -4,6 +4,7 @@ using SystemUptimeTracker.Qa.Automation.Support;
 
 namespace SystemUptimeTracker.Qa.Automation.Configuration;
 
+[TestFixture(Category = "Unit")]
 public sealed class QaDatabaseIsolationConfigurationTests
 {
     private const string MAIN_DATABASE_CONNECTION_STRING = "Server=127.0.0.1,10433;Database=SystemUptimeTracker;User Id=sa;Password=P@ssword123!;Encrypt=True;MultipleActiveResultSets=true;TrustServerCertificate=True";

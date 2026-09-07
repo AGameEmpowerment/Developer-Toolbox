@@ -42,6 +42,10 @@ jobs:
         shell: pwsh
         run: ./sync_ai_assets.ps1
 
+      - name: Validate canonical assets and generated coverage
+        shell: pwsh
+        run: python ./tests/test_ai_assets.py
+
       - name: Fail when generated assets are stale
         shell: pwsh
         run: |

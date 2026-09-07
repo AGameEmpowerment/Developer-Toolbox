@@ -7,13 +7,13 @@ namespace SystemUptimeTracker.Qa.Automation.Infrastructure;
 public sealed class AspireHostIntegrationTests : SystemUptimeTrackerFunctionalTestBase
 {
     [Test]
-    public void AppHost_StartsServerApiBackend()
+    public async Task AppHost_StartsServerApiBackend()
     {
         Logger.LogInformation("Starting Aspire AppHost server API integration smoke test.");
 
         try
         {
-            SystemUptimeTrackerAppHostManager.Acquire(SystemUptimeTrackerAppHostReadinessScope.SERVER_ONLY);
+            await SystemUptimeTrackerAppHostManager.AcquireAsync(SystemUptimeTrackerAppHostReadinessScope.SERVER_ONLY);
             Assert.Pass("Aspire AppHost started and the server API backend responded successfully.");
         }
         finally

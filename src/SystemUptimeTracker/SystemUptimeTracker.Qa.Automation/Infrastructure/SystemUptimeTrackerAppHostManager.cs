@@ -156,7 +156,7 @@ internal static class SystemUptimeTrackerAppHostManager
         ];
     }
 
-    internal static void Acquire(SystemUptimeTrackerAppHostReadinessScope readinessScope = SystemUptimeTrackerAppHostReadinessScope.SERVER_AND_CLIENT)
+    internal static async Task AcquireAsync(SystemUptimeTrackerAppHostReadinessScope readinessScope = SystemUptimeTrackerAppHostReadinessScope.SERVER_AND_CLIENT)
     {
         EnsureCleanupHooksRegistered();
 
@@ -259,7 +259,7 @@ internal static class SystemUptimeTrackerAppHostManager
 
         try
         {
-            WaitForReadyAsync(readinessScope).ConfigureAwait(false).GetAwaiter().GetResult();
+            await WaitForReadyAsync(readinessScope).ConfigureAwait(false);
         }
         catch
         {

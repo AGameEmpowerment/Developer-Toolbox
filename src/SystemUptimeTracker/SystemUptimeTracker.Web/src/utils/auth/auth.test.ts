@@ -32,6 +32,36 @@ describe("local identity auth pages", () => {
     });
   });
 
+  describe("cookie-secret validation", () => {
+    it("uses the local fallback outside production", async () => {
+      const { resolveCookieSecret } = await import("./auth");
+
+      expect(resolveCookieSecret(undefined, "development")).toBe(
+        "development-only-local-auth-cookie-secret",
+      );
+    });
+
+    it.each([
+      undefined,
+      "short-secret",
+      "replace_with_high_entropy_secret",
+      "replace_with_64_character_hex_secret",
+    ])("rejects an unsafe production value: %s", async (secret) => {
+      const { resolveCookieSecret } = await import("./auth");
+
+      expect(() => resolveCookieSecret(secret, "production")).toThrow(
+        "AUTH_COOKIE_SECRET must be a non-placeholder value of at least 32 characters in production.",
+      );
+    });
+
+    it("preserves a valid production secret exactly", async () => {
+      const { resolveCookieSecret } = await import("./auth");
+      const secret = ` ${"a".repeat(32)} `;
+
+      expect(resolveCookieSecret(secret, "production")).toBe(secret);
+    });
+  });
+
   it("redirects login requests to first-time setup when no administrator exists", async () => {
     vi.mocked(global.fetch).mockResolvedValue(
       new Response(

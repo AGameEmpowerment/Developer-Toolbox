@@ -56,14 +56,14 @@ public abstract class SystemUptimeTrackerPlaywrightTestBase : QaPlaywrightTestBa
         return SystemUptimeTrackerAppHostManager.CreateQaAutomationHostArgs();
     }
 
-    protected override void OnBeforeHostCreated()
+    protected override async Task OnBeforeHostCreated()
     {
         if (QaAutomationExecution.UseExternalHost)
         {
             return;
         }
 
-        SystemUptimeTrackerAppHostManager.Acquire(SystemUptimeTrackerAppHostReadinessScope.SERVER_AND_CLIENT);
+        await SystemUptimeTrackerAppHostManager.AcquireAsync(SystemUptimeTrackerAppHostReadinessScope.SERVER_AND_CLIENT);
     }
 
     protected override void OnHostCreationFailed()

@@ -1,7 +1,6 @@
 # Unit Tests
 
-Unit tests go in folders that match the folder structure of the web project. A general rule of thumb is to make sure you have unit tests for all your types that implement an interface.
-We are currently missing tests on things in the Connection folder as they were acting up, and we may move some of those to a shared library.
+Unit tests go in folders that match the folder structure of the application projects. A general rule of thumb is to make sure you have unit tests for all types that implement an interface.
 
 ## Repository Tests
 

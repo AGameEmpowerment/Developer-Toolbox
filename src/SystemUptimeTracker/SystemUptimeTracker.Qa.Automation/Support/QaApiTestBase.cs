@@ -7,8 +7,9 @@ namespace SystemUptimeTracker.Qa.Automation.Support
             return [];
         }
 
-        protected virtual void OnBeforeHostCreated()
+        protected virtual Task OnBeforeHostCreated()
         {
+            return Task.CompletedTask;
         }
 
         protected virtual void OnHostCreationFailed()
@@ -23,13 +24,12 @@ namespace SystemUptimeTracker.Qa.Automation.Support
         {
         }
 
-        protected override Task OnOneTimeSetUp()
+        protected override async Task OnOneTimeSetUp()
         {
             try
             {
-                OnBeforeHostCreated();
+                await OnBeforeHostCreated();
                 OnHostReady();
-                return Task.CompletedTask;
             }
             catch
             {

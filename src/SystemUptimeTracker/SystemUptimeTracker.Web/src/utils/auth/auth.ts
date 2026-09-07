@@ -13,6 +13,11 @@ import {
 
 const sessionCookieName = "systemuptimetracker.auth.session";
 const defaultSessionLifetimeSeconds = 60 * 60;
+const minimumProductionCookieSecretLength = 32;
+const productionCookieSecretPlaceholders = new Set([
+  "replace_with_high_entropy_secret",
+  "replace_with_64_character_hex_secret",
+]);
 
 type SessionUser = {
   sub: string;
@@ -60,18 +65,33 @@ const getAppBaseUrl = () =>
 export const getApiBaseUrl = () =>
   process.env.API_BASE_URL || "https://localhost:7060/";
 
-const getCookieSecret = () => {
-  const configuredSecret = process.env.AUTH_COOKIE_SECRET;
-  if (configuredSecret) {
-    return configuredSecret;
+export const resolveCookieSecret = (
+  configuredSecret: string | undefined,
+  environment: string | undefined,
+) => {
+  if (environment !== "production") {
+    return configuredSecret || "development-only-local-auth-cookie-secret";
   }
 
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("AUTH_COOKIE_SECRET must be configured in production.");
+  const normalizedSecret = configuredSecret?.trim();
+  if (
+    !normalizedSecret ||
+    normalizedSecret.length < minimumProductionCookieSecretLength ||
+    productionCookieSecretPlaceholders.has(normalizedSecret)
+  ) {
+    throw new Error(
+      `AUTH_COOKIE_SECRET must be a non-placeholder value of at least ${minimumProductionCookieSecretLength} characters in production.`,
+    );
   }
 
-  return "development-only-local-auth-cookie-secret";
+  return configuredSecret;
 };
+
+const getCookieSecret = () =>
+  resolveCookieSecret(
+    process.env.AUTH_COOKIE_SECRET,
+    process.env.NODE_ENV,
+  );
 
 const getEncryptionKey = () =>
   crypto.createHash("sha256").update(getCookieSecret()).digest();

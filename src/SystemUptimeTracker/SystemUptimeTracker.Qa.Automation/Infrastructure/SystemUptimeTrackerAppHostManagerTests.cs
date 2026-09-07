@@ -1,6 +1,6 @@
 namespace SystemUptimeTracker.Qa.Automation.Infrastructure;
 
-[TestFixture]
+[TestFixture(Category = "Unit")]
 public sealed class SystemUptimeTrackerAppHostManagerTests
 {
     [Test]

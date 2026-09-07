@@ -3,6 +3,7 @@ using SystemUptimeTracker.Qa.Automation.Support;
 
 namespace SystemUptimeTracker.Qa.Automation.Configuration;
 
+[TestFixture(Category = "Unit")]
 public sealed class SystemUptimeTrackerPageCatalogTests
 {
     [Test]

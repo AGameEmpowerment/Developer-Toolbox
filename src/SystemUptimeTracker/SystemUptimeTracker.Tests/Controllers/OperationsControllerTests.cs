@@ -78,7 +78,9 @@ public class OperationsControllerTests
         {
             Assert.That(payload.ApplicationName, Is.EqualTo("SystemUptimeTracker.Api"));
             Assert.That(payload.ApplicationVersion, Is.EqualTo("1.2.3"));
+            Assert.That(payload.BuildVersion, Is.EqualTo("1.2.3.4"));
             Assert.That(payload.Environment, Is.EqualTo(TESTING_ENVIRONMENT));
+            Assert.That(payload.StartedAtUtc, Is.EqualTo(new DateTimeOffset(2026, 4, 17, 12, 0, 0, TimeSpan.Zero)));
         });
     }
 

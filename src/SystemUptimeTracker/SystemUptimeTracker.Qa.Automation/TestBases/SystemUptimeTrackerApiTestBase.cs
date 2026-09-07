@@ -18,14 +18,14 @@ public abstract class SystemUptimeTrackerApiTestBase : QaApiTestBase
         return SystemUptimeTrackerAppHostManager.CreateQaAutomationHostArgs();
     }
 
-    protected override void OnBeforeHostCreated()
+    protected override async Task OnBeforeHostCreated()
     {
         if (QaAutomationExecution.UseExternalHost)
         {
             return;
         }
 
-        SystemUptimeTrackerAppHostManager.Acquire(SystemUptimeTrackerAppHostReadinessScope.SERVER_ONLY);
+        await SystemUptimeTrackerAppHostManager.AcquireAsync(SystemUptimeTrackerAppHostReadinessScope.SERVER_ONLY);
     }
 
     protected override void OnHostCreationFailed()

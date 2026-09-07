@@ -5,7 +5,7 @@ using SystemUptimeTracker.Qa.Automation.Support;
 
 namespace SystemUptimeTracker.Qa.Automation;
 
-[TestFixture]
+[TestFixture(Category = "Unit")]
 public sealed class RegisterDependentServicesTests
 {
     [Test]
