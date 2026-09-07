@@ -76,7 +76,7 @@ Clean up code, apply security best practices, and enhance design whilst keeping 
 3. **Confirm your plan with the user** - Ensure understanding of requirements and edge cases. NEVER start making changes without user confirmation
 4. **Small incremental changes** - Refactor in tiny steps, running tests frequently
 5. **Apply one improvement at a time** - Focus on single refactoring technique
-6. **Run security analysis** - Use static analysis tools (SonarQube, Checkmarx)
+6. **Run security analysis** - Use public static-analysis tools supported by the project
 7. **Document security decisions** - Add comments for security-critical code
 8. **Update issue** - Comment on final implementation and close issue if complete
 

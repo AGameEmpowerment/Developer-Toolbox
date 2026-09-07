@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - ".devcontainer/**"
-      - ".github/skills/toolbox-repository-bridge/**"
+      - ".agents/skills/toolbox-repository-bridge/**"
       - ".github/workflows/toolbox-bootstrap-validation.yml"
       - ".gitattributes"
       - "Install-ToolboxSetup.ps1"
@@ -17,7 +17,7 @@ on:
   push:
     paths:
       - ".devcontainer/**"
-      - ".github/skills/toolbox-repository-bridge/**"
+      - ".agents/skills/toolbox-repository-bridge/**"
       - ".github/workflows/toolbox-bootstrap-validation.yml"
       - ".gitattributes"
       - "Install-ToolboxSetup.ps1"

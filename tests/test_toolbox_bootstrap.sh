@@ -73,7 +73,7 @@ expected_files=(
     ".devcontainer/start_devcontainer.sh"
     ".devcontainer/start_developer_toolkit.ps1"
     ".devcontainer/start_developer_toolkit.sh"
-    ".github/skills/toolbox-repository-bridge/SKILL.md"
+    ".agents/skills/toolbox-repository-bridge/SKILL.md"
     ".claude/skills/toolbox-repository-bridge/SKILL.md"
 )
 for relative_path in "${expected_files[@]}"; do

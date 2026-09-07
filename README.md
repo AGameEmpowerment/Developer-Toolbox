@@ -117,7 +117,9 @@ Use this checklist to adapt the template for your own repository.
 Recommended priority for copying into a new repository:
 
 - High priority:
-    - .github (Copilot instructions, workflows, and repo automation)
+    - .ai (canonical instructions, agents, prompts, and collections)
+    - .agents/skills (canonical shared skill implementations)
+    - .github, .claude, and .codex (tool adapters and repository automation)
     - devops (pipelines, manifests, and structure)
     - src (starting point for application code)
     - .editorconfig, .gitattributes, .gitignore
@@ -180,6 +182,7 @@ If you remove any of these tools from your project, update .devcontainer/devcont
 
 Use the links below to find focused documentation in this repository. Each link includes a one-sentence description of what the document is for.
 
+- [.ai/README.md](.ai/README.md) – Canonical, tool-neutral AI asset layout and synchronization rules.
 - [.github/readme.md](.github/readme.md) – Repository automation, Copilot configuration, and GitHub-specific guidance.
 - [containers/readme.md](containers/readme.md) – Docker Compose services and local dependency containers.
 - [containers/certs/readme.md](containers/certs/readme.md) – Certificate setup for HTTPS and WireMock scenarios.
@@ -201,9 +204,10 @@ Use the links below to find focused documentation in this repository. Each link 
 
 ## AI asset synchronization
 
-Canonical agents, prompts, instructions, collections, and skills live under
-`.github/`. Claude discovery adapters under `.claude/` are generated redirects;
-their canonical content is not duplicated.
+Canonical policy, instructions, agents, prompts, and collections live under
+`.ai/`. Shared skill implementations live under `.agents/skills/`. GitHub
+Copilot adapters under `.github/instructions/` and Claude discovery files under
+`.claude/` are generated from those canonical sources.
 
 After changing a canonical AI asset, run:
 
@@ -212,8 +216,8 @@ pwsh -NoProfile -File ./sync_ai_assets.ps1
 ```
 
 The `AI Asset Synchronization` workflow verifies that generated adapters are
-current. The public Toolbox intentionally has no JFrog, SonarQube, private
-registry, or private pipeline-catalog dependency.
+current. The public Toolbox uses public package sources, container images, and
+repository resources throughout.
 
 ## Additional resources
 
@@ -239,7 +243,8 @@ npx skills check
 
 Reference:
 
-- `.github/skills/INDEX.md` (canonical skill discovery map)
+- `.ai/skills/INDEX.md` (canonical cross-tool skill discovery map)
+- `.agents/skills/` (public shared skill implementations)
 
 ### Install Shared Skills Globally (Codex + Copilot)
 

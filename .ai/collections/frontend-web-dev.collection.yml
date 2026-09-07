@@ -1,0 +1,22 @@
+id: frontend-web-dev
+name: Frontend Web Development
+description: Essential prompts, instructions, and chat modes for modern frontend web development including React, Angular, Vue, TypeScript, and CSS frameworks.
+tags: [frontend, web, react, typescript, javascript, css, html, angular, vue]
+items:
+  # Expert Chat Modes
+  - path: agents/expert-react-frontend-engineer.agent.md
+    kind: agent
+
+  # Development Instructions
+  - path: instructions/reactjs.md
+    kind: instruction
+  - path: instructions/nextjs.md
+    kind: instruction
+  - path: instructions/nodejs-javascript-vitest.md
+    kind: instruction
+
+  # Prompts
+
+display:
+  ordering: alpha
+  show_badge: true

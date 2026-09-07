@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 SCRIPT_PATH = (
     Path(__file__).resolve().parents[1]
-    / ".github"
+    / ".agents"
     / "skills"
     / "github-wiki"
     / "scripts"
@@ -199,4 +199,3 @@ class PrepareWikiSafetyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

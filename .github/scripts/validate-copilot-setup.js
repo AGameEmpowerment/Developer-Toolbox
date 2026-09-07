@@ -35,11 +35,11 @@ function readFile(filePath) {
  * Parse YAML frontmatter from markdown
  */
 function parseFrontmatter(content) {
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const frontmatterMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
     if (!frontmatterMatch) return null;
     
     const frontmatter = {};
-    const lines = frontmatterMatch[1].split('\n');
+    const lines = frontmatterMatch[1].split(/\r?\n/);
     
     for (const line of lines) {
         const match = line.match(/^(\w+):\s*(.+)$/);
@@ -113,20 +113,20 @@ function validateInstructionFiles() {
 }
 
 /**
- * Validate agent files in .github/agents/
+ * Validate agent files in .ai/agents/
  */
 function validateAgentFiles() {
-    const agentsDir = '.github/agents';
+    const agentsDir = '.ai/agents';
     
     if (!fileExists(agentsDir)) {
-        info.push('ℹ Optional: No .github/agents/ directory (agents are optional)');
+        info.push('ℹ Optional: No .ai/agents/ directory (agents are optional)');
         return;
     }
     
     const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.agent.md') || f.endsWith('.md'));
     
     if (files.length === 0) {
-        info.push('ℹ No agent files found in .github/agents/ (agents are optional)');
+        info.push('ℹ No agent files found in .ai/agents/ (agents are optional)');
         return;
     }
     
@@ -148,20 +148,20 @@ function validateAgentFiles() {
 }
 
 /**
- * Validate prompt files in .github/prompts/
+ * Validate prompt files in .ai/prompts/
  */
 function validatePromptFiles() {
-    const promptsDir = '.github/prompts';
+    const promptsDir = '.ai/prompts';
     
     if (!fileExists(promptsDir)) {
-        info.push('ℹ Optional: No .github/prompts/ directory (prompts are optional)');
+        info.push('ℹ Optional: No .ai/prompts/ directory (prompts are optional)');
         return;
     }
     
     const files = fs.readdirSync(promptsDir).filter(f => f.endsWith('.prompt.md') || f.endsWith('.md'));
     
     if (files.length === 0) {
-        info.push('ℹ No prompt files found in .github/prompts/ (prompts are optional)');
+        info.push('ℹ No prompt files found in .ai/prompts/ (prompts are optional)');
         return;
     }
     
@@ -169,13 +169,13 @@ function validatePromptFiles() {
 }
 
 /**
- * Validate collection files in .github/collections/
+ * Validate collection files in .ai/collections/
  */
 function validateCollectionFiles() {
-    const collectionsDir = '.github/collections';
+    const collectionsDir = '.ai/collections';
     
     if (!fileExists(collectionsDir)) {
-        info.push('ℹ Optional: No .github/collections/ directory (collections are optional)');
+        info.push('ℹ Optional: No .ai/collections/ directory (collections are optional)');
         return;
     }
     
@@ -184,7 +184,7 @@ function validateCollectionFiles() {
     );
     
     if (files.length === 0) {
-        info.push('ℹ No collection files found in .github/collections/ (collections are optional)');
+        info.push('ℹ No collection files found in .ai/collections/ (collections are optional)');
         return;
     }
     

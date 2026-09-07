@@ -1,27 +1,25 @@
-# This workflow validates checked-in local-toolbox adapters; it does not deploy.
+# This workflow validates checked-in local-toolbox templates; it does not deploy.
 name: AI Asset Synchronization
 
 on:
   pull_request:
     paths:
+      - '.ai/**'
+      - '.agents/skills/**'
       - '.claude/**'
-      - '.github/agents/**'
-      - '.github/collections/**'
       - '.github/instructions/**'
-      - '.github/prompts/**'
-      - '.github/skills/**'
+      - '.github/copilot-instructions.md'
       - '.github/workflows/ai-assets-sync.yml'
       - 'AGENTS.md'
       - 'CLAUDE.md'
       - 'sync_ai_assets.ps1'
   push:
     paths:
+      - '.ai/**'
+      - '.agents/skills/**'
       - '.claude/**'
-      - '.github/agents/**'
-      - '.github/collections/**'
       - '.github/instructions/**'
-      - '.github/prompts/**'
-      - '.github/skills/**'
+      - '.github/copilot-instructions.md'
       - '.github/workflows/ai-assets-sync.yml'
       - 'AGENTS.md'
       - 'CLAUDE.md'
@@ -33,7 +31,7 @@ permissions:
 
 jobs:
   verify-generated-adapters:
-    name: Verify generated adapters
+    name: Verify Generated Adapters
     runs-on: ubuntu-latest
 
     steps:
@@ -51,5 +49,5 @@ jobs:
           if ($changes) {
               $changes
               git diff
-              throw 'Generated AI assets are out of sync. Run sync_ai_assets.ps1.'
+              throw 'Generated AI assets are out of sync. Edit canonical sources and run sync_ai_assets.ps1.'
           }

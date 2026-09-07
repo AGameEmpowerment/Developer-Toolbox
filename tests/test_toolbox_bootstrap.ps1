@@ -105,7 +105,7 @@ printf '%s\n' "$*"
         ".devcontainer/start_devcontainer.sh",
         ".devcontainer/start_developer_toolkit.ps1",
         ".devcontainer/start_developer_toolkit.sh",
-        ".github/skills/toolbox-repository-bridge/SKILL.md",
+        ".agents/skills/toolbox-repository-bridge/SKILL.md",
         ".claude/skills/toolbox-repository-bridge/SKILL.md"
     )
     foreach ($relativePath in $expectedFiles) {

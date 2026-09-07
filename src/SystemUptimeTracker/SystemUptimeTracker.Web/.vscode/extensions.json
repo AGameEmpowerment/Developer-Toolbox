@@ -1,6 +1,5 @@
 {
   "recommendations": [
-    "sonarsource.sonarlint-vscode",
     "github.codespaces",
     "github.copilot-chat",
     "github.vscode-pull-request-github",

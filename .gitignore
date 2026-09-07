@@ -432,7 +432,6 @@ FodyWeavers.xsd
 #merge files
 *.sln.iml
 *.orig
-.jfrog/*
 nugetlibs/
 
 # WireMock TLS certificates (generated, contain private keys)

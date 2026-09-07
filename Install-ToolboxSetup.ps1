@@ -13,7 +13,7 @@ directories are always preserved.
 The root directory of the Git repository that will receive the bootstrap files.
 
 .EXAMPLE
-./Install-ToolboxSetup.ps1 -TargetRepositoryPath C:\Code\Church\MyProject
+./Install-ToolboxSetup.ps1 -TargetRepositoryPath C:\Code\Projects\MyProject
 
 .OUTPUTS
 None.
@@ -35,7 +35,7 @@ if ([string]::IsNullOrWhiteSpace($TargetRepositoryPath)) {
     Write-Output "Usage: ./Install-ToolboxSetup.ps1 -TargetRepositoryPath <repository-root>"
     Write-Output ""
     Write-Output "Example:"
-    Write-Output "  ./Install-ToolboxSetup.ps1 -TargetRepositoryPath C:\Code\Church\MyProject"
+    Write-Output "  ./Install-ToolboxSetup.ps1 -TargetRepositoryPath C:\Code\Projects\MyProject"
     Write-Output ""
     [Console]::Error.WriteLine("error: TargetRepositoryPath is required.")
     exit 2
@@ -244,5 +244,4 @@ foreach ($bootstrapFile in $bootstrapFiles) {
 Write-Output "Toolbox bootstrap files are ready in '$repositoryRoot'."
 Write-Output "Primary AI skill: toolbox-repository-bridge"
 Write-Output "Run '.\setup_toolbox.ps1' or 'bash ./setup_toolbox.sh' from the target repository."
-
 

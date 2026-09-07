@@ -6,10 +6,9 @@ setup/_toolbox.ps1
 setup/_toolbox.sh
 setup/toolbox-bootstrap-files.txt
 .devcontainer
-.github/skills/toolbox-repository-bridge
+.agents/skills/toolbox-repository-bridge
 .claude/skills/toolbox-repository-bridge
 .editorconfig
 .vsconfig
 Default-Visual-Studio-Settings.vssettings
 Delete_Old_Git_Tags.ps1
-
