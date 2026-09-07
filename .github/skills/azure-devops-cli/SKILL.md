@@ -7,7 +7,7 @@ description: Manage Azure DevOps resources via CLI including projects, repos, pi
 
 Manage Azure DevOps resources using the Azure CLI with the Azure DevOps extension.
 
-**CLI Version:** Use the current Azure CLI version for your environment. Run `az version` and confirm the Azure DevOps extension is installed before using these commands.
+**CLI Version:** Run `az version` or `az --version` to verify the Azure CLI version installed in your environment.
 
 ## Prerequisites
 
@@ -23,8 +23,12 @@ az extension add --name azure-devops
 ## Authentication
 
 ```bash
-# Login with a PAT via stdin to avoid leaking it in shell history or process args
-printf '%s' "$AZURE_DEVOPS_EXT_PAT" | az devops login --organization https://dev.azure.com/{org}
+# Login with a PAT using the interactive prompt
+# Avoid passing PATs on the command line because they can be captured in shell history.
+az devops login --organization https://dev.azure.com/{org}
+
+# For automation, pass the PAT via stdin instead of --token
+echo "$AZURE_DEVOPS_EXT_PAT" | az devops login --organization https://dev.azure.com/{org}
 
 # Set default organization and project (avoids repeating --org/--project)
 # Note: Legacy URL https://{org}.visualstudio.com should be replaced with https://dev.azure.com/{org}
@@ -33,8 +37,6 @@ az devops configure --defaults organization=https://dev.azure.com/{org} project=
 # List current configuration
 az devops configure --list
 ```
-
-Never pass PATs on the command line or paste them into shared logs. Set `AZURE_DEVOPS_EXT_PAT` securely in your shell or CI environment first, then pipe it to `az devops login`.
 
 ## CLI Structure
 

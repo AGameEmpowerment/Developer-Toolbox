@@ -1,13 +1,16 @@
 {
   "name": "Com.AGameEmpowerment.DevContainer",
 
-  // Build from custom Dockerfile that removes the expired Yarn apt repository.
-  // This fixes GPG key errors (NO_PUBKEY 62D54FD4003F6525) during feature installation.
-  // More info: https://containers.dev/guide/dockerfile
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".",
-    "options": ["--label=com.agameempowerment.devcontainer=developer-toolbox"]
+  // Ubuntu 24.04 with the released .NET 10 SDK, git, and PowerShell preinstalled.
+  // The maintained 2-10.0 line replaces the frozen 1-10.0 release-candidate image.
+  "image": "mcr.microsoft.com/devcontainers/dotnet:2-10.0",
+
+  // Match the smallest GitHub Codespaces machine. Running the complete optional
+  // local emulator stack can require more memory.
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "8gb",
+    "storage": "32gb"
   },
 
   // Features to add to the dev container. More info: https://containers.dev/features.
@@ -51,9 +54,9 @@
       "installDirectlyFromGitHubRelease": true,
       "version": "latest"
     },
-    // Node.js with npm, yarn, and pnpm for React/frontend development
+    // Node.js 24 LTS with npm, yarn, and pnpm for frontend development
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "lts",
+      "version": "24",
       "nodeGypDependencies": true,
       "nvmVersion": "latest"
     },
@@ -98,12 +101,18 @@
         "[jsonc]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode"
         },
+        "[powershell]": {
+          "editor.defaultFormatter": "ms-vscode.powershell"
+        },
         "files.trimTrailingWhitespace": true,
         "files.insertFinalNewline": true,
-        "dotnet.defaultSolution": "disable"
+        "dotnet.defaultSolution": "disable",
+        "eslint.workingDirectories": [{ "mode": "auto" }],
+        "npm.packageManager": "npm"
       },
       // VS Code extensions to install in the dev container.
       "extensions": [
+        "Anthropic.claude-code",
         // Core Editor Enhancements
         "DotJoshJohnson.xml",
         "EditorConfig.EditorConfig",
@@ -173,12 +182,8 @@
     }
   },
 
-  // Use 'postCreateCommand' to run commands after the container is created.
-  // Uses workspaceFolder to ensure correct path regardless of mount configuration
-  "postCreateCommand": "pwsh -File ${containerWorkspaceFolder}/post_devcontainer.ps1",
-
-  // Use 'onCreateCommand' to install Aspire templates (replaces deprecated 'aspire' workload)
-  "onCreateCommand": "dotnet new install Aspire.ProjectTemplates --force",
+  // Prepare tools without restoring packages or starting the optional emulator stack.
+  "postCreateCommand": "pwsh -File ${containerWorkspaceFolder}/.devcontainer/post_devcontainer.ps1",
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
@@ -189,7 +194,24 @@
     5001, // ASP.NET HTTPS
     5173, // Vite dev server
     7071, // Azure Functions
-    8080 // General web server
+    8080, // General web server
+    10000, // Azurite Blob
+    10001, // Azurite Queue
+    10002, // Azurite Table
+    10080, // WireMock HTTP
+    10081, // Cosmos DB emulator
+    10120, // Redis
+    10121, // RedisInsight
+    10130, // smtp4dev SMTP
+    10131, // smtp4dev POP3
+    10132, // smtp4dev IMAP
+    10140, // smtp4dev web UI
+    10150, // Seq
+    10170, // Service Bus AMQP
+    10171, // Service Bus management
+    10181, // Cosmos DB Data Explorer
+    10433, // SQL Server
+    10443 // WireMock HTTPS
   ],
 
   "portsAttributes": {
@@ -224,6 +246,34 @@
     "8080": {
       "label": "Web Server",
       "protocol": "http"
+    },
+    "10080": {
+      "label": "WireMock HTTP",
+      "protocol": "http"
+    },
+    "10081": {
+      "label": "Cosmos DB emulator",
+      "protocol": "https"
+    },
+    "10121": {
+      "label": "RedisInsight",
+      "protocol": "http"
+    },
+    "10140": {
+      "label": "smtp4dev",
+      "protocol": "http"
+    },
+    "10150": {
+      "label": "Seq",
+      "protocol": "http"
+    },
+    "10181": {
+      "label": "Cosmos DB Data Explorer",
+      "protocol": "https"
+    },
+    "10443": {
+      "label": "WireMock HTTPS",
+      "protocol": "https"
     }
   },
 
@@ -232,11 +282,13 @@
   },
 
   "containerEnv": {
+    "DEVCONTAINER": "true",
     "ASPNETCORE_ENVIRONMENT": "Development",
     "DOTNET_ENVIRONMENT": "Development",
     "ASPNETCORE_LOCALDEV": "true",
     "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
     "DOTNET_NOLOGO": "1",
+    "NUGET_XMLDOC_MODE": "skip",
     "NODE_ENV": "development"
   },
 

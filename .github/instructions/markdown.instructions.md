@@ -3,6 +3,7 @@ description: 'Documentation and content creation standards'
 applyTo: '**/*.md'
 ---
 
+
 ## Markdown Content Rules
 
 The following markdown content rules are enforced in the validators:

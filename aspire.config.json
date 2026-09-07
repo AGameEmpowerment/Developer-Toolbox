@@ -1,5 +1,5 @@
 {
   "appHost": {
-    "path": "Automation/Pathway.Endorsement.Functions.AppHost/Pathway.Endorsement.Functions.AppHost.csproj"
+    "path": "src/SystemUptimeTracker/SystemUptimeTracker.AppHost/SystemUptimeTracker.AppHost.csproj"
   }
 }

@@ -3,6 +3,7 @@ description: 'Markdown standards for installation documentation'
 applyTo: 'INSTALL-*.md'
 ---
 
+
 ## Installation Documentation Rules
 
 Use these rules for repository installation guides and setup walkthroughs.

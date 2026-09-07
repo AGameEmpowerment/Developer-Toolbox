@@ -1,0 +1,55 @@
+# This workflow validates checked-in local-toolbox adapters; it does not deploy.
+name: AI Asset Synchronization
+
+on:
+  pull_request:
+    paths:
+      - '.claude/**'
+      - '.github/agents/**'
+      - '.github/collections/**'
+      - '.github/instructions/**'
+      - '.github/prompts/**'
+      - '.github/skills/**'
+      - '.github/workflows/ai-assets-sync.yml'
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'sync_ai_assets.ps1'
+  push:
+    paths:
+      - '.claude/**'
+      - '.github/agents/**'
+      - '.github/collections/**'
+      - '.github/instructions/**'
+      - '.github/prompts/**'
+      - '.github/skills/**'
+      - '.github/workflows/ai-assets-sync.yml'
+      - 'AGENTS.md'
+      - 'CLAUDE.md'
+      - 'sync_ai_assets.ps1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-generated-adapters:
+    name: Verify generated adapters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Regenerate host adapters
+        shell: pwsh
+        run: ./sync_ai_assets.ps1
+
+      - name: Fail when generated assets are stale
+        shell: pwsh
+        run: |
+          $changes = git status --porcelain
+          if ($changes) {
+              $changes
+              git diff
+              throw 'Generated AI assets are out of sync. Run sync_ai_assets.ps1.'
+          }

@@ -10,7 +10,7 @@ const mockFeatureFlagService = ({
     return mockHelpPromise({
       succeed: loadSucceed,
       delay: loadDelay,
-      result: { success: flagResult, error: "sadness" },
+      result: { success: flagResult, error: "feature flag unavailable" },
     });
   };
   const loadFlagById = () => {
@@ -19,7 +19,7 @@ const mockFeatureFlagService = ({
       delay: loadDelay,
       result: {
         success: flagResult,
-        error: "sadness2 lets keep sonarqube happy",
+        error: "feature flag unavailable",
       },
     });
   };

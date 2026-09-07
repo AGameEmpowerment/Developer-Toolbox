@@ -1,7 +1,8 @@
 ---
 description: 'Guidelines for building REST APIs with ASP.NET'
-applyTo: '**/*.cs, **/*.json'
+applyTo: '**/*.cs,**/*.json'
 ---
+
 
 # ASP.NET REST API Development
 

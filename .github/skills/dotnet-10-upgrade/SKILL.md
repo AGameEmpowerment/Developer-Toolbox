@@ -6,7 +6,6 @@ metadata:
   author: ".NET Stack team"
   version: 1.0
   updated: 2026-02-24
-  source-repo: ICS-Eng/agent-skills
 
 ---
 

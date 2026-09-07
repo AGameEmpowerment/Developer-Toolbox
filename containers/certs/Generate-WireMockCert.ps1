@@ -216,7 +216,7 @@ if ($ShowPassword) {
 }
 Write-Host ""
 Write-Host "  2. Start WireMock:" -ForegroundColor Gray
-Write-Host "     docker compose up wiremock" -ForegroundColor DarkGray
+Write-Host "     docker compose up wiremock  # or: podman compose up wiremock" -ForegroundColor DarkGray
 Write-Host ""
 Write-Host "  3. Test HTTPS endpoint:" -ForegroundColor Gray
 Write-Host "     curl -k https://localhost:$WireMockHttpsPort/__admin/health" -ForegroundColor DarkGray

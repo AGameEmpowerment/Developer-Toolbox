@@ -3,6 +3,7 @@ description: 'Playwright .NET test generation instructions'
 applyTo: '**/Tests/**/*.cs'
 ---
 
+
 # Playwright .NET Test Generation Instructions
 
 ## Test Writing Guidelines

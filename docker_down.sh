@@ -89,11 +89,20 @@ resolve_container_runtime() {
 
     case "$requested_runtime" in
         auto)
-            if command -v docker >/dev/null 2>&1; then
-                printf '%s' "docker"
-            elif command -v podman >/dev/null 2>&1; then
-                printf '%s' "podman"
-            fi
+            local first_installed_runtime=""
+            local runtime
+            for runtime in docker podman; do
+                if command -v "$runtime" >/dev/null 2>&1; then
+                    if [[ -z "$first_installed_runtime" ]]; then
+                        first_installed_runtime="$runtime"
+                    fi
+                    if "$runtime" info >/dev/null 2>&1; then
+                        printf '%s' "$runtime"
+                        return
+                    fi
+                fi
+            done
+            printf '%s' "$first_installed_runtime"
             ;;
         docker|podman)
             if command -v "$requested_runtime" >/dev/null 2>&1; then

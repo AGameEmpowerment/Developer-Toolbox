@@ -3,6 +3,7 @@ description: 'Guidelines for GitHub Copilot to write comments to achieve self-ex
 applyTo: '**'
 ---
 
+
 # Self-explanatory Code Commenting Instructions
 
 ## Core Principle

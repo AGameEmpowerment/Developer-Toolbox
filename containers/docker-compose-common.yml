@@ -41,6 +41,7 @@ services:
             # vnext-preview image. HTTPS keeps it compatible with the .NET SDK.
             PROTOCOL: "https"
             ENABLE_EXPLORER: "true"
+            EXPLORER_PROTOCOL: "https"
         ports:
             - "127.0.0.1:10081:8081"
             - "127.0.0.1:10181:1234"
@@ -121,8 +122,8 @@ services:
         restart: unless-stopped
         container_name: Smtp4Dev
 
-    # Local OpenTelemetry Collector with durable storage
-    otel-collector:
+    # Local Seq observability service with OTLP ingestion and durable storage
+    otlp-seq:
         image: datalust/seq:latest
         environment:
             ACCEPT_EULA: "${ACCEPT_EULA}"
@@ -131,7 +132,7 @@ services:
         ports:
             - "127.0.0.1:10150:80" # Web UI and API port
         restart: unless-stopped
-        container_name: OtelCollector
+        container_name: SeqOtlp
         volumes:
             - seq-data:/data
 

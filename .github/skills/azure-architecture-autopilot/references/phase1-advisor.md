@@ -333,7 +333,7 @@ if (-not $PythonCmd) {
 
 # ─── Step 2: Built-in Script Path Discovery (no pip install needed) ───
 # Priority 1: Project local skill folder
-$ScriptsDir = Get-ChildItem -Path ".github\skills\azure-architecture-autopilot" -Filter "cli.py" -Recurse -ErrorAction SilentlyContinue |
+$ScriptsDir = Get-ChildItem -Path ".agents\skills\azure-architecture-autopilot" -Filter "cli.py" -Recurse -ErrorAction SilentlyContinue |
   Where-Object { $_.Directory.Name -eq 'scripts' } |
   Select-Object -First 1 -ExpandProperty DirectoryName
 # Priority 2: Global skill folder

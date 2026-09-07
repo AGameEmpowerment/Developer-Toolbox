@@ -10,7 +10,6 @@
 /.gitignore                     @AGameEmpowerment/agame-org-admins
 /.devcontainer/                 @AGameEmpowerment/agame-org-admins
 /.github/                       @AGameEmpowerment/agame-org-admins
-/.sonarlint/                    @AGameEmpowerment/agame-org-admins
 /.vscode/                       @AGameEmpowerment/agame-org-admins
 /containers/                    @AGameEmpowerment/agame-org-admins
 

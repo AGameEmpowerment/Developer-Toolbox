@@ -3,6 +3,7 @@ description: 'Guidelines for building C# applications'
 applyTo: '**/*.cs'
 ---
 
+
 # C# Development
 
 ## C# Instructions

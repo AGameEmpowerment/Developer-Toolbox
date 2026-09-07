@@ -44,6 +44,23 @@ It's OK to briefly explain terms if you're in doubt, and feel free to clarify te
 
 ## Creating a skill
 
+### Select the repository destination
+
+Choose the native discovery path before writing files:
+
+- Default to a repository-local skill unless the user explicitly requests a
+  global/user installation.
+- When running as Codex, create repository-local skills at
+  `.github/skills/<name>/SKILL.md`.
+- When running as Claude, create repository-local skills at
+  `.claude/skills/<name>/SKILL.md`.
+- Do not create repository skills under `.ai/skills/` or `.codex/skills/`.
+- Use a user/global location only when the user explicitly requests a global
+  installation rather than a repository skill.
+
+Resolve every bundled resource relative to the chosen skill directory and keep
+the entire skill package under the same root.
+
 ### Capture Intent
 
 Start by understanding the user's intent. The current conversation might already contain a workflow the user wants to capture (e.g., they say "turn this into a skill"). If so, extract answers from the conversation history first — the tools used, the sequence of steps, corrections the user made, input/output formats observed. The user may need to fill the gaps, and should confirm before proceeding to the next step.

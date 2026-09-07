@@ -1,7 +1,8 @@
 ---
 description: 'Color usage guidelines and styling rules for HTML elements to ensure accessible, professional designs.'
-applyTo: '**/*.html, **/*.css, **/*.js'
+applyTo: '**/*.html,**/*.css,**/*.js'
 ---
+
 
 # HTML CSS Style Color Guide
 

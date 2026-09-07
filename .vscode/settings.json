@@ -5,5 +5,13 @@
   "remote.restoreForwardedPorts": false,
   "remote.otherPortsAttributes": {
     "onAutoForward": "ignore"
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true
   }
 }

@@ -12,6 +12,23 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from generator import generate_diagram
 
 
+def _safe_output_path(value, suffix):
+    """Resolve user-provided output paths inside the current workspace."""
+    base = Path.cwd().resolve()
+    candidate = Path(value).expanduser()
+    if candidate.is_absolute():
+        resolved = candidate.resolve()
+    else:
+        resolved = (base / candidate).resolve()
+
+    try:
+        resolved.relative_to(base)
+    except ValueError:
+        raise ValueError(f"Output path must stay within {base}") from None
+
+    return resolved.with_suffix(suffix)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Generate interactive Azure architecture diagrams",
@@ -49,10 +66,12 @@ def main():
     )
 
     # Determine output paths
-    out = Path(args.output)
-    html_path = out.with_suffix(".html")
-    png_path = out.with_suffix(".png")
-    svg_path = out.with_suffix(".svg")
+    try:
+        html_path = _safe_output_path(args.output, ".html")
+        png_path = _safe_output_path(args.output, ".png")
+    except ValueError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
 
     if args.format in ("html", "both"):
         html_path.write_text(html, encoding="utf-8")
@@ -60,7 +79,7 @@ def main():
 
     if args.format in ("png", "both"):
         # Write temp HTML then screenshot with puppeteer/playwright
-        tmp_html = html_path if args.format == "both" else Path(str(png_path) + ".tmp.html")
+        tmp_html = html_path if args.format == "both" else png_path.with_suffix(".png.tmp.html")
         if args.format != "both":
             tmp_html.write_text(html, encoding="utf-8")
 
@@ -72,7 +91,7 @@ def main():
         if success:
             print(f"PNG saved: {png_path}")
         else:
-            print(f"WARNING: PNG export failed. Install puppeteer (npm i puppeteer) for PNG support.", file=sys.stderr)
+            print("WARNING: PNG export failed. Install puppeteer (npm i puppeteer) for PNG support.", file=sys.stderr)
             print(f"HTML saved instead: {html_path}")
             if not html_path.exists():
                 html_path.write_text(html, encoding="utf-8")

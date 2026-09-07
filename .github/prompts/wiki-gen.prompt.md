@@ -16,8 +16,7 @@ Before writing or updating any page, reflect and integrate guidance from:
 - `.github/instructions/performance-optimization.instructions.md`
 - `.github/instructions/a11y.instructions.md`
 - `.github/instructions/devops-core-principles.instructions.md` (CALMS + DORA)
-- `.github/instructions/spec-driven-workflow-v1.instructions.md` (requirements/design/tasks artifacts)
-- `.github/instructions/self-explanatory-code-commenting.instructions.md` (minimal WHY‑focused commentary)
+- `.github/instructions/self-explanatory-code-commenting.instructions.md` (minimal WHY-focused commentary)
 
 Document cross‑cutting concerns succinctly; avoid copying entire instruction files—summarize how the project applies them.
 Avoid running shell or other script commands unless explicitly required for discovery or validation.
@@ -161,4 +160,3 @@ Aim for internal consistency, reduced onboarding time, lowered operational frict
 Suggest adoption of automated doc validation (link checking, secret scanning, style linting), diagram automation, and performance dashboards integration.
 
 Proceed now with DISCOVERY unless an up‑to‑date wiki already covers the taxonomy comprehensively.
-

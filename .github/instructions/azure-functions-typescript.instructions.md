@@ -1,7 +1,8 @@
 ---
 description: 'TypeScript patterns for Azure Functions'
-applyTo: '**/*.ts, **/*.js, **/*.json'
+applyTo: '**/*.ts,**/*.js,**/*.json'
 ---
+
 
 ## Guidance for Code Generation
 - Generate modern TypeScript code for Node.js

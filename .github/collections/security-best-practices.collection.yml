@@ -10,14 +10,10 @@ items:
     kind: instruction
   - path: instructions/performance-optimization.instructions.md
     kind: instruction
-  - path: instructions/object-calisthenics.instructions.md
-    kind: instruction
   - path: instructions/self-explanatory-code-commenting.instructions.md
     kind: instruction
 
   # Security & Safety Prompts
-  - path: prompts/ai-prompt-engineering-safety-review.prompt.md
-    kind: prompt
 
 display:
   ordering: alpha

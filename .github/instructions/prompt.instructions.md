@@ -3,6 +3,7 @@ description: 'Guidelines for creating high-quality prompt files for GitHub Copil
 applyTo: '**/*.prompt.md'
 ---
 
+
 # Copilot Prompt Files Guidelines
 
 Instructions for creating effective and maintainable prompt files that guide GitHub Copilot in delivering consistent, high-quality outcomes across any repository.

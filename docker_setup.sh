@@ -22,6 +22,15 @@ GRAY='\033[0;90m'
 NC='\033[0m' # No Color
 
 CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-auto}"
+ENV_FILE_WITHOUT_PASSWORD=""
+
+cleanup() {
+    if [[ -n "$ENV_FILE_WITHOUT_PASSWORD" && -f "$ENV_FILE_WITHOUT_PASSWORD" ]]; then
+        rm -f "$ENV_FILE_WITHOUT_PASSWORD"
+    fi
+}
+
+trap cleanup EXIT
 
 usage() {
     echo "Usage: $0 [OPTIONS]"
@@ -62,15 +71,26 @@ resolve_container_runtime() {
 
     case "$requested_runtime" in
         auto)
-            if command -v docker >/dev/null 2>&1; then
-                printf '%s' "docker"
-            elif command -v podman >/dev/null 2>&1; then
-                printf '%s' "podman"
-            else
+            local installed_runtime=false
+            local runtime
+            for runtime in docker podman; do
+                if command -v "$runtime" >/dev/null 2>&1; then
+                    installed_runtime=true
+                    if "$runtime" info >/dev/null 2>&1 && "$runtime" compose version >/dev/null 2>&1; then
+                        printf '%s' "$runtime"
+                        return
+                    fi
+                fi
+            done
+
+            if [[ "$installed_runtime" == false ]]; then
                 echo -e "${RED}Missing dependency: no supported container runtime CLI was found.${NC}" >&2
                 echo "Install Docker Desktop or Podman, make sure the CLI is available in PATH, then open a new terminal." >&2
-                exit 1
+            else
+                echo -e "${RED}No installed container runtime is reachable with Compose support.${NC}" >&2
+                echo "Start Docker or Podman, or select one explicitly with --runtime." >&2
             fi
+            exit 1
             ;;
         docker|podman)
             if command -v "$requested_runtime" >/dev/null 2>&1; then
@@ -242,17 +262,12 @@ if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then
         bash "$GENERATE_CERT_SCRIPT" -p "$KEYSTORE_PASSWORD" -f
 
         if [[ -f "$WIREMOCK_KEYSTORE" ]]; then
-            # Update .env with the generated password
-            if grep -q 'WIREMOCK_KEYSTORE_PASSWORD=' "$ENV_FILE"; then
-                # Use portable in-place edit (works on both GNU and BSD/macOS sed)
-                if [[ "$(uname)" == "Darwin" ]]; then
-                    sed -i '' "s/WIREMOCK_KEYSTORE_PASSWORD=\"[^\"]*\"/WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"/" "$ENV_FILE"
-                else
-                    sed -i "s/WIREMOCK_KEYSTORE_PASSWORD=\"[^\"]*\"/WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"/" "$ENV_FILE"
-                fi
-            else
-                echo "WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"" >> "$ENV_FILE"
-            fi
+            # Replace every active assignment regardless of quoting and append one normalized value.
+            ENV_FILE_WITHOUT_PASSWORD="$(mktemp "${ENV_FILE}.tmp.XXXXXX")"
+            grep -Ev '^[[:space:]]*WIREMOCK_KEYSTORE_PASSWORD[[:space:]]*=' "$ENV_FILE" > "$ENV_FILE_WITHOUT_PASSWORD" || true
+            printf 'WIREMOCK_KEYSTORE_PASSWORD="%s"\n' "$KEYSTORE_PASSWORD" >> "$ENV_FILE_WITHOUT_PASSWORD"
+            mv "$ENV_FILE_WITHOUT_PASSWORD" "$ENV_FILE"
+            ENV_FILE_WITHOUT_PASSWORD=""
             echo -e "${GREEN}WireMock certificate generated and .env updated.${NC}"
         else
             echo -e "${YELLOW}Warning: WireMock certificate generation failed. HTTPS may not work.${NC}"
@@ -271,7 +286,7 @@ else
             assert_keytool_available
 
             # Read the password from the newly created .env file
-            ENV_PASSWORD=$(grep 'WIREMOCK_KEYSTORE_PASSWORD=' "$ENV_FILE" | sed 's/WIREMOCK_KEYSTORE_PASSWORD="\?\([^"]*\)"\?/\1/')
+            ENV_PASSWORD="$(sed -n 's/^[[:space:]]*WIREMOCK_KEYSTORE_PASSWORD[[:space:]]*=[[:space:]]*"\{0,1\}\([^"#]*\)"\{0,1\}[[:space:]]*$/\1/p' "$ENV_FILE" | tail -n 1)"
             if [[ -z "$ENV_PASSWORD" ]]; then
                 ENV_PASSWORD="changeit"  # Default from .env.example
             fi
@@ -399,7 +414,7 @@ echo -e "\n${GREEN}=== Setup Complete ===${NC}"
 echo -e "Services available:"
 echo -e "${GRAY}  SQL Server:     localhost:10433${NC}"
 echo -e "${GRAY}  CosmosDB:       https://localhost:10081${NC}"
-echo -e "${GRAY}  Cosmos Explorer: http://localhost:10181${NC}"
+echo -e "${GRAY}  Cosmos Explorer: https://localhost:10181${NC}"
 echo -e "${GRAY}  Redis:          localhost:10120${NC}"
 echo -e "${GRAY}  RedisInsight:   http://localhost:10121${NC}"
 echo -e "${GRAY}  SMTP4Dev SMTP:  localhost:10130${NC}"

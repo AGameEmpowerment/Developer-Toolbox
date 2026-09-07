@@ -28,8 +28,12 @@ From the repository root you can start the configured services with:
 # Preferred: use the helper script which sets up environment and runs compose
 ./docker_setup.ps1
 
+# Select a runtime explicitly when both are installed
+./docker_setup.ps1 -ContainerRuntime podman
+
 # Or start the full development compose stack directly
 docker compose -f containers/docker-compose-common.yml up -d
+podman compose -f containers/docker-compose-common.yml up -d
 
 # Refresh the Docker images used by the development stack
 ./docker_pull.ps1
@@ -44,10 +48,13 @@ docker compose -f containers/docker-compose-common.yml logs -f redisinsight
 ```bash
 # Linux/macOS/WSL equivalents
 ./docker_setup.sh
+./docker_setup.sh --runtime podman
 ./docker_pull.sh
 ```
 
-To stop the shared local stack without deleting persistent data, run `./docker_down.ps1` on Windows or `./docker_down.sh` on Linux/macOS/WSL. Deleting Docker named volumes now requires an explicit second confirmation flag: `-CleanVolumes -Force` or `--clean-volumes --force`.
+The helper scripts default to `auto`, preferring the first reachable Docker or Podman engine with Compose support. Set `CONTAINER_RUNTIME` or pass `-ContainerRuntime`/`--runtime` to select one explicitly.
+
+To stop the shared local stack without deleting persistent data, run `./docker_down.ps1` on Windows or `./docker_down.sh` on Linux/macOS/WSL. Deleting named volumes now requires an explicit second confirmation flag: `-CleanVolumes -Force` or `--clean-volumes --force`.
 
 Redis and RedisInsight endpoints for local development:
 

@@ -3,6 +3,7 @@ description: 'Guidelines for creating custom agent files for GitHub Copilot'
 applyTo: '**/*.agent.md'
 ---
 
+
 # Custom Agent File Guidelines
 
 Instructions for creating effective and maintainable custom agent files that provide specialized expertise for specific development tasks in GitHub Copilot.
@@ -12,7 +13,7 @@ Instructions for creating effective and maintainable custom agent files that pro
 - Target audience: Developers creating custom agents for GitHub Copilot
 - File format: Markdown with YAML frontmatter
 - File naming convention: lowercase with hyphens (e.g., `test-specialist.agent.md`)
-- Location: `.github/agents/` directory (repository-level) or `agents/` directory (organization/enterprise-level)
+- Location: `.github/agents/` directory (repository-level) or `agents/` directory (organization-level)
 - Purpose: Define specialized agents with tailored expertise, tools, and instructions for specific tasks
 - Official documentation: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents
 
@@ -168,7 +169,7 @@ Each handoff in the list must include the following properties:
 
 Here's an example of three agents with handoffs creating a complete workflow:
 
-**Planning Agent** (`planner.agent.md`):
+**Planning Agent** (`plan.agent.md`):
 ```yaml
 ---
 description: 'Generate an implementation plan for new features or refactoring'
@@ -970,8 +971,8 @@ Each level can override settings from previous levels.
 - [Your First Custom Agent Tutorial](https://docs.github.com/en/copilot/tutorials/customization-library/custom-agents/your-first-custom-agent)
 
 ### Related Files
-- [Prompt Files Guidelines](./prompt.instructions.md) - For creating prompt files
-- [Instructions Guidelines](./instructions.instructions.md) - For creating instruction files
+- [Prompt Files Guidelines](./prompt.md) - For creating prompt files
+- Use `sync_ai_assets.ps1` to refresh Claude adapters from the canonical `.github` instruction library.
 
 ## Version Compatibility Notes
 

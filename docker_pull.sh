@@ -59,15 +59,26 @@ resolve_container_runtime() {
 
     case "$requested_runtime" in
         auto)
-            if command -v docker >/dev/null 2>&1; then
-                printf '%s' "docker"
-            elif command -v podman >/dev/null 2>&1; then
-                printf '%s' "podman"
-            else
+            local installed_runtime=false
+            local runtime
+            for runtime in docker podman; do
+                if command -v "$runtime" >/dev/null 2>&1; then
+                    installed_runtime=true
+                    if "$runtime" info >/dev/null 2>&1 && "$runtime" compose version >/dev/null 2>&1; then
+                        printf '%s' "$runtime"
+                        return
+                    fi
+                fi
+            done
+
+            if [[ "$installed_runtime" == false ]]; then
                 echo "Missing dependency: no supported container runtime CLI was found." >&2
                 echo "Install Docker Desktop or Podman, make sure the CLI is available in PATH, then open a new terminal." >&2
-                exit 1
+            else
+                echo "No installed container runtime is reachable with Compose support." >&2
+                echo "Start Docker or Podman, or select one explicitly with --runtime." >&2
             fi
+            exit 1
             ;;
         docker|podman)
             if command -v "$requested_runtime" >/dev/null 2>&1; then

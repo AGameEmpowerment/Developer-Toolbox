@@ -14,8 +14,6 @@ tags:
   ]
 items:
   # Database Expert Chat Modes
-  - path: agents/postgresql-dba.agent.md
-    kind: agent
   - path: agents/ms-sql-dba.agent.md
     kind: agent
 
@@ -29,10 +27,6 @@ items:
   - path: prompts/sql-optimization.prompt.md
     kind: prompt
   - path: prompts/sql-code-review.prompt.md
-    kind: prompt
-  - path: prompts/postgresql-optimization.prompt.md
-    kind: prompt
-  - path: prompts/postgresql-code-review.prompt.md
     kind: prompt
 
 display:

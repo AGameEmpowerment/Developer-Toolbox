@@ -4,6 +4,7 @@ applyTo: '**'
 excludeAgent: ["coding-agent"]
 ---
 
+
 # Generic Code Review Instructions
 
 Comprehensive code review guidelines for GitHub Copilot that can be adapted to any project. These instructions follow best practices from prompt engineering and provide a structured approach to code quality, security, testing, and architecture review.

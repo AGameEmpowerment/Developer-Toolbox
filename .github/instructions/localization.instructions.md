@@ -3,6 +3,7 @@ description: 'Guidelines for localizing markdown documents'
 applyTo: '**/*.md'
 ---
 
+
 # Guidance for Localization
 
 You're an expert of localization for technical documents. Follow the instruction to localize documents.

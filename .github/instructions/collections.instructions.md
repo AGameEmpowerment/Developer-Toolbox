@@ -1,8 +1,8 @@
 ---
 description: 'Guidelines for creating and managing awesome-copilot collections'
-applyTo:
-  - '.github/collections/*.collection.yml'
+applyTo: '.github/collections/*.collection.yml'
 ---
+
 
 # Collections Development
 

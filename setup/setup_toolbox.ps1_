@@ -1,0 +1,61 @@
+#Requires -Version 5.1
+<#
+.SYNOPSIS
+Gets the Developer Toolbox and starts its shared local service stack.
+
+.DESCRIPTION
+Repository-root convenience entry point. All clone, update, and setup behavior
+is owned by setup/_toolbox.ps1; this script only forwards parameters.
+
+.PARAMETER ToolboxPath
+Where to find or clone the Toolbox.
+
+.PARAMETER Branch
+The Toolbox branch to clone or fast-forward. Defaults to main.
+
+.PARAMETER ContainerRuntime
+The container runtime passed to the Toolbox setup script.
+
+.PARAMETER SkipSetup
+Clone or update the Toolbox without starting its service stack.
+
+.PARAMETER NoUpdate
+Use an existing Toolbox checkout without fetching updates.
+
+.EXAMPLE
+./setup_toolbox.ps1
+
+.EXAMPLE
+./setup_toolbox.ps1 -SkipSetup
+
+.OUTPUTS
+None.
+#>
+[CmdletBinding()]
+param(
+    [Parameter()]
+    [string]$ToolboxPath,
+
+    [Parameter()]
+    [ValidateNotNullOrEmpty()]
+    [string]$Branch = "main",
+
+    [Parameter()]
+    [ValidateSet("auto", "docker", "podman")]
+    [string]$ContainerRuntime = "auto",
+
+    [Parameter()]
+    [switch]$SkipSetup,
+
+    [Parameter()]
+    [switch]$NoUpdate
+)
+
+$toolboxLauncher = Join-Path $PSScriptRoot "setup/_toolbox.ps1"
+if (-not (Test-Path -LiteralPath $toolboxLauncher -PathType Leaf)) {
+    throw "Toolbox launcher was not found at '$toolboxLauncher'."
+}
+
+& $toolboxLauncher @PSBoundParameters
+
+

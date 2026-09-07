@@ -3,6 +3,7 @@ description: 'Shell scripting best practices and conventions for bash, sh, zsh, 
 applyTo: '**/*.sh'
 ---
 
+
 # Shell Scripting Guidelines
 
 Instructions for writing clean, safe, and maintainable shell scripts for bash, sh, zsh, and other shells.

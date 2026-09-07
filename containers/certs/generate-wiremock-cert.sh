@@ -209,7 +209,7 @@ else
 fi
 echo ""
 echo -e "${GRAY}  2. Start WireMock:${NC}"
-echo -e "     docker compose up wiremock"
+echo -e "     docker compose up wiremock  # or: podman compose up wiremock"
 echo ""
 echo -e "${GRAY}  3. Test HTTPS endpoint:${NC}"
 echo -e "     curl -k https://localhost:${WIREMOCK_HTTPS_PORT}/__admin/health"

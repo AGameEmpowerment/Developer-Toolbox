@@ -34,10 +34,39 @@ function Resolve-ContainerRuntime {
     )
 
     if ($RequestedRuntime -eq "auto") {
+        $installedRuntimes = @()
         foreach ($runtime in @("docker", "podman")) {
             if (Get-Command $runtime -ErrorAction SilentlyContinue) {
-                return $runtime
+                $installedRuntimes += $runtime
+                $runtimeIsReachable = $false
+                try {
+                    & $runtime info *> $null
+                    $runtimeIsReachable = ($LASTEXITCODE -eq 0)
+                } catch {
+                    $runtimeIsReachable = $false
+                }
+                if (-not $runtimeIsReachable) {
+                    continue
+                }
+
+                $composeIsAvailable = $false
+                try {
+                    & $runtime compose version *> $null
+                    $composeIsAvailable = ($LASTEXITCODE -eq 0)
+                } catch {
+                    $composeIsAvailable = $false
+                }
+                if ($composeIsAvailable) {
+                    return $runtime
+                }
             }
+        }
+
+        if ($installedRuntimes.Count -gt 0) {
+            throw @"
+No installed container runtime is reachable with Compose support.
+Start Docker or Podman, or select one explicitly with -ContainerRuntime.
+"@
         }
 
         throw @"
@@ -65,8 +94,14 @@ function Assert-ContainerRuntimeReady {
         [string]$RuntimeDisplayName
     )
 
-    & $ContainerCli info *> $null
-    if ($LASTEXITCODE -eq 0) {
+    $runtimeIsReachable = $false
+    try {
+        & $ContainerCli info *> $null
+        $runtimeIsReachable = ($LASTEXITCODE -eq 0)
+    } catch {
+        $runtimeIsReachable = $false
+    }
+    if ($runtimeIsReachable) {
         return
     }
 
@@ -92,8 +127,14 @@ function Assert-ContainerComposeAvailable {
         [string]$RuntimeDisplayName
     )
 
-    & $ContainerCli compose version *> $null
-    if ($LASTEXITCODE -ne 0) {
+    $composeIsAvailable = $false
+    try {
+        & $ContainerCli compose version *> $null
+        $composeIsAvailable = ($LASTEXITCODE -eq 0)
+    } catch {
+        $composeIsAvailable = $false
+    }
+    if (-not $composeIsAvailable) {
         throw @"
 Missing dependency: $RuntimeDisplayName compose support is not available.
 Install $RuntimeDisplayName with compose support, or choose another runtime with -ContainerRuntime.
@@ -336,7 +377,7 @@ Write-Host "`n=== Setup Complete ===" -ForegroundColor Green
 Write-Host "Services available:" -ForegroundColor White
 Write-Host "  SQL Server:    localhost:10433" -ForegroundColor Gray
 Write-Host "  CosmosDB:      https://localhost:10081" -ForegroundColor Gray
-Write-Host "  Cosmos Explorer: http://localhost:10181" -ForegroundColor Gray
+Write-Host "  Cosmos Explorer: https://localhost:10181" -ForegroundColor Gray
 Write-Host "  Redis:         localhost:10120" -ForegroundColor Gray
 Write-Host "  RedisInsight:  http://localhost:10121" -ForegroundColor Gray
 Write-Host "  SMTP4Dev SMTP: localhost:10130" -ForegroundColor Gray

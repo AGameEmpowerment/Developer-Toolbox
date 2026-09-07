@@ -20,6 +20,9 @@ If any guidance in this file conflicts with the sources above, the more specific
 - Before committing changes to the local git repository, ask the user for explicit approval, except when the user asks Codex to review/address pull request comments; in that case, fix relevant comments, resolve each thread with a note, and commit the local changes without waiting for a second confirmation.
 - Before pushing changes to any remote git repository, ask the user for explicit approval.
 - Use `.github/skills/INDEX.md` as the canonical map for available skills.
+- Treat `.github/` as the canonical AI asset library. After changing skills,
+  instructions, or prompts, run `sync_ai_assets.ps1`; do not hand-edit marked
+  files under `.claude/`.
 - Prefer global Skills CLI discovery (`npx skills find <query>`) and the installed `find-skills` skill when searching for new capabilities.
 
 ## How To Choose Which Files To Consult First

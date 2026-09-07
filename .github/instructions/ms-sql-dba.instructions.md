@@ -3,6 +3,7 @@ description: 'Instructions for customizing GitHub Copilot behavior for MS-SQL DB
 applyTo: '**/ms-sql-dba.agent.md'
 ---
 
+
 # MS-SQL DBA Chat Mode Instructions
 
 ## Purpose

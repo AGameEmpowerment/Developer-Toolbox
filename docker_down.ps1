@@ -44,13 +44,27 @@ function Resolve-ContainerRuntime {
     )
 
     if ($RequestedRuntime -eq "auto") {
+        $firstInstalledRuntime = $null
         foreach ($runtime in @("docker", "podman")) {
             if (Get-Command $runtime -ErrorAction SilentlyContinue) {
-                return $runtime
+                if (-not $firstInstalledRuntime) {
+                    $firstInstalledRuntime = $runtime
+                }
+
+                $runtimeIsReachable = $false
+                try {
+                    & $runtime info *> $null
+                    $runtimeIsReachable = ($LASTEXITCODE -eq 0)
+                } catch {
+                    $runtimeIsReachable = $false
+                }
+                if ($runtimeIsReachable) {
+                    return $runtime
+                }
             }
         }
 
-        return $null
+        return $firstInstalledRuntime
     }
 
     if (Get-Command $RequestedRuntime -ErrorAction SilentlyContinue) {
@@ -67,8 +81,12 @@ function Test-ContainerRuntimeReady {
         [string]$ContainerCli
     )
 
-    & $ContainerCli info *> $null
-    return ($LASTEXITCODE -eq 0)
+    try {
+        & $ContainerCli info *> $null
+        return ($LASTEXITCODE -eq 0)
+    } catch {
+        return $false
+    }
 }
 
 function Get-ContainerRuntimeUnavailableMessage {

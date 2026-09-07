@@ -1,35 +1,20 @@
 id: testing-automation
 name: Testing & Test Automation
-description: Comprehensive collection for writing tests, test automation, and test-driven development including unit tests, integration tests, and end-to-end testing strategies.
-tags:
-  [testing, tdd, automation, unit-tests, integration, playwright, jest, nunit]
+description: Repository-focused collection for QA planning, browser automation, and end-to-end testing of the .NET and Next.js examples.
+tags: [testing, qa, automation, integration, playwright, dotnet, nextjs]
 items:
   # TDD Chat Modes
-  - path: agents/tdd-red.agent.md
-    kind: agent
-  - path: agents/tdd-green.agent.md
-    kind: agent
-  - path: agents/tdd-refactor.agent.md
-    kind: agent
   - path: agents/playwright-tester.agent.md
+    kind: agent
+  - path: agents/qa-automation.agent.md
     kind: agent
 
   # Testing Instructions
   - path: instructions/playwright-typescript.instructions.md
     kind: instruction
-  - path: instructions/playwright-python.instructions.md
-    kind: instruction
 
   # Testing Prompts
-  - path: prompts/playwright-explore-website.prompt.md
-    kind: prompt
-  - path: prompts/playwright-generate-test.prompt.md
-    kind: prompt
-  - path: prompts/csharp-nunit.prompt.md
-    kind: prompt
-  - path: prompts/java-junit.prompt.md
-    kind: prompt
-  - path: prompts/ai-prompt-engineering-safety-review.prompt.md
+  - path: prompts/breakdown-test.prompt.md
     kind: prompt
 
 display:

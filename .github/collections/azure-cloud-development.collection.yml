@@ -16,12 +16,6 @@ items:
   # Azure Expert Chat Modes
   - path: agents/azure-principal-architect.agent.md
     kind: agent
-  - path: agents/azure-saas-architect.agent.md
-    kind: agent
-  - path: agents/azure-logic-apps-expert.agent.md
-    kind: agent
-  - path: agents/azure-verified-modules-bicep.agent.md
-    kind: agent
   - path: agents/azure-verified-modules-terraform.agent.md
     kind: agent
   - path: agents/terraform-azure-planning.agent.md
@@ -30,8 +24,6 @@ items:
     kind: agent
 
   # Infrastructure as Code Instructions
-  - path: instructions/bicep-code-best-practices.instructions.md
-    kind: instruction
   - path: instructions/terraform.instructions.md
     kind: instruction
   - path: instructions/terraform-azure.instructions.md
@@ -42,15 +34,11 @@ items:
   # Azure Development Instructions
   - path: instructions/azure-functions-typescript.instructions.md
     kind: instruction
-  - path: instructions/azure-logic-apps-power-automate.instructions.md
-    kind: instruction
   - path: instructions/azure-devops-pipelines.instructions.md
     kind: instruction
 
   # Infrastructure & Deployment Instructions
   - path: instructions/containerization-docker-best-practices.instructions.md
-    kind: instruction
-  - path: instructions/kubernetes-deployment-best-practices.instructions.md
     kind: instruction
 
   # Azure Prompts

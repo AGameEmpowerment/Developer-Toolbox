@@ -3,6 +3,7 @@ description: 'Guidelines for generating SQL statements and stored procedures'
 applyTo: '**/*.sql'
 ---
 
+
 # SQL Development
 
 ## Database schema generation

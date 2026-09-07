@@ -3,6 +3,7 @@ description: 'Terraform Conventions and Guidelines'
 applyTo: '**/*.tf'
 ---
 
+
 # Terraform Conventions
 
 ## General Instructions
