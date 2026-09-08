@@ -4,21 +4,14 @@
 
 .DESCRIPTION
     Automatically detects Node (React) projects and C# projects within a directory
-    and performs package installation/restoration. Supports JFrog CLI for .NET
-    restore if available, otherwise falls back to dotnet restore.
+    and performs package installation/restoration using public package sources.
 
 .PARAMETER RootPath
     Root directory to search for projects. Accepts relative or absolute paths.
     Defaults to the script's directory. Searches recursively through all subdirectories.
 
-.PARAMETER UseJFrog
-    Use JFrog CLI for .NET package restoration instead of dotnet restore.
-
 .EXAMPLE
     .\run-copilot-setup.ps1 -RootPath ".\src"
-
-.EXAMPLE
-    .\run-copilot-setup.ps1 -RootPath "..\MyProject" -UseJFrog
 
 .EXAMPLE
     .\run-copilot-setup.ps1 -RootPath "C:\MyProject"
@@ -27,10 +20,7 @@
 param(
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [string]$RootPath = $PSScriptRoot,
-
-    [Parameter()]
-    [switch]$UseJFrog
+    [string]$RootPath = $PSScriptRoot
 )
 
 begin {
@@ -56,7 +46,7 @@ process {
 
         Write-Host "Searching for projects in: $resolvedPath"
         Write-Verbose 'Searching recursively through subdirectories...'
-        $nodeProjects = Get-ChildItem -Path $resolved
+        $projectsFound = $false
 
         # Search for Node/React projects (package.json files)
         Write-Verbose 'Searching for Node projects...'
@@ -105,30 +95,13 @@ process {
             $projectsFound = $true
             Write-Host "`nFound $($csharpProjects.Count) C# project(s)" -ForegroundColor Green
 
-            # Determine which restore command to use
-            $restoreCommand = 'dotnet'
-            if ($UseJFrog.IsPresent) {
-                $jfVersion = jf --version 2>$null
-                if ($jfVersion) {
-                    $restoreCommand = 'jf dotnet'
-                    Write-Verbose "Using JFrog CLI version: $jfVersion"
-                } else {
-                    Write-Warning "JFrog CLI not found. Falling back to dotnet restore"
-                    $restoreCommand = 'dotnet'
-                }
-            }
-
-            Write-Host "  Using restore command: $restoreCommand restore"
+            Write-Host "  Using restore command: dotnet restore"
 
             foreach ($project in $csharpProjects) {
                 Write-Host "  Restoring: $($project.FullName)"
 
                 try {
-                    if ($restoreCommand -eq 'jf dotnet') {
-                        $result = jf dotnet restore $project.FullName 2>&1
-                    } else {
-                        $result = dotnet restore $project.FullName 2>&1
-                    }
+                    $result = dotnet restore $project.FullName 2>&1
 
                     if ($LASTEXITCODE -eq 0) {
                         Write-Host "    ✓ Successfully restored packages" -ForegroundColor Green

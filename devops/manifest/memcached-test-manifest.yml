@@ -1,0 +1,14 @@
+# TEMPLATE / EXAMPLE ONLY: local developer reference, not production configuration.
+applications:
+  - name: ((memcachedAppName))
+    command: memcached -c 1024 -m 192
+    docker:
+      image: memcached:1.6-alpine
+    health-check-type: process
+    instances: 1
+    memory: 256M
+    no-route: true
+
+# After pushing, allow only the consuming application to reach TCP port 11211:
+# cf add-network-policy <source-app> --destination-app <memcached-app> --port 11211 --protocol tcp
+

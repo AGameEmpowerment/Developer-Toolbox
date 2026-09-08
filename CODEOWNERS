@@ -9,8 +9,11 @@
 /.gitattributes                 @AGameEmpowerment/agame-org-admins
 /.gitignore                     @AGameEmpowerment/agame-org-admins
 /.devcontainer/                 @AGameEmpowerment/agame-org-admins
+/.agents/                       @AGameEmpowerment/agame-org-admins
+/.ai/                           @AGameEmpowerment/agame-org-admins
+/.claude/                       @AGameEmpowerment/agame-org-admins
+/.codex/                        @AGameEmpowerment/agame-org-admins
 /.github/                       @AGameEmpowerment/agame-org-admins
-/.sonarlint/                    @AGameEmpowerment/agame-org-admins
 /.vscode/                       @AGameEmpowerment/agame-org-admins
 /containers/                    @AGameEmpowerment/agame-org-admins
 

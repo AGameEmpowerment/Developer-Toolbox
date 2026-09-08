@@ -2,6 +2,7 @@
   // Recommended extensions - synced with devcontainer.json
   // Extensions are auto-installed in the dev container via devcontainer.json
   "recommendations": [
+    "Anthropic.claude-code",
     // === ESSENTIAL: Core development tools ===
     "GitHub.copilot",
     "GitHub.copilot-chat",

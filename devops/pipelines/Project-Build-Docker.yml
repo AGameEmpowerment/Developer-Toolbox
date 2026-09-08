@@ -1,0 +1,30 @@
+# Local-development template only. It builds from a public Node.js base image
+# and deliberately does not authenticate to or push into a container registry.
+trigger: none
+pr: none
+
+name: developer-toolbox-docker-$(Date:yyyyMMdd)$(Rev:.r)
+
+variables:
+  clientPath: src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client
+  imageName: developer-toolbox-example-client
+
+stages:
+  - stage: BuildContainer
+    displayName: Build the public example container
+    jobs:
+      - job: Docker
+        displayName: Build client image
+        pool:
+          vmImage: ubuntu-latest
+        steps:
+          - task: Docker@2
+            displayName: Build image without publishing
+            inputs:
+              command: build
+              repository: $(imageName)
+              Dockerfile: $(clientPath)/Dockerfile
+              buildContext: $(clientPath)
+              tags: |
+                $(Build.BuildId)
+                latest

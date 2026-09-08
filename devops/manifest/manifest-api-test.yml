@@ -1,0 +1,13 @@
+# TEMPLATE / EXAMPLE ONLY: local developer reference, not production configuration.
+applications:
+  - name: ((apiAppName))
+    memory: 1G
+    instances: 1
+    buildpacks:
+      - dotnet_core_buildpack
+    stack: cflinuxfs4
+    routes:
+      - route: ((apiRoute))
+    env:
+      ASPNETCORE_ENVIRONMENT: Test
+

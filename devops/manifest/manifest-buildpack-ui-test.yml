@@ -1,0 +1,9 @@
+# TEMPLATE / EXAMPLE ONLY: local developer reference, not production configuration.
+# This example uses the public Cloud Foundry Node.js buildpack.
+applications:
+  - name: ((uiAppName))
+    buildpacks:
+      - nodejs_buildpack
+    command: npm start
+    stack: cflinuxfs4
+

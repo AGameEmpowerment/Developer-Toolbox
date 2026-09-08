@@ -28,8 +28,12 @@ From the repository root you can start the configured services with:
 # Preferred: use the helper script which sets up environment and runs compose
 ./docker_setup.ps1
 
+# Select a runtime explicitly when both are installed
+./docker_setup.ps1 -ContainerRuntime podman
+
 # Or start the full development compose stack directly
 docker compose -f containers/docker-compose-common.yml up -d
+podman compose -f containers/docker-compose-common.yml up -d
 
 # Refresh the Docker images used by the development stack
 ./docker_pull.ps1
@@ -44,41 +48,13 @@ docker compose -f containers/docker-compose-common.yml logs -f redisinsight
 ```bash
 # Linux/macOS/WSL equivalents
 ./docker_setup.sh
+./docker_setup.sh --runtime podman
 ./docker_pull.sh
 ```
 
-To stop the shared local stack without deleting persistent data, run `./docker_down.ps1` on Windows or `./docker_down.sh` on Linux/macOS/WSL. `-CleanAll` and `--clean-all` only remove ephemeral files and preserve Docker named volumes. Deleting stored emulator data requires the dedicated volume cleanup flag: `-CleanVolumes` or `--clean-volumes`.
+The helper scripts default to `auto`, preferring the first reachable Docker or Podman engine with Compose support. Set `CONTAINER_RUNTIME` or pass `-ContainerRuntime`/`--runtime` to select one explicitly.
 
-## External exposure
-
-All published service ports default to `127.0.0.1`, which keeps them reachable from the local machine only.
-
-To expose a specific service externally, set its `*_BIND_HOST` value in `containers/.env` to `0.0.0.0`, then recreate that service or rerun the setup script.
-
-Available bind controls:
-
-- `MSSQL_BIND_HOST`
-- `COSMOSDB_BIND_HOST`
-- `REDIS_BIND_HOST`
-- `REDISINSIGHT_BIND_HOST`
-- `SMTP4DEV_BIND_HOST`
-- `SEQ_BIND_HOST`
-- `WIREMOCK_BIND_HOST`
-- `AZURITE_BIND_HOST`
-- `SERVICEBUS_BIND_HOST`
-
-Example:
-
-```pwsh
-# Expose only Seq and RedisInsight externally
-(Get-Content .env) -replace '^SEQ_BIND_HOST=.*$', 'SEQ_BIND_HOST="0.0.0.0"' `
-           -replace '^REDISINSIGHT_BIND_HOST=.*$', 'REDISINSIGHT_BIND_HOST="0.0.0.0"' |
-  Set-Content .env
-
-docker-compose -p dev_common_shared -f docker-compose-common.yml up -d --force-recreate otel-collector redisinsight
-```
-
-On Windows hosts that use a Linux Docker engine, changing the bind host may still require additional host networking configuration for LAN access.
+To stop the shared local stack without deleting persistent data, run `./docker_down.ps1` on Windows or `./docker_down.sh` on Linux/macOS/WSL. Deleting named volumes now requires an explicit second confirmation flag: `-CleanVolumes -Force` or `--clean-volumes --force`.
 
 Redis and RedisInsight endpoints for local development:
 

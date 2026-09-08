@@ -1,0 +1,10 @@
+node_modules/
+.next/
+out/
+coverage/
+.env*local
+*.log
+.cache/
+*.tgz
+.idea/
+.vscode/

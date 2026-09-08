@@ -1,0 +1,15 @@
+# TEMPLATE / EXAMPLE ONLY: local developer reference, not production configuration.
+applications:
+  - name: ((uiAppName))
+    command: npm start
+    buildpacks:
+      - nodejs_buildpack
+    stack: cflinuxfs4
+    timeout: 600
+    routes:
+      - route: ((uiRoute))
+    env:
+      API_BASE_URL: ((apiBaseUrl))
+      APP_BASE_URL: ((appBaseUrl))
+      NODE_ENV: production
+

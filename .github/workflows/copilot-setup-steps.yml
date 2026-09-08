@@ -61,18 +61,18 @@ jobs:
                   echo "✓ Found $INSTRUCTION_COUNT instruction files"
 
                   # Check for optional directories
-                  if [ -d .github/agents ]; then
-                    AGENT_COUNT=$(find .github/agents -name "*.md" | wc -l)
+                  if [ -d .ai/agents ]; then
+                    AGENT_COUNT=$(find .ai/agents -name "*.md" | wc -l)
                     echo "ℹ Found $AGENT_COUNT agent files"
                   fi
 
-                  if [ -d .github/prompts ]; then
-                    PROMPT_COUNT=$(find .github/prompts -name "*.md" | wc -l)
+                  if [ -d .ai/prompts ]; then
+                    PROMPT_COUNT=$(find .ai/prompts -name "*.md" | wc -l)
                     echo "ℹ Found $PROMPT_COUNT prompt files"
                   fi
 
-                  if [ -d .github/collections ]; then
-                    COLLECTION_COUNT=$(find .github/collections -name "*.yml" -o -name "*.md" | wc -l)
+                  if [ -d .ai/collections ]; then
+                    COLLECTION_COUNT=$(find .ai/collections -name "*.yml" -o -name "*.md" | wc -l)
                     echo "ℹ Found $COLLECTION_COUNT collection files"
                   fi
 

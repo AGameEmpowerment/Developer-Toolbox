@@ -1,0 +1,57 @@
+# This workflow validates local-development bootstrap templates; it does not deploy.
+name: Toolbox Bootstrap Validation
+
+on:
+  pull_request:
+    paths:
+      - ".devcontainer/**"
+      - ".agents/skills/toolbox-repository-bridge/**"
+      - ".github/workflows/toolbox-bootstrap-validation.yml"
+      - ".gitattributes"
+      - "Install-ToolboxSetup.ps1"
+      - "install_toolbox_setup.sh"
+      - "setup/**"
+      - "start_developer_toolkit.ps1"
+      - "start_developer_toolkit.sh"
+      - "tests/test_toolbox_bootstrap.*"
+  push:
+    paths:
+      - ".devcontainer/**"
+      - ".agents/skills/toolbox-repository-bridge/**"
+      - ".github/workflows/toolbox-bootstrap-validation.yml"
+      - ".gitattributes"
+      - "Install-ToolboxSetup.ps1"
+      - "install_toolbox_setup.sh"
+      - "setup/**"
+      - "start_developer_toolkit.ps1"
+      - "start_developer_toolkit.sh"
+      - "tests/test_toolbox_bootstrap.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bash-bootstrap:
+    name: Bash bootstrap tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Run Bash bootstrap tests
+        shell: bash
+        run: bash ./tests/test_toolbox_bootstrap.sh
+
+  powershell-bootstrap:
+    name: PowerShell bootstrap tests
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Run PowerShell bootstrap tests
+        shell: pwsh
+        run: ./tests/test_toolbox_bootstrap.ps1

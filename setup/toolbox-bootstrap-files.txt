@@ -1,0 +1,14 @@
+# Target paths copied into a consuming repository by both installers.
+# Missing root sources resolve from disabled setup/<target-name>_ templates.
+setup_toolbox.ps1
+setup_toolbox.sh
+setup/_toolbox.ps1
+setup/_toolbox.sh
+setup/toolbox-bootstrap-files.txt
+.devcontainer
+.agents/skills/toolbox-repository-bridge
+.claude/skills/toolbox-repository-bridge
+.editorconfig
+.vsconfig
+Default-Visual-Studio-Settings.vssettings
+Delete_Old_Git_Tags.ps1

@@ -1,139 +1,72 @@
 # GitHub Copilot Setup
 
-This repository includes a large `.github` library intended to improve
-repository-aware AI assistance for Copilot, Codex, and similar tooling.
+This repository uses `.ai/` as the canonical, cross-tool AI engineering library.
+GitHub Copilot keeps its required entry point under `.github/`; that file
+redirects to authoritative content rather than maintaining a second policy set.
 
-## Current Structure
+Important: this is a local developer toolbox. Its AI assets and engineering
+artifacts are templates or examples and are not production-ready.
 
-| Path | Purpose |
+## Architecture
+
+| Path | Responsibility |
 | --- | --- |
-| `.github/copilot-instructions.md` | Primary repository guidance |
-| `.github/instructions/` | File- or domain-specific instruction set |
-| `.github/agents/` | Task-focused agent definitions |
-| `.github/prompts/` | Reusable prompt templates |
-| `.github/collections/` | Curated groupings of prompts, instructions, and agents |
-| `.github/skills/` | Local skill modules and discovery index |
-| `.github/workflows/` | Workflow automation related to Copilot setup |
-| `.github/dependabot.yml` | Automated dependency maintenance |
+| `.ai/constitution.md` | Authoritative repository-wide policy |
+| `.ai/instructions/` | Canonical specialized instructions |
+| `.ai/agents/` | Canonical agent definitions |
+| `.ai/prompts/` | Canonical reusable prompts |
+| `.ai/skills/INDEX.md` | Cross-tool skill registry and precedence |
+| `.agents/skills/` | Codex-created/installed and shared repository skills |
+| `.claude/skills/` | Claude-created/installed repository skills |
+| `.github/copilot-instructions.md` | Copilot entry point into `.ai/` |
+| `.github/instructions/` | Generated Copilot path-scoped adapters |
+| `.claude/rules/` | Generated Claude path-scoped adapters |
+| `.ai/collections/` | Curated bundles of repository-relevant assets |
+| `.github/workflows/`, `.github/dependabot.yml` | GitHub platform automation |
 
-Current inventory at the time of the March 10, 2026 documentation refresh:
+## Editing Rules
 
-- 41 instruction files
-- 13 agent files
-- 40 prompt files
-- 14 collection manifests (13 `*.collection.yml` files plus `structured-autonomy-collection.yml`) plus companion markdown
-- 13 skill folders
+Edit `.ai/constitution.md`, `.ai/instructions/`, `.ai/agents/`, or
+`.ai/prompts/` when changing behavior. Instruction files use portable `paths`
+metadata. Run `pwsh ./sync_ai_assets.ps1` to translate it into committed
+Copilot `applyTo` adapters and Claude `paths` rules. Never edit generated files
+under `.github/instructions/` or `.claude/rules/` directly.
 
-## How It Works
+For skills, choose the location based on discovery behavior:
 
-### Repository Instructions
+- Codex creates and installs repository skills in `.agents/skills/`.
+- Claude creates and installs repository skills in `.claude/skills/`.
+- Do not put installable skills in `.ai/skills/` or `.codex/skills/`.
+- Register discovery and precedence rules in `.ai/skills/INDEX.md`.
 
-`.github/copilot-instructions.md` provides the shared baseline for this
-repository. It describes the repository as a multi-language starter and points
-agents toward the more specific instruction files under `.github/instructions/`.
+## Entry-Point Flow
 
-### Specialized Instructions
+```text
+Copilot -> .github/copilot-instructions.md --+
+        -> .github/instructions/ ------------+-> .ai canonical sources
+Claude  -> CLAUDE.md ------------------------+
+        -> .claude/rules/ -------------------+
+Codex   -> AGENTS.md ------------------------+
+                                              -> relevant skill root
+```
 
-The instruction library covers:
+This keeps repository behavior portable and reviewable in one place.
 
-- Security and OWASP
-- Accessibility
-- Performance
-- DevOps and Docker
-- .NET and C#
-- React and Next.js
-- Terraform and Azure
-- Power Platform
-- Markdown, prompts, collections, and agent authoring
+## Synchronization Check
 
-These files are intended to be consulted selectively based on the task being
-performed.
+Generated adapters are committed. Local validation and CI should regenerate
+them and fail when the working tree changes:
 
-### Agents
+```powershell
+pwsh ./sync_ai_assets.ps1
+$changes = git status --porcelain
+if ($changes) {
+    $changes
+    git diff
+    exit 1
+}
+```
 
-The current agent set includes specialists for:
-
-- Accessibility
-- API architecture
-- Debugging
-- DevOps
-- Dynatrace
-- .NET
-- Next.js
-- React frontend work
-- JFrog security
-- SQL Server DBA work
-- Planning
-- Terraform
-- WinForms
-
-### Prompts
-
-The prompt library is a reusable authoring and implementation toolkit. It
-contains templates for:
-
-- Architecture and ADR generation
-- API and container scaffolding
-- Documentation and README generation
-- Testing breakdowns
-- DevOps rollout planning
-- SQL review and optimization
-- Copilot instruction, prompt, and collection generation
-
-### Collections
-
-Collections are higher-level bundles that group related prompts, instructions,
-and agents for scenarios such as Azure cloud work, DevOps on-call, testing
-automation, project planning, and security review.
-
-Important note:
-
-- Several collection manifests currently point at assets that are not present in
-  this repository. Treat collections as curation manifests, not guaranteed
-  self-contained bundles.
-
-### Skills
-
-`.github/skills/INDEX.md` is the canonical discovery map for local skill usage.
-The bundled skills cover areas like Application Insights, Azure resource
-visualization, GitHub issues, NuGet management, VS Code command helpers, and web
-application testing.
-
-## Workflow Support
-
-The current workflow support in `.github/workflows/copilot-setup-steps.yml`
-restores the example projects and exercises basic Copilot configuration paths in
-CI.
-
-Key behaviors:
-
-- Checks out the repository
-- Sets up .NET 10
-- Configures JFrog CLI
-- Sets up Node.js 24
-- Restores npm dependencies for the sample client
-- Restores .NET dependencies for the example solution
-
-## What Was Removed
-
-The `.github/scripts/` folder was intentionally removed from this repository and
-is no longer part of the supported Copilot setup story. Documentation and wiki
-content should not reference local `.github/scripts` utilities.
-
-## Recommended Usage
-
-Use this library in layers:
-
-1. Start with `.github/copilot-instructions.md`.
-2. Pull in the relevant files from `.github/instructions/` for the task.
-3. Use agent files when a task benefits from a dedicated persona or workflow.
-4. Use prompt files as reusable starting points rather than ad hoc prompts.
-5. Use skills when the repository already has a task-specific module.
-
-## Repository Review Summary
-
-From a documentation and maintainability standpoint, the `.github` library is
-one of the strongest parts of this repository. Its main weakness is consistency:
-the high-level collections promise more assets than are actually present. That
-gap is documented in the root README and the wiki review page so consumers do
-not mistake placeholders for implemented capability.
+A diff means a canonical asset changed without its adapters being refreshed,
+or a generated adapter was edited directly. The
+`workflows/ai-assets-sync.yml` workflow runs this check for relevant changes.

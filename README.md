@@ -12,9 +12,12 @@ If your project is not Azure/.NET-centric, you can still use this template, but 
 
 ## What this template includes
 
-- Dev Container configuration with common workloads: .NET 8/9, Node.js LTS, Azure CLI, Azure Developer CLI, Docker, Terraform, PowerShell, Python, Java (minimal), GitHub CLI, and a curated VS Code extension pack.
+- Dev Container configuration with .NET 8/9/10, Node.js 24, Azure CLI, Azure Developer CLI, Docker, Terraform, PowerShell, Python, Java, GitHub CLI, and a curated VS Code extension pack.
 - Containerized local dependencies via Docker Compose.
 - DevOps scaffolding, pipeline placeholders, and manifests.
+- Cross-platform, non-overwriting installers for adding Toolbox support to another Git repository.
+- Public Copilot, Codex, and Claude assets with generated cross-tool discovery adapters.
+- A generic .NET 10 and Next.js sample under `src/DeveloperToolbox.Example` with unit tests and public-only dependencies.
 - Default repository standards (CODEOWNERS, CONTRIBUTING, CHANGELOG, LICENSE, .editorconfig, .gitattributes, .gitignore).
 
 ## Choose your setup path
@@ -67,7 +70,7 @@ Use this if you want native tooling on Linux without Dev Containers.
     - PowerShell
     - .NET SDK 8, 9, 10
     - OpenJDK
-    - Node.js LTS (optional)
+    - Node.js 24 (optional)
 
 2. Start the containerized dependencies:
     - Run docker_setup.sh
@@ -79,20 +82,25 @@ Use this if you want native tooling on Linux without Dev Containers.
 
 Use this if you only need frontend tooling or Node.js-based automation.
 
-1. Install Node.js LTS (nvm or system package manager).
+1. Install Node.js 24 (nvm or system package manager).
 2. Install project dependencies with npm.
 3. Run your Node.js workflow locally.
 4. Start containerized dependencies only if needed.
 
 ## Database and local services
 
-The default Docker Compose setup runs a local SQL Server instance and other supporting services. The SQL Server container exposes localhost port 10433 and initializes a database named ProjectExample.
+The Docker Compose stack provides SQL Server, Cosmos DB, Redis and RedisInsight,
+smtp4dev, Seq with OTLP ingestion, WireMock, Azurite, and the Azure Service Bus
+emulator. Every host port is bound to `127.0.0.1`; this is a local-development
+topology, not a deployment topology.
 
 WireMock HTTPS certificate generation uses `keytool`, which is provided by a Java Development Kit (JDK). If you plan to generate WireMock certificates locally, install OpenJDK (recommended) and ensure `keytool` is available on your PATH.
 
 Use the following example connection string for local development:
 
-Server=127.0.0.1,10433;Database=ProjectExample;User Id=sa;Password=P@ssword123!;TrustServerCertificate=True;
+```text
+Server=127.0.0.1,10433;Database=ProjectExample;User Id=sa;Password=<local-password>;TrustServerCertificate=True;
+```
 
 Security note: the provided password is for local development only. Do not reuse it in production. Store secrets in your secret manager or environment configuration.
 
@@ -110,7 +118,9 @@ Use this checklist to adapt the template for your own repository.
 Recommended priority for copying into a new repository:
 
 - High priority:
-    - .github (Copilot instructions, workflows, and repo automation)
+    - .ai (canonical instructions, agents, prompts, and collections)
+    - .agents/skills (canonical shared skill implementations)
+    - .github, .claude, and .codex (tool adapters and repository automation)
     - devops (pipelines, manifests, and structure)
     - src (starting point for application code)
     - .editorconfig, .gitattributes, .gitignore
@@ -122,12 +132,45 @@ Recommended priority for copying into a new repository:
 - Low priority:
     - example content or sample solutions you do not need
 
+## Add Toolbox support to another repository
+
+The bootstrap installers copy only missing integration files. They preserve
+every existing file, directory, and symbolic link in the target repository.
+
+Windows:
+
+```powershell
+./Install-ToolboxSetup.ps1 -TargetRepositoryPath C:\path\to\MyProject
+```
+
+Linux, WSL, or macOS:
+
+```bash
+./install_toolbox_setup.sh /path/to/MyProject
+```
+
+From the consuming repository, clone or update the shared public Toolbox
+without starting services:
+
+```powershell
+./setup_toolbox.ps1 -SkipSetup
+```
+
+```bash
+./setup_toolbox.sh --skip-setup
+```
+
+The launchers use `AGameEmpowerment/Developer-Toolbox` and honor
+`DEVELOPER_TOOLBOX_ROOT` or an explicit Toolbox path. Docker and Podman are
+supported; automatic selection chooses the first reachable engine with Compose
+support.
+
 ## Dev Container workload summary
 
 The dev container is configured for the following workloads:
 
 - .NET SDK 8/9 and wasm-tools workload
-- Node.js LTS with npm, yarn, and pnpm
+- Node.js 24 with npm, yarn, and pnpm
 - Azure CLI, Azure Developer CLI, and Bicep
 - Docker-in-Docker for container workflows
 - Terraform and TFLint
@@ -140,6 +183,7 @@ If you remove any of these tools from your project, update .devcontainer/devcont
 
 Use the links below to find focused documentation in this repository. Each link includes a one-sentence description of what the document is for.
 
+- [.ai/README.md](.ai/README.md) – Canonical, tool-neutral AI asset layout and synchronization rules.
 - [.github/readme.md](.github/readme.md) – Repository automation, Copilot configuration, and GitHub-specific guidance.
 - [containers/readme.md](containers/readme.md) – Docker Compose services and local dependency containers.
 - [containers/certs/readme.md](containers/certs/readme.md) – Certificate setup for HTTPS and WireMock scenarios.
@@ -158,6 +202,24 @@ Use the links below to find focused documentation in this repository. Each link 
 - If SQL Server does not start, check container logs and confirm the environment variables in containers/.env.
 - If WireMock certificate generation fails, verify OpenJDK is installed and `keytool` is available on PATH.
 - For script execution issues on Windows, set PowerShell execution policy to allow local scripts.
+
+## AI asset synchronization
+
+Canonical policy, instructions, agents, prompts, and collections live under
+`.ai/`. Shared skill implementations live under `.agents/skills/`. GitHub
+Copilot adapters under `.github/instructions/`, Claude discovery files under
+`.claude/`, and selected Codex subagents under `.codex/agents/` are generated
+from those canonical sources.
+
+After changing a canonical AI asset, run:
+
+```powershell
+pwsh -NoProfile -File ./sync_ai_assets.ps1
+```
+
+The `AI Asset Synchronization` workflow verifies that generated adapters are
+current. The public Toolbox uses public package sources, container images, and
+repository resources throughout.
 
 ## Additional resources
 
@@ -183,7 +245,8 @@ npx skills check
 
 Reference:
 
-- `.github/skills/INDEX.md` (canonical skill discovery map)
+- `.ai/skills/INDEX.md` (canonical cross-tool skill discovery map)
+- `.agents/skills/` (public shared skill implementations)
 
 ### Install Shared Skills Globally (Codex + Copilot)
 

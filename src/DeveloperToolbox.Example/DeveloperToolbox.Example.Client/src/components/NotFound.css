@@ -1,0 +1,11 @@
+.not-found {
+  max-width: 48rem;
+  margin-inline: auto;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.not-found__code {
+  color: #475569;
+  font-weight: 700;
+}

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackageId>DeveloperToolbox.Example.Lib</PackageId>
+    <Authors>Developer Toolbox Contributors</Authors>
+    <Description>A generic library used to demonstrate public NuGet packaging.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/AGameEmpowerment/Developer-Toolbox</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AGameEmpowerment/Developer-Toolbox.git</RepositoryUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+</Project>

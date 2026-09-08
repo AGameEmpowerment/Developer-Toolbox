@@ -1,5 +1,15 @@
 #!/bin/bash
-# Setup Docker Services (Linux/Unix/WSL/Devcontainer)
+# Setup Container Services (Linux/Unix/WSL/Devcontainer)
+
+if [ -z "${BASH_VERSION:-}" ]; then
+    echo "Missing dependency: Bash 3.2 or later is required. Run this script with bash, not sh." >&2
+    exit 1
+fi
+
+if (( BASH_VERSINFO[0] < 3 || (BASH_VERSINFO[0] == 3 && BASH_VERSINFO[1] < 2) )); then
+    echo "Missing dependency: Bash 3.2 or later is required. Current version: ${BASH_VERSION}." >&2
+    exit 1
+fi
 
 set -euo pipefail
 
@@ -11,12 +21,189 @@ CYAN='\033[0;36m'
 GRAY='\033[0;90m'
 NC='\033[0m' # No Color
 
+CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-auto}"
+ENV_FILE_WITHOUT_PASSWORD=""
+
+cleanup() {
+    if [[ -n "$ENV_FILE_WITHOUT_PASSWORD" && -f "$ENV_FILE_WITHOUT_PASSWORD" ]]; then
+        rm -f "$ENV_FILE_WITHOUT_PASSWORD"
+    fi
+}
+
+trap cleanup EXIT
+
+usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  --runtime auto|docker|podman  Container runtime to use (default: auto, or CONTAINER_RUNTIME)"
+    echo "  -h, --help               Show this help message"
+}
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --runtime)
+            if [[ $# -lt 2 || "$2" == -* ]]; then
+                echo -e "${RED}Error: --runtime requires auto, docker, or podman.${NC}" >&2
+                exit 1
+            fi
+            CONTAINER_RUNTIME="$2"
+            shift 2
+            ;;
+        --runtime=*)
+            CONTAINER_RUNTIME="${1#*=}"
+            shift
+            ;;
+        --help|-h)
+            usage
+            exit 0
+            ;;
+        *)
+            echo -e "${RED}Unknown option: $1${NC}" >&2
+            echo "Use --help for usage information." >&2
+            exit 1
+            ;;
+    esac
+done
+
+resolve_container_runtime() {
+    local requested_runtime="$1"
+
+    case "$requested_runtime" in
+        auto)
+            local installed_runtime=false
+            local runtime
+            for runtime in docker podman; do
+                if command -v "$runtime" >/dev/null 2>&1; then
+                    installed_runtime=true
+                    if "$runtime" info >/dev/null 2>&1 && "$runtime" compose version >/dev/null 2>&1; then
+                        printf '%s' "$runtime"
+                        return
+                    fi
+                fi
+            done
+
+            if [[ "$installed_runtime" == false ]]; then
+                echo -e "${RED}Missing dependency: no supported container runtime CLI was found.${NC}" >&2
+                echo "Install Docker Desktop or Podman, make sure the CLI is available in PATH, then open a new terminal." >&2
+            else
+                echo -e "${RED}No installed container runtime is reachable with Compose support.${NC}" >&2
+                echo "Start Docker or Podman, or select one explicitly with --runtime." >&2
+            fi
+            exit 1
+            ;;
+        docker|podman)
+            if command -v "$requested_runtime" >/dev/null 2>&1; then
+                printf '%s' "$requested_runtime"
+            else
+                echo -e "${RED}Missing dependency: '${requested_runtime}' was not found in PATH.${NC}" >&2
+                echo "Install ${requested_runtime}, make sure its CLI is available in PATH, then open a new terminal." >&2
+                exit 1
+            fi
+            ;;
+        *)
+            echo -e "${RED}Error: Invalid runtime '${requested_runtime}'. Use docker, podman, or auto.${NC}" >&2
+            exit 1
+            ;;
+    esac
+}
+
+format_runtime_display_name() {
+    case "$1" in
+        docker)
+            printf '%s' "Docker"
+            ;;
+        podman)
+            printf '%s' "Podman"
+            ;;
+        *)
+            printf '%s' "$1"
+            ;;
+    esac
+}
+
+assert_runtime_ready() {
+    local runtime="$1"
+    local display_name="$2"
+
+    if "$runtime" info >/dev/null 2>&1; then
+        return
+    fi
+
+    if [[ "$runtime" == "docker" ]]; then
+        echo -e "${RED}${display_name} CLI is installed, but the Docker engine is not reachable.${NC}" >&2
+        echo "Start Docker Desktop, wait until it finishes starting, then rerun this script." >&2
+    else
+        echo -e "${RED}${display_name} CLI is installed, but the Podman engine is not reachable.${NC}" >&2
+        echo "Start the Podman machine with 'podman machine start', then rerun this script." >&2
+    fi
+
+    exit 1
+}
+
+assert_compose_available() {
+    local runtime="$1"
+    local display_name="$2"
+
+    if ! "$runtime" compose version >/dev/null 2>&1; then
+        echo -e "${RED}Missing dependency: ${display_name} compose support is not available.${NC}" >&2
+        echo "Install ${display_name} with compose support, or choose another runtime with --runtime." >&2
+        exit 1
+    fi
+}
+
+find_keytool() {
+    if command -v keytool >/dev/null 2>&1; then
+        printf '%s' "keytool"
+        return
+    fi
+
+    if [[ -n "${JAVA_HOME:-}" && -f "${JAVA_HOME}/bin/keytool" ]]; then
+        printf '%s' "${JAVA_HOME}/bin/keytool"
+        return
+    fi
+
+    local common_paths=(
+        "/usr/lib/jvm/*/bin/keytool"
+        "/usr/java/*/bin/keytool"
+        "/opt/java/*/bin/keytool"
+        "/opt/jdk*/bin/keytool"
+    )
+
+    local pattern
+    local found
+    for pattern in "${common_paths[@]}"; do
+        found="$(compgen -G "$pattern" 2>/dev/null || true)"
+        found="${found%%$'\n'*}"
+        if [[ -n "$found" && -f "$found" ]]; then
+            printf '%s' "$found"
+            return
+        fi
+    done
+}
+
+assert_keytool_available() {
+    if [[ -n "$(find_keytool)" ]]; then
+        return
+    fi
+
+    echo -e "${RED}Missing dependency: Java JDK keytool was not found.${NC}" >&2
+    echo "Install free OpenJDK with: sudo apt install default-jdk" >&2
+    echo "If keytool is still unavailable, add the JDK bin directory to PATH or set JAVA_HOME." >&2
+    echo "WireMock HTTPS certificate generation requires keytool." >&2
+    exit 1
+}
+
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONTAINERS_DIR="${SCRIPT_DIR}/containers"
 CERTS_DIR="${CONTAINERS_DIR}/certs"
 ENV_FILE="${CONTAINERS_DIR}/.env"
 ENV_EXAMPLE_FILE="${CONTAINERS_DIR}/.env.example"
+CONTAINER_CLI="$(resolve_container_runtime "$CONTAINER_RUNTIME")"
+RUNTIME_DISPLAY_NAME="$(format_runtime_display_name "$CONTAINER_CLI")"
+assert_runtime_ready "$CONTAINER_CLI" "$RUNTIME_DISPLAY_NAME"
+assert_compose_available "$CONTAINER_CLI" "$RUNTIME_DISPLAY_NAME"
 
 generate_random_password() {
     local password=""
@@ -53,7 +240,7 @@ if [[ ! -f "$ENV_FILE" ]]; then
     fi
 fi
 
-# Note: .env is consumed by docker compose; this script does not execute it
+# Note: .env is consumed by container compose; this script does not execute it
 # to avoid running arbitrary configuration as shell code.
 #endregion
 
@@ -66,6 +253,7 @@ GENERATE_CERT_SCRIPT="${CERTS_DIR}/generate-wiremock-cert.sh"
 if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then
     if [[ -f "$GENERATE_CERT_SCRIPT" ]]; then
         echo -e "${YELLOW}Generating WireMock TLS certificate...${NC}"
+        assert_keytool_available
 
         # Generate a random password for the keystore
         KEYSTORE_PASSWORD="$(generate_random_password)"
@@ -74,17 +262,12 @@ if [[ ! -f "$WIREMOCK_KEYSTORE" ]]; then
         bash "$GENERATE_CERT_SCRIPT" -p "$KEYSTORE_PASSWORD" -f
 
         if [[ -f "$WIREMOCK_KEYSTORE" ]]; then
-            # Update .env with the generated password
-            if grep -q 'WIREMOCK_KEYSTORE_PASSWORD=' "$ENV_FILE"; then
-                # Use portable in-place edit (works on both GNU and BSD/macOS sed)
-                if [[ "$(uname)" == "Darwin" ]]; then
-                    sed -i '' "s/WIREMOCK_KEYSTORE_PASSWORD=\"[^\"]*\"/WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"/" "$ENV_FILE"
-                else
-                    sed -i "s/WIREMOCK_KEYSTORE_PASSWORD=\"[^\"]*\"/WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"/" "$ENV_FILE"
-                fi
-            else
-                echo "WIREMOCK_KEYSTORE_PASSWORD=\"${KEYSTORE_PASSWORD}\"" >> "$ENV_FILE"
-            fi
+            # Replace every active assignment regardless of quoting and append one normalized value.
+            ENV_FILE_WITHOUT_PASSWORD="$(mktemp "${ENV_FILE}.tmp.XXXXXX")"
+            grep -Ev '^[[:space:]]*WIREMOCK_KEYSTORE_PASSWORD[[:space:]]*=' "$ENV_FILE" > "$ENV_FILE_WITHOUT_PASSWORD" || true
+            printf 'WIREMOCK_KEYSTORE_PASSWORD="%s"\n' "$KEYSTORE_PASSWORD" >> "$ENV_FILE_WITHOUT_PASSWORD"
+            mv "$ENV_FILE_WITHOUT_PASSWORD" "$ENV_FILE"
+            ENV_FILE_WITHOUT_PASSWORD=""
             echo -e "${GREEN}WireMock certificate generated and .env updated.${NC}"
         else
             echo -e "${YELLOW}Warning: WireMock certificate generation failed. HTTPS may not work.${NC}"
@@ -100,8 +283,10 @@ else
         echo -e "${YELLOW}This may cause a password mismatch. Regenerating keystore to match .env password...${NC}"
 
         if [[ -f "$GENERATE_CERT_SCRIPT" ]]; then
+            assert_keytool_available
+
             # Read the password from the newly created .env file
-            ENV_PASSWORD=$(grep 'WIREMOCK_KEYSTORE_PASSWORD=' "$ENV_FILE" | sed 's/WIREMOCK_KEYSTORE_PASSWORD="\?\([^"]*\)"\?/\1/')
+            ENV_PASSWORD="$(sed -n 's/^[[:space:]]*WIREMOCK_KEYSTORE_PASSWORD[[:space:]]*=[[:space:]]*"\{0,1\}\([^"#]*\)"\{0,1\}[[:space:]]*$/\1/p' "$ENV_FILE" | tail -n 1)"
             if [[ -z "$ENV_PASSWORD" ]]; then
                 ENV_PASSWORD="changeit"  # Default from .env.example
             fi
@@ -210,67 +395,39 @@ else
 fi
 #endregion
 
-#region Docker Services
-echo -e "\n${CYAN}=== Docker Services ===${NC}"
+#region Container Services
+echo -e "\n${CYAN}=== ${RUNTIME_DISPLAY_NAME} Services ===${NC}"
 
-if command -v docker &> /dev/null; then
-    echo -e "${YELLOW}Starting Docker containers...${NC}"
+echo -e "${YELLOW}Starting ${RUNTIME_DISPLAY_NAME} containers...${NC}"
 
-    # Start the shared development collection.
-    docker compose \
-        --env-file "$ENV_FILE" \
-        -f "${CONTAINERS_DIR}/docker-compose-common.yml" \
-        -p dev_common_shared \
-        up -d
+# Start the shared development collection.
+"$CONTAINER_CLI" compose \
+    --env-file "$ENV_FILE" \
+    -f "${CONTAINERS_DIR}/docker-compose-common.yml" \
+    -p dev_common_shared \
+    up -d
 
-    echo -e "${GREEN}Docker containers started.${NC}"
-else
-    echo -e "${RED}Error: Docker is not installed or not in PATH.${NC}"
-    exit 1
-fi
+echo -e "${GREEN}${RUNTIME_DISPLAY_NAME} containers started.${NC}"
 #endregion
-
-get_service_bind_label() {
-    local value="$1"
-
-    if [[ -z "$value" || "$value" == "127.0.0.1" ]]; then
-        echo "localhost"
-    elif [[ "$value" == "0.0.0.0" ]]; then
-        echo "<host-ip-or-dns>"
-    else
-        echo "$value"
-    fi
-}
-
-mssql_bind_host=$(get_service_bind_label "${MSSQL_BIND_HOST:-127.0.0.1}")
-cosmos_bind_host=$(get_service_bind_label "${COSMOSDB_BIND_HOST:-127.0.0.1}")
-redis_bind_host=$(get_service_bind_label "${REDIS_BIND_HOST:-127.0.0.1}")
-redisinsight_bind_host=$(get_service_bind_label "${REDISINSIGHT_BIND_HOST:-127.0.0.1}")
-smtp_bind_host=$(get_service_bind_label "${SMTP4DEV_BIND_HOST:-127.0.0.1}")
-seq_bind_host=$(get_service_bind_label "${SEQ_BIND_HOST:-127.0.0.1}")
-wiremock_bind_host=$(get_service_bind_label "${WIREMOCK_BIND_HOST:-127.0.0.1}")
-azurite_bind_host=$(get_service_bind_label "${AZURITE_BIND_HOST:-127.0.0.1}")
-servicebus_bind_host=$(get_service_bind_label "${SERVICEBUS_BIND_HOST:-127.0.0.1}")
 
 echo -e "\n${GREEN}=== Setup Complete ===${NC}"
 echo -e "Services available:"
-echo -e "${GRAY}  SQL Server:     ${mssql_bind_host}:10433${NC}"
-echo -e "${GRAY}  CosmosDB:       https://${cosmos_bind_host}:10081${NC}"
-echo -e "${GRAY}  Cosmos Explorer: http://${cosmos_bind_host}:10181${NC}"
-echo -e "${GRAY}  Redis:          ${redis_bind_host}:10120${NC}"
-echo -e "${GRAY}  RedisInsight:   http://${redisinsight_bind_host}:10121${NC}"
-echo -e "${GRAY}  SMTP4Dev SMTP:  ${smtp_bind_host}:10130${NC}"
-echo -e "${GRAY}  SMTP4Dev POP:   ${smtp_bind_host}:10131${NC}"
-echo -e "${GRAY}  SMTP4Dev IMAP:  ${smtp_bind_host}:10132${NC}"
-echo -e "${GRAY}  SMTP4Dev Web:   http://${smtp_bind_host}:10140${NC}"
-echo -e "${GRAY}  Seq (OTEL):     http://${seq_bind_host}:10150${NC}"
-echo -e "${GRAY}  WireMock HTTP:  http://${wiremock_bind_host}:10080${NC}"
-echo -e "${GRAY}  WireMock HTTPS: https://${wiremock_bind_host}:10443${NC}"
-echo -e "${GRAY}  Azurite Blob:   ${azurite_bind_host}:10000${NC}"
-echo -e "${GRAY}  Azurite Queue:  ${azurite_bind_host}:10001${NC}"
-echo -e "${GRAY}  Azurite Table:  ${azurite_bind_host}:10002${NC}"
-echo -e "${GRAY}  Service Bus:    ${servicebus_bind_host}:10170${NC}"
-echo -e "${GRAY}  Service Bus Admin: ${servicebus_bind_host}:10171${NC}"
+echo -e "${GRAY}  SQL Server:     localhost:10433${NC}"
+echo -e "${GRAY}  CosmosDB:       https://localhost:10081${NC}"
+echo -e "${GRAY}  Cosmos Explorer: https://localhost:10181${NC}"
+echo -e "${GRAY}  Redis:          localhost:10120${NC}"
+echo -e "${GRAY}  RedisInsight:   http://localhost:10121${NC}"
+echo -e "${GRAY}  SMTP4Dev SMTP:  localhost:10130${NC}"
+echo -e "${GRAY}  SMTP4Dev POP:   localhost:10131${NC}"
+echo -e "${GRAY}  SMTP4Dev IMAP:  localhost:10132${NC}"
+echo -e "${GRAY}  SMTP4Dev Web:   http://localhost:10140${NC}"
+echo -e "${GRAY}  Seq (OTEL):     http://localhost:10150${NC}"
+echo -e "${GRAY}  WireMock HTTP:  http://localhost:10080${NC}"
+echo -e "${GRAY}  WireMock HTTPS: https://localhost:10443${NC}"
+echo -e "${GRAY}  Azurite Blob:   localhost:10000${NC}"
+echo -e "${GRAY}  Azurite Queue:  localhost:10001${NC}"
+echo -e "${GRAY}  Azurite Table:  localhost:10002${NC}"
+echo -e "${GRAY}  Service Bus:    localhost:10170${NC}"
+echo -e "${GRAY}  Service Bus Admin: localhost:10171${NC}"
 echo ""
-echo -e "${GRAY}Set individual *_BIND_HOST values in containers/.env to 0.0.0.0 to expose selected services externally.${NC}"
 echo "Head back to README.md for deployment of the database and other services..."

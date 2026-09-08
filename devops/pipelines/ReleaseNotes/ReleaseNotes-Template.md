@@ -21,10 +21,10 @@
 {{#forEach this.workItems}}
 {{#if isFirst}}## WorkItems {{/if}}
 {{#if (contains (lookup this.fields 'System.WorkItemType') 'Bug')}}
-*  [{{this.id}}](https://dev.azure.com/agameempowerment/SI/_workitems/edit/{{this.id}})  {{lookup this.fields 'System.Title'}} <span style="color:red">(Bug)</span> [{{lookup this.fields 'System.Tags'}}]
+*  [{{this.id}}](https://dev.azure.com/your-organization/your-project/_workitems/edit/{{this.id}})  {{lookup this.fields 'System.Title'}} <span style="color:red">(Bug)</span> [{{lookup this.fields 'System.Tags'}}]
 {{/if}}
 {{#if (contains (lookup this.fields 'System.WorkItemType') 'User Story')}}
-*  [{{this.id}}](https://dev.azure.com/agameempowerment/SI/_workitems/edit/{{this.id}})  {{lookup this.fields 'System.Title'}} <span style="color:blue">(User Story)</span> [{{lookup this.fields 'System.Tags'}}]
+*  [{{this.id}}](https://dev.azure.com/your-organization/your-project/_workitems/edit/{{this.id}})  {{lookup this.fields 'System.Title'}} <span style="color:blue">(User Story)</span> [{{lookup this.fields 'System.Tags'}}]
 {{/if}}
 {{/forEach}}
 
@@ -32,7 +32,7 @@
 {{#forEach this.workItems}}
 {{#if isFirst}}## WorkItems {{/if}}
 {{#if (contains (lookup this.fields 'System.WorkItemType') 'Bug')}}
-*  [{{this.id}}](https://dev.azure.com/agameempowerment/SI/_workitems/edit/{{this.id}})  {{lookup this.fields 'System.Title'}}
+*  [{{this.id}}](https://dev.azure.com/your-organization/your-project/_workitems/edit/{{this.id}})  {{lookup this.fields 'System.Title'}}
    - **WIT** {{lookup this.fields 'System.WorkItemType'}}
    - **Tags** {{lookup this.fields 'System.Tags'}}
    - **Description** {{{lookup this.fields 'System.Description'}}}
@@ -40,7 +40,7 @@
    - **Release Note Description** {{{lookup this.fields 'System.ReleaseNoteDescription'}}}
 {{/if}}
 {{#if (contains (lookup this.fields 'System.WorkItemType') 'User Story')}}
-*  [{{this.id}}](https://dev.azure.com/agameempowerment/SI/_workitems/edit/{{this.id}})  {{lookup this.fields 'System.Title'}}
+*  [{{this.id}}](https://dev.azure.com/your-organization/your-project/_workitems/edit/{{this.id}})  {{lookup this.fields 'System.Title'}}
    - **WIT** {{lookup this.fields 'System.WorkItemType'}}
    - **Tags** {{lookup this.fields 'System.Tags'}}
    - **Description** {{{lookup this.fields 'System.Description'}}}
