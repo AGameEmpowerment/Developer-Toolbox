@@ -2,7 +2,7 @@
   "date": "2026-10-27",
   "referenceCommit": "618951fbd522f1a52ea68af130512cc5931a536a",
   "baseCommit": "66f452566f589a05c520d2679b320d020284d5f5",
-  "sourceState": "uncommitted working tree",
+  "sourceState": "Resource sources committed on codex/toolbox-resource-parity; comparison executed before commit against baseCommit plus recorded changes.",
   "method": "Compare complete docker compose config --format json documents for each group using the example environment and identical project names; normalize absolute checkout paths only.",
   "groups": {
     "common": {
@@ -64,5 +64,6 @@
         "aws-init"
       ]
     }
-  }
+  },
+  "reviewedSourceCommit": "46c7d9d500d15d9481762c181ea4336db0c6df24"
 }

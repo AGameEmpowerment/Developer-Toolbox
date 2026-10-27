@@ -13,10 +13,15 @@ post_date: 2026-10-27
 
 ## Source state
 
-Reviewed 2026-10-27. Project base commit `66f452566f589a05c520d2679b320d020284d5f5` with uncommitted changes.
-Reference source commit `618951fbd522f1a52ea68af130512cc5931a536a`.
-The current [source inventory](test-inventory.json) hashes the actual checkout;
-these results do not claim that the new work is already committed or published.
+Reviewed 2026-10-27. Code and test baseline: `46c7d9d500d15d9481762c181ea4336db0c6df24` on
+`codex/toolbox-resource-parity`. Reference source: `618951fbd522f1a52ea68af130512cc5931a536a`.
+
+The [source inventory](test-inventory.json) counts exact Git blobs at that commit.
+Executions occurred before the commit; their receipts retain base commit
+`66f452566f589a05c520d2679b320d020284d5f5`, dirty-tree state and checkout hashes.
+The [original execution-input inventory](https://github.com/AGameEmpowerment/Developer-Toolbox/blob/46c7d9d500d15d9481762c181ea4336db0c6df24/docs/parity/test-inventory.json)
+preserves those hashes. Every recorded input was verified to match this committed
+baseline after checkout line-ending normalization. Branch changes remain unmerged.
 
 ## Resource parity and builds
 
@@ -117,7 +122,8 @@ adapter discovery and actual executions remain separate.
 [verification.json](verification.json) contains per-area runner counters, image IDs
 and hashes of local output evidence. Local NUnit TRX reports are under ignored
 `artifacts/parity/dotnet-remediation/`; private machine paths are not copied here. The source
-inventory includes per-file authored methods/markers and exact SHA-256 inputs.
+inventory includes per-file authored methods/markers and Git-blob SHA-256 inputs;
+execution receipts preserve their original checkout hashes separately.
 
 ```powershell
 dotnet build DeveloperToolbox.Example.slnx --configuration Release

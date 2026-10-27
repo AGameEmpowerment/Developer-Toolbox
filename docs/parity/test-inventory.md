@@ -13,10 +13,10 @@ post_date: 2026-10-27
 
 ## Scope and method
 
-Reviewed 2026-10-27, working tree based on source commit `66f452566f589a05c520d2679b320d020284d5f5`. Repository
+Reviewed 2026-10-27, exact source commit `46c7d9d500d15d9481762c181ea4336db0c6df24`. Repository
 `AGameEmpowerment/Developer-Toolbox`.
 
-This is a working-tree declaration inventory, not a runtime test total. NUnit attributes are separated into `[Test]`,
+This is a tracked-source declaration inventory, not a runtime test total. NUnit attributes are separated into `[Test]`,
 inline `[TestCase]`, source `[TestCaseSource]` and `[Theory]` markers; multiple inline rows can belong to one authored
 method. The separate authoredAttributedMethodDeclarations total maps each marker to the next C# method and deduplicates
 by source line; per-file method names and lines are retained in JSON. This is a syntax scan, not Roslyn or framework
@@ -63,12 +63,14 @@ as tests. Code coverage is unavailable without a measured report. Test counts do
 
 ## Reproduction and evidence
 
-The adjacent JSON records per-file counts and checkout hashes, plus a manifest of all scanned source inputs. The source
-commit identifies the base of this uncommitted working tree, not a committed version of these changes. Repeat with
---worktree while reviewing the change set.
+The adjacent `test-inventory.json` includes every counted path, marker totals and SHA-256 of its Git blob at the
+selected commit. `inventory-source.py` contains the exact counting implementation. Run it from the repository root; it
+reads source text and hashes from Git blobs, independently of checkout line endings, and rejects changed source inputs.
+The recorded commit pins the reviewed source snapshot, independently of later inventory-tooling changes. Without
+`--check`, it regenerates the two inventory documents. `--check` validates both reports without rewriting them.
 
 ```powershell
-python docs/reviews/inventory-source.py --root . --repo AGameEmpowerment/Developer-Toolbox --output-dir docs/parity --date 2026-10-27 --source-commit 66f452566f589a05c520d2679b320d020284d5f5 --worktree --check
+python docs/reviews/inventory-source.py --root . --repo AGameEmpowerment/Developer-Toolbox --output-dir docs/parity --date 2026-10-27 --source-commit 46c7d9d500d15d9481762c181ea4336db0c6df24 --check
 ```
 
 Full source scan excludes untracked build output, dependencies and Git submodule contents. Upstream vendored

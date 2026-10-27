@@ -2,7 +2,7 @@
   "date": "2026-10-27",
   "baseCommit": "66f452566f589a05c520d2679b320d020284d5f5",
   "referenceCommit": "618951fbd522f1a52ea68af130512cc5931a536a",
-  "sourceState": "uncommitted working tree; current source hashes are in test-inventory.json",
+  "sourceState": "Committed code/test baseline on codex/toolbox-resource-parity; execution receipts retain their original pre-commit source provenance.",
   "coverage": "unavailable; no measured coverage report collected",
   "images": [
     {
@@ -468,5 +468,12 @@
     "tests/test_oidc_startup.ps1": "8e10dc65a6d8d8eed3c0701b1197a702800ac25dc4d0a058ef4d062b9a307b62",
     "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/DeveloperToolbox.Example.Data.csproj": "cb85f80709e6ab9276de3000ec4f5ae1cbde78687740023793b61d83759d017c",
     "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/DeveloperToolbox.Example.Resources.csproj": "0ce530ea5036e276876842f0f8617e125cd220496004630f38de2f5b7dc2cacf"
+  },
+  "reviewedSourceCommit": "46c7d9d500d15d9481762c181ea4336db0c6df24",
+  "executionSourceInventory": "46c7d9d500d15d9481762c181ea4336db0c6df24:docs/parity/test-inventory.json",
+  "executionInputsMatchReviewedCommit": {
+    "passed": true,
+    "inputs": 228,
+    "method": "Verify original checkout SHA-256 manifest against current bytes, then compare each input to selected Git blobs allowing checkout CRLF/LF normalization only."
   }
 }
