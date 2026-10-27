@@ -13,8 +13,9 @@ post_date: 2026-10-27
 
 ## Scope
 
-Reviewed 2026-10-27. This is an uncommitted parity update based on source commit
-`66f452566f589a05c520d2679b320d020284d5f5`. It is local developer infrastructure,
+Reviewed 2026-10-27. Code and test baseline:
+`46c7d9d500d15d9481762c181ea4336db0c6df24` on `codex/toolbox-resource-parity`.
+This is local developer infrastructure,
 examples and reusable templates.
 
 ```mermaid

@@ -309,5 +309,6 @@ No delivery template was deployed or published.
 See [architecture](docs/architecture.md), [current test inventory](docs/parity/test-inventory.md),
 [OneBox adoption](docs/guides/onebox-adoption.md), and the
 [wiki](https://github.com/AGameEmpowerment/Developer-Toolbox/wiki).
-The wiki draft records this working tree's base commit and source hashes;
-it does not claim these changes are already on the default branch.
+The wiki update is maintained on `codex/toolbox-resource-parity` in the separate
+wiki repository. It records committed source revisions and original execution
+hashes; the feature branch remains unmerged into the default branch.
