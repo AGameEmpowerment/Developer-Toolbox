@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-27",
+  "scope": "Windows x64 host, current user",
+  "jdk": {
+    "Version": "25.0.5.0.2",
+    "Sha256": "5da7525c8268a10a66bd76a39f4e9af24d4ebc974d42800a609852c498a68460",
+    "Method": "verified Microsoft ZIP, user installation"
+  },
+  "maven": {
+    "Version": "3.10.0",
+    "Sha512": "22d31676d5b92ed53308c19ecded3245d0efd0cddfec51ec7bab62f4f13ad70ddddceff8e62940e0e8e2421f3cde8106737f4becec0aa034ffeff2a754e88337",
+    "Method": "verified Apache ZIP, user installation"
+  },
+  "javaHome": "%LOCALAPPDATA%/Programs/Microsoft/jdk-25.0.5.0.2+1",
+  "mavenHome": "%LOCALAPPDATA%/Programs/Apache/apache-maven-3.10.0",
+  "configuration": "User JAVA_HOME and user PATH; existing unrelated entries preserved",
+  "installationNote": "WinGet removed the previous JDK but its replacement MSI failed with exit 1603. Verified Microsoft ZIP installation restored Java; Apache ZIP installation added Maven.",
+  "sources": [
+    "https://learn.microsoft.com/en-us/java/openjdk/download",
+    "https://maven.apache.org/download.cgi"
+  ],
+  "verification": [
+    "java -version: 25.0.5.0.2",
+    "javac -version: 25.0.5.0.2",
+    "mvn --version: 3.10.0 using Microsoft JDK 25.0.5.0.2"
+  ]
+}

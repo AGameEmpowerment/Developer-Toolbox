@@ -1,0 +1,35 @@
+# Local developer examples. No cloud deployment is performed by toolbox setup.
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Local .NET 10 Lambda HTTP and EventBridge examples
+Globals:
+  Function:
+    Runtime: dotnet10
+    Architectures: [x86_64]
+    MemorySize: 256
+    Timeout: 30
+Resources:
+  HttpSample:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: DeveloperToolbox.Example.Lambda::DeveloperToolbox.Example.Lambda.Function::HandleHttp
+      Events:
+        LocalHttp:
+          Type: HttpApi
+          Properties:
+            Path: /samples
+            Method: POST
+  EventSample:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: DeveloperToolbox.Example.Lambda::DeveloperToolbox.Example.Lambda.Function::HandleEvent
+  QueueSample:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: DeveloperToolbox.Example.Lambda::DeveloperToolbox.Example.Lambda.Function::HandleSqs
+      Environment:
+        Variables:
+          ConnectionStrings__Postgres: ''

@@ -142,47 +142,93 @@ Install $RuntimeDisplayName with compose support, or choose another runtime with
     }
 }
 
-function Find-KeyTool {
-    $keytool = Get-Command keytool -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
-    if ($keytool) {
-        return $keytool
-    }
-
-    if ($env:JAVA_HOME) {
-        $javaHomeTool = Join-Path $env:JAVA_HOME "bin\keytool.exe"
-        if (Test-Path $javaHomeTool) {
-            return $javaHomeTool
+function Assert-PodmanStopPersistence {
+    if ($ContainerCli -ne "podman") { return }
+    $serverVersion = ((& $ContainerCli version --format '{{.Server.Version}}' 2>$null) | Out-String).Trim()
+    $versionSucceeded = ($LASTEXITCODE -eq 0)
+    if (-not $versionSucceeded -or $serverVersion -notmatch '^\d+\.\d+\.\d+(?:[-+].+)?$') {
+        # Native Linux Podman has no separate server object; info describes its engine.
+        $remote = ((& $ContainerCli info --format '{{.Host.ServiceIsRemote}}' 2>$null) | Out-String).Trim()
+        if ($LASTEXITCODE -eq 0 -and $remote -eq "false") {
+            $serverVersion = ((& $ContainerCli info --format '{{.Version.Version}}' 2>$null) | Out-String).Trim()
+            $versionSucceeded = ($LASTEXITCODE -eq 0)
         }
     }
-
-    $commonPaths = @(
-        "C:\Program Files\Java\*\bin\keytool.exe",
-        "C:\Program Files\Eclipse Adoptium\*\bin\keytool.exe",
-        "C:\Program Files\Microsoft\jdk-*\bin\keytool.exe",
-        "C:\Program Files\Zulu\*\bin\keytool.exe"
-    )
-
-    foreach ($pattern in $commonPaths) {
-        $found = Get-ChildItem -Path $pattern -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($found) {
-            return $found.FullName
-        }
+    if (-not $versionSucceeded -or $serverVersion -notmatch '^(\d+)\.\d+\.\d+(?:[-+].+)?$') {
+        throw "Unable to determine the Podman server version. Podman 6 or later is required to keep manually stopped services stopped across restarts."
     }
-
-    return $null
+    if ([int]$matches[1] -lt 6) {
+        throw "Podman server 6 or later is required to keep manually stopped services stopped across restarts. Upgrade the Podman engine, then rerun setup."
+    }
 }
 
-function Assert-JavaKeyToolAvailable {
-    if (Find-KeyTool) {
-        return
-    }
+function Invoke-SharedCompose {
+    param([string[]]$ComposeArguments)
+    & $ContainerCli compose @ComposeArguments
+}
 
-    throw @"
-Missing dependency: Java JDK keytool was not found.
-Install free Microsoft OpenJDK with 'winget install Microsoft.OpenJDK.25', then open a new terminal.
-If keytool is still unavailable, add the JDK bin directory to PATH or set JAVA_HOME.
-WireMock HTTPS certificate generation requires keytool.
-"@
+function Initialize-SharedDataVolumes {
+    # Compose must treat migrated volumes as external because their original labels remain.
+    # Label new volumes so explicit teardown cleanup can find them with either runtime.
+    $groupVolumes = [ordered]@{
+        azure = @('cosmos-data', 'mssql-data', 'azurite-data')
+        aws = @('postgres-data', 'dynamodb-data', 'rabbitmq-data')
+    }
+    foreach ($group in $groupVolumes.Keys) {
+        foreach ($volume in $groupVolumes[$group]) {
+            $volumeName = "dev_common_shared_$volume"
+            & $ContainerCli volume inspect $volumeName *> $null
+            if ($LASTEXITCODE -eq 0) { continue }
+            & $ContainerCli volume create --driver local `
+                --label "com.docker.compose.project=dev_${group}_shared" `
+                --label "com.docker.compose.volume=$volume" $volumeName | Out-Null
+            if ($LASTEXITCODE -ne 0) { throw "Unable to create shared data volume '$volumeName'." }
+        }
+    }
+}
+
+function Remove-LegacySharedContainers {
+    # Podman Compose's --remove-orphans can also remove retained resources.
+    # Inspect exact labels and remove only retired samples or relocated cloud resources.
+    $servicesToRemove = @('functions-key-init', 'function-app', 'lambda-runtime',
+        'lambda-sqs-runtime', 'lambda-sqs-dispatcher', 'function-app-java',
+        'lambda-runtime-java', 'lambda-sqs-runtime-java', 'lambda-sqs-dispatcher-java',
+        'function-app-node', 'lambda-runtime-node', 'lambda-sqs-dispatcher-node',
+        'function-app-python', 'lambda-runtime-python', 'lambda-sqs-dispatcher-python')
+    # Release fixed container names before recreating cloud resources in their groups.
+    # The new Compose files reuse the original named volumes.
+    $servicesToRemove += @('mssql', 'cosmosdb', 'azurite', 'service-bus',
+        'postgres', 'dynamodb-volume-init', 'dynamodb', 'rabbitmq', 'aws-emulator', 'aws-init')
+    $containerIds = @()
+    foreach ($projectLabel in @('com.docker.compose.project', 'io.podman.compose.project')) {
+        $found = @(& $ContainerCli ps -a --filter "label=${projectLabel}=dev_common_shared" -q 2>$null)
+        if ($LASTEXITCODE -ne 0) { throw 'Unable to enumerate retired sample containers in the shared toolbox project.' }
+        $containerIds += $found
+    }
+    foreach ($containerId in @($containerIds | Select-Object -Unique)) {
+        $containerId = ([string]$containerId).Trim()
+        if (-not $containerId) { continue }
+        if ($containerId -notmatch '^[a-fA-F0-9]{12,64}$') { throw 'The selected engine returned an invalid container identifier.' }
+        $labelJson = ((& $ContainerCli inspect --format '{{json .Config.Labels}}' $containerId 2>$null) | Out-String).Trim()
+        if ($LASTEXITCODE -ne 0) { throw 'Unable to verify labels on a possible retired sample container.' }
+        try { $labels = ConvertFrom-Json -InputObject $labelJson -ErrorAction Stop }
+        catch { throw 'The selected engine returned invalid container-label metadata.' }
+        if ($null -eq $labels) { continue }
+        $service = $null
+        foreach ($prefix in @('com.docker.compose', 'io.podman.compose')) {
+            $projectLabel = $labels.PSObject.Properties["$prefix.project"]
+            $serviceLabel = $labels.PSObject.Properties["$prefix.service"]
+            if ($projectLabel -and $projectLabel.Value -ceq 'dev_common_shared' -and $serviceLabel) {
+                $service = $serviceLabel.Value
+                break
+            }
+        }
+        if ($servicesToRemove -ccontains $service) {
+            & $ContainerCli rm -f $containerId *> $null
+            if ($LASTEXITCODE -ne 0) { throw 'Unable to remove a retired sample container from the shared toolbox project.' }
+            Write-Host "Removed legacy shared container: $service (volumes retained)." -ForegroundColor Gray
+        }
+    }
 }
 
 #region Environment Setup
@@ -203,88 +249,78 @@ if (-not (Test-Path $EnvFile)) {
     }
 }
 
-# Load .env values for display
-$EnvValues = @{}
-if (Test-Path $EnvFile) {
-    Get-Content $EnvFile | ForEach-Object {
-        $line = $_.Trim()
-        if ($line -and -not $line.StartsWith('#') -and $line -match '^\s*([^=]+)=(.*)\s*$') {
-            $key = $matches[1].Trim()
-            $val = $matches[2].Trim()
-            if ($val.StartsWith('"') -and $val.EndsWith('"')) {
-                $val = $val.Substring(1, $val.Length - 2)
-            }
-            $EnvValues[$key] = $val
+# Keep existing developer .env files compatible when new service settings
+# are introduced without overwriting any local values.
+$envLines = @(Get-Content -LiteralPath $EnvFile -Encoding UTF8)
+$missingAssignments = @()
+foreach ($templateLine in Get-Content -LiteralPath $EnvExampleFile -Encoding UTF8) {
+    if ($templateLine -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=') {
+        $key = $matches[1]
+        if (-not ($envLines -cmatch "^\s*(?:export\s+)?$([regex]::Escape($key))\s*=")) {
+            $missingAssignments += $templateLine
+            $envLines += $templateLine
+            Write-Host "$key added to .env for local services." -ForegroundColor Green
         }
     }
 }
+if ($missingAssignments.Count -gt 0) {
+    # A leading newline also handles a developer file with no final newline.
+    Add-Content -LiteralPath $EnvFile -Encoding UTF8 -Value ([Environment]::NewLine + ($missingAssignments -join [Environment]::NewLine))
+}
+
+# Generate explicit auto placeholders once without overwriting developer values.
+. (Join-Path $ContainersDir "environment.ps1")
+Initialize-ToolboxEnvironment -EnvFile $EnvFile
+
 #endregion
 
 #region WireMock Certificate Setup
+$ContainerCli = Resolve-ContainerRuntime -RequestedRuntime $ContainerRuntime
+$RuntimeDisplayName = (Get-Culture).TextInfo.ToTitleCase($ContainerCli)
+Assert-ContainerRuntimeReady -ContainerCli $ContainerCli -RuntimeDisplayName $RuntimeDisplayName
+Assert-ContainerComposeAvailable -ContainerCli $ContainerCli -RuntimeDisplayName $RuntimeDisplayName
+& (Join-Path $PSScriptRoot 'docker_pull.ps1') -ContainerRuntime $ContainerCli
+if ($LASTEXITCODE -ne 0) { throw 'Missing-image preparation failed.' }
+$engineVersion = & $ContainerCli image inspect --format '{{ index .Config.Labels "com.microsoft.version" }}' mcr.microsoft.com/mssql/server:latest
+if ($LASTEXITCODE -ne 0 -or [string]$engineVersion -notmatch '^\d+\.\d+\.\d+\.\d+$') {
+    throw 'The local SQL Server base is missing a valid publisher version label.'
+}
+$env:TOOLBOX_MSSQL_ENGINE_VERSION = ([string]$engineVersion).Trim()
+Assert-PodmanStopPersistence
+
+$SharedGroups = @("common", "azure", "aws")
+$SelectedServices = @()
+foreach ($group in $SharedGroups) {
+    $SelectedServices += @(Invoke-SharedCompose -ComposeArguments @("--env-file", $EnvFile,
+        "-f", "$ContainersDir/docker-compose-$group.yml", "-p", "dev_${group}_shared", "config", "--services"))
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to resolve the $group Compose services. Check containers/.env."
+    }
+}
+
 Write-Host "`n=== WireMock Certificate Setup ===" -ForegroundColor Cyan
 
 $WireMockKeystore = Join-Path $CertsDir "wiremock.jks"
 $GenerateCertScript = Join-Path $CertsDir "Generate-WireMockCert.ps1"
 
-if (-not (Test-Path $WireMockKeystore)) {
+if (-not (Test-Path $WireMockKeystore) -or $EnvFileJustCreated -or $script:ToolboxGeneratedWireMockPassword) {
     if (Test-Path $GenerateCertScript) {
         Write-Host "Generating WireMock TLS certificate..." -ForegroundColor Yellow
-        Assert-JavaKeyToolAvailable
-
-        # Generate a random password for the keystore
-        $KeystorePassword = -join ((65..90) + (97..122) + (48..57) | Get-Random -Count 24 | ForEach-Object { [char]$_ })
-
-        # Run the certificate generation script
-        & $GenerateCertScript -KeystorePassword $KeystorePassword -Force
-
-        if ($LASTEXITCODE -eq 0 -or (Test-Path $WireMockKeystore)) {
-            # Update .env with the generated password
-            # Remove any existing WIREMOCK_KEYSTORE_PASSWORD entries, regardless of format
-            $envLines = Get-Content $EnvFile
-            $envLines = $envLines | Where-Object { $_ -notmatch '^\s*WIREMOCK_KEYSTORE_PASSWORD\s*=' }
-            # Append a normalized WIREMOCK_KEYSTORE_PASSWORD line
-            $envLines += "WIREMOCK_KEYSTORE_PASSWORD=`"$KeystorePassword`""
-            $envContent = ($envLines -join [Environment]::NewLine) + [Environment]::NewLine
-            Set-Content $EnvFile $envContent -NoNewline
-            Write-Host "WireMock certificate generated and .env updated." -ForegroundColor Green
-        } else {
-            Write-Warning "WireMock certificate generation failed. HTTPS may not work."
-            Write-Warning "You can manually run: $GenerateCertScript"
+        $EnvPassword = Get-ToolboxWireMockPassword -EnvFile $EnvFile -ContainerRuntime $ContainerCli
+        if (-not $EnvPassword) { throw "Configure WIREMOCK_KEYSTORE_PASSWORD in containers/.env before generating certificates." }
+        $previousKeystorePassword = [Environment]::GetEnvironmentVariable("TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD", "Process")
+        try {
+            $env:TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD = $EnvPassword
+            & $GenerateCertScript -ContainerRuntime $ContainerCli -Force
+        } finally {
+            [Environment]::SetEnvironmentVariable("TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD", $previousKeystorePassword, "Process")
         }
+        Write-Host "WireMock certificate generated using the configured keystore password." -ForegroundColor Green
     } else {
         Write-Warning "WireMock certificate script not found at: $GenerateCertScript"
     }
 } else {
-    # Keystore exists - check for potential password mismatch
-    if ($EnvFileJustCreated) {
-        Write-Host "WireMock keystore already exists, but .env was just created from .env.example." -ForegroundColor Yellow
-        Write-Host "This may cause a password mismatch. Regenerating keystore to match .env password..." -ForegroundColor Yellow
-
-        if (Test-Path $GenerateCertScript) {
-            Assert-JavaKeyToolAvailable
-
-            # Read the password from the newly created .env file
-            $EnvPassword = $EnvValues['WIREMOCK_KEYSTORE_PASSWORD']
-            if (-not $EnvPassword) {
-                $EnvPassword = "changeit"  # Default from .env.example
-            }
-
-            # Regenerate keystore with the .env password
-            & $GenerateCertScript -KeystorePassword $EnvPassword -Force
-
-            if ($LASTEXITCODE -eq 0 -or (Test-Path $WireMockKeystore)) {
-                Write-Host "WireMock keystore regenerated to match .env password." -ForegroundColor Green
-            } else {
-                Write-Warning "Failed to regenerate WireMock keystore. HTTPS may not work."
-                Write-Warning "You can manually run: $GenerateCertScript -KeystorePassword `"$EnvPassword`" -Force"
-            }
-        } else {
-            Write-Warning "WireMock certificate script not found. Cannot regenerate keystore."
-            Write-Warning "Manual action needed: Either regenerate .env or regenerate the keystore."
-        }
-    } else {
-        Write-Host "WireMock keystore already exists. Skipping certificate generation." -ForegroundColor Gray
-    }
+    Write-Host "WireMock keystore already exists. Skipping certificate generation." -ForegroundColor Gray
 }
 
 # Import certificate to Windows trusted root store for automatic trust (Windows only)
@@ -349,25 +385,22 @@ if (Test-Path $WireMockCert) {
 #endregion
 
 #region Container Services
-$ContainerCli = Resolve-ContainerRuntime -RequestedRuntime $ContainerRuntime
-$RuntimeDisplayName = (Get-Culture).TextInfo.ToTitleCase($ContainerCli)
-Assert-ContainerRuntimeReady -ContainerCli $ContainerCli -RuntimeDisplayName $RuntimeDisplayName
-Assert-ContainerComposeAvailable -ContainerCli $ContainerCli -RuntimeDisplayName $RuntimeDisplayName
-
 Write-Host "`n=== $RuntimeDisplayName Services ===" -ForegroundColor Cyan
 
 Write-Host "Starting $RuntimeDisplayName containers..." -ForegroundColor Yellow
 
-## Start the shared development collection.
-& $ContainerCli compose `
-    --env-file "$EnvFile" `
-    -f "$ContainersDir/docker-compose-common.yml" `
-    -p dev_common_shared `
-    up -d
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "$RuntimeDisplayName compose failed with exit code $LASTEXITCODE." -ErrorAction Continue
-    exit $LASTEXITCODE
+## Start the shared infrastructure resources.
+Initialize-SharedDataVolumes
+Remove-LegacySharedContainers
+foreach ($group in $SharedGroups) {
+    Write-Host "Starting dev_${group}_shared..." -ForegroundColor Yellow
+    Invoke-SharedCompose -ComposeArguments @("--env-file", $EnvFile,
+        "-f", "$ContainersDir/docker-compose-$group.yml", "-p", "dev_${group}_shared",
+        "up", "--build", "-d")
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "$RuntimeDisplayName compose for dev_${group}_shared failed with exit code $LASTEXITCODE." -ErrorAction Continue
+        exit $LASTEXITCODE
+    }
 }
 
 Write-Host "$RuntimeDisplayName containers started." -ForegroundColor Green
@@ -376,15 +409,17 @@ Write-Host "$RuntimeDisplayName containers started." -ForegroundColor Green
 Write-Host "`n=== Setup Complete ===" -ForegroundColor Green
 Write-Host "Services available:" -ForegroundColor White
 Write-Host "  SQL Server:    localhost:10433" -ForegroundColor Gray
+Write-Host "  PostgreSQL:    localhost:10432" -ForegroundColor Gray
 Write-Host "  CosmosDB:      https://localhost:10081" -ForegroundColor Gray
 Write-Host "  Cosmos Explorer: https://localhost:10181" -ForegroundColor Gray
+Write-Host "  DynamoDB:      http://localhost:10180" -ForegroundColor Gray
 Write-Host "  Redis:         localhost:10120" -ForegroundColor Gray
 Write-Host "  RedisInsight:  http://localhost:10121" -ForegroundColor Gray
 Write-Host "  SMTP4Dev SMTP: localhost:10130" -ForegroundColor Gray
 Write-Host "  SMTP4Dev POP:  localhost:10131" -ForegroundColor Gray
 Write-Host "  SMTP4Dev IMAP: localhost:10132" -ForegroundColor Gray
 Write-Host "  SMTP4Dev Web:  http://localhost:10140" -ForegroundColor Gray
-Write-Host "  Seq (OTEL):    http://localhost:10150" -ForegroundColor Gray
+Write-Host "  Seq (OTLP):    http://localhost:10150" -ForegroundColor Gray
 Write-Host "  WireMock HTTP: http://localhost:10080" -ForegroundColor Gray
 Write-Host "  WireMock HTTPS: https://localhost:10443" -ForegroundColor Gray
 Write-Host "  Azurite Blob:  localhost:10000" -ForegroundColor Gray
@@ -392,6 +427,12 @@ Write-Host "  Azurite Queue: localhost:10001" -ForegroundColor Gray
 Write-Host "  Azurite Table: localhost:10002" -ForegroundColor Gray
 Write-Host "  Service Bus:   localhost:10170" -ForegroundColor Gray
 Write-Host "  Service Bus Admin: localhost:10171" -ForegroundColor Gray
+if ($SelectedServices -contains "rabbitmq") {
+    Write-Host "  RabbitMQ: localhost:10190; management: http://localhost:10191" -ForegroundColor Gray
+}
+if ($SelectedServices -contains "aws-emulator") {
+    Write-Host "  Moto SQS/SNS/EventBridge/S3: http://localhost:10195" -ForegroundColor Gray
+}
 Write-Host ""
-Write-Host "Head back to README.md for deployment of the database and other services..."
+Write-Host "See README.md for using these infrastructure resources from the independent examples."
 

@@ -1,7 +1,7 @@
 # Pull container images required by the shared development stack.
 #
-# Most services are declared as image-based services in
-# containers/docker-compose-common.yml, so we let the selected runtime pull those
+# Image-based services, including PostgreSQL and DynamoDB Local, are declared in
+# containers/docker-compose-{common,azure,aws}.yml, so the selected runtime pulls them
 # directly. The local SQL Server service is built from containers/mssql, so we
 # also pull its base image explicitly.
 
@@ -23,8 +23,11 @@ $ErrorActionPreference = "Stop"
 $ScriptDir = $PSScriptRoot
 if (-not $ScriptDir) { $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path }
 
-$ComposeFile = Join-Path $ScriptDir "containers/docker-compose-common.yml"
-$sqlBaseImage = "mcr.microsoft.com/mssql/server:latest"
+$ComposeFiles = @("common", "azure", "aws" | ForEach-Object {
+    Join-Path $ScriptDir "containers/docker-compose-$_.yml"
+})
+$EnvFile = Join-Path $ScriptDir "containers/.env"
+$EnvExampleFile = Join-Path $ScriptDir "containers/.env.example"
 
 function Resolve-ContainerRuntime {
     param(
@@ -147,46 +150,39 @@ $RuntimeDisplayName = (Get-Culture).TextInfo.ToTitleCase($ContainerCli)
 Assert-ContainerRuntimeReady -ContainerCli $ContainerCli -RuntimeDisplayName $RuntimeDisplayName
 Assert-ContainerComposeAvailable -ContainerCli $ContainerCli -RuntimeDisplayName $RuntimeDisplayName
 
-Write-Host "$RuntimeDisplayName images and container setup started."
+Write-Host "$RuntimeDisplayName missing-image preparation started."
 
-$registryMirrors = @()
-if ($ContainerCli -eq "docker") {
-    $containerInfo = & $ContainerCli info 2>$null
-    $registryMirrors = @($containerInfo | Where-Object { $_ -match '^\s+https?://' } | ForEach-Object { $_.Trim() })
-    if ($registryMirrors.Count -gt 0) {
-        Write-Host "$RuntimeDisplayName registry mirrors detected:" -ForegroundColor Yellow
-        $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
+# Match setup's additive environment preparation before Compose parses any services.
+# Pulling images does not initialize function keys, certificates, or containers.
+if (-not (Test-Path -LiteralPath $EnvExampleFile -PathType Leaf)) {
+    throw ".env.example not found. Cannot prepare the image-pull environment."
+}
+if (-not (Test-Path -LiteralPath $EnvFile)) {
+    Copy-Item -LiteralPath $EnvExampleFile -Destination $EnvFile
+    Write-Host "Created containers/.env from .env.example." -ForegroundColor Green
+}
+$envLines = @(Get-Content -LiteralPath $EnvFile)
+$missingAssignments = @()
+foreach ($templateLine in Get-Content -LiteralPath $EnvExampleFile) {
+    if ($templateLine -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=') {
+        $key = $matches[1]
+        if (-not ($envLines -cmatch "^\s*(?:export\s+)?$([regex]::Escape($key))\s*=")) {
+            $missingAssignments += $templateLine
+            $envLines += $templateLine
+        }
     }
 }
-
-Write-Host "Pulling compose-managed images from $ComposeFile..." -ForegroundColor Yellow
-& $ContainerCli compose -f $ComposeFile pull
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to pull compose-managed images (exit code $LASTEXITCODE)." -ErrorAction Continue
-
-    if ($ContainerCli -eq "docker" -and $registryMirrors.Count -gt 0) {
-        Write-Host "Docker is configured to use registry mirror(s). If one is unavailable, pulls will fail before reaching the upstream registry." -ForegroundColor Yellow
-        Write-Host "Configured mirror(s):" -ForegroundColor Yellow
-        $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
-        Write-Host "Check Docker Desktop > Settings > Docker Engine, or %APPDATA%\Docker\daemon.json, to remove or fix the mirror." -ForegroundColor Yellow
-    }
-
-    exit $LASTEXITCODE
+if ($missingAssignments.Count -gt 0) {
+    # Preserve raw quoting/interpolation and handle existing files without a final newline.
+    Add-Content -LiteralPath $EnvFile -Value ([Environment]::NewLine + ($missingAssignments -join [Environment]::NewLine))
+    Write-Host "Added $($missingAssignments.Count) missing settings to containers/.env." -ForegroundColor Green
 }
 
-Write-Host "Pulling SQL Server base image for containers/mssql/Dockerfile: $sqlBaseImage..." -ForegroundColor Yellow
-& $ContainerCli pull $sqlBaseImage
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to pull '$sqlBaseImage' (exit code $LASTEXITCODE)." -ErrorAction Continue
-
-    if ($ContainerCli -eq "docker" -and $registryMirrors.Count -gt 0) {
-        Write-Host "Docker is configured to use registry mirror(s). If one is unavailable, pulls will fail before reaching the upstream registry." -ForegroundColor Yellow
-        Write-Host "Configured mirror(s):" -ForegroundColor Yellow
-        $registryMirrors | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
-        Write-Host "Check Docker Desktop > Settings > Docker Engine, or %APPDATA%\Docker\daemon.json, to remove or fix the mirror." -ForegroundColor Yellow
-    }
-
-    exit $LASTEXITCODE
+. (Join-Path $PSScriptRoot '.devcontainer/ensure_image.ps1')
+$images = @($ComposeFiles | ForEach-Object {
+    Select-String -LiteralPath $_ -Pattern '^\s+image:\s*(\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value }
+}) + @('mcr.microsoft.com/mssql/server:latest', 'docker.io/library/python:latest')
+foreach ($image in @($images | Sort-Object -Unique)) {
+    Ensure-ToolboxImage -Runtime $ContainerCli -Image $image
 }
-
-Write-Host "$RuntimeDisplayName images and container setup completed."
+Write-Host "$RuntimeDisplayName missing-image preparation completed."

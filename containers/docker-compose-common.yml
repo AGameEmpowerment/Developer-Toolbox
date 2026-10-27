@@ -1,65 +1,20 @@
-# General project Development Resources / Team level configuration
+# Shared common development resources
 # These resources are intended for development and testing purposes only.
-# As needed update the exposed frontend port mappings from the container.
+# Infrastructure resources only; examples run independently against these endpoints.
+# All services start with an explicit setup/up command. Long-running services use
+# unless-stopped so a developer's manual stop survives engine or machine restarts.
+# Initialization jobs use no restart policy and complete once per explicit startup.
+
+# Keep independent service network namespaces with either Compose provider.
+# A shared Podman pod would make Service Bus and RabbitMQ collide on port 5672.
+x-podman:
+    in_pod: false
 
 services:
-    # Local SQL Server Instance
-    #
-    # Custom build from local Dockerfile in ./mssql.
-    # Rationale: Allows for custom configuration, initialization scripts, or extensions not available in standard images.
-    # Build context: ./mssql (see Dockerfile in that directory).
-    # Environment variables:
-    #   - SA_PASSWORD: SQL Server system administrator password (required)
-    #   - ACCEPT_EULA: Must be set to "Y" to accept the license agreement (required)
-    #   - MSSQL_AGENT_ENABLED: Enables SQL Server Agent (optional, default "true")
-    # For more details on Dockerfile instructions, see: https://docs.docker.com/engine/reference/builder/
-    mssql:
-        build: ./mssql
-        environment:
-            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
-            SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
-            ACCEPT_EULA: "${ACCEPT_EULA}"
-            MSSQL_AGENT_ENABLED: "true"
-        ports:
-            - "127.0.0.1:10433:1433" # SQL Server Connection Port
-        volumes:
-            - mssql-data:/var/opt/mssql
-        networks:
-            default:
-            sb-emulator:
-                aliases:
-                    - mssql
-        restart: unless-stopped
-        container_name: SqlServer
-        hostname: mssql
-
-    # CosmoDb Server Instance
-    cosmosdb:
-        image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
-        environment:
-            # The current Microsoft guidance for the Linux emulator uses the
-            # vnext-preview image. HTTPS keeps it compatible with the .NET SDK.
-            PROTOCOL: "https"
-            ENABLE_EXPLORER: "true"
-            EXPLORER_PROTOCOL: "https"
-        ports:
-            - "127.0.0.1:10081:8081"
-            - "127.0.0.1:10181:1234"
-        volumes:
-            - cosmos-data:/data
-        healthcheck:
-            test: ["CMD-SHELL", "curl --insecure --fail --silent https://127.0.0.1:8081/ >/dev/null || exit 1"]
-            interval: 20s
-            timeout: 10s
-            retries: 15
-            start_period: 60s
-        container_name: CosmoDb
-        restart: unless-stopped
-        hostname: cosmosdb
-
     # Local Redis Cache Instance
     redis:
-        image: redis:latest
+        image: docker.io/library/redis:latest
+        pull_policy: never
         command:
             [
                 "redis-server",
@@ -83,7 +38,8 @@ services:
 
     # Local RedisInsight UI for Redis Cache
     redisinsight:
-        image: redis/redisinsight:latest
+        image: docker.io/redis/redisinsight:latest
+        pull_policy: never
         ports:
             - "127.0.0.1:10121:5540" # RedisInsight Web UI
         environment:
@@ -107,7 +63,8 @@ services:
 
     # Local Mail Trap
     smtp4dev:
-        image: rnwood/smtp4dev:latest
+        image: docker.io/rnwood/smtp4dev:latest
+        pull_policy: never
         ports:
             - "127.0.0.1:10130:25" # smtp server
             - "127.0.0.1:10131:110" # pop server
@@ -124,7 +81,8 @@ services:
 
     # Local Seq observability service with OTLP ingestion and durable storage
     otlp-seq:
-        image: datalust/seq:latest
+        image: docker.io/datalust/seq:latest
+        pull_policy: never
         environment:
             ACCEPT_EULA: "${ACCEPT_EULA}"
             SEQ_FIRSTRUN_NOAUTHENTICATION: "${SEQ_FIRSTRUN_NOAUTHENTICATION}"
@@ -145,15 +103,16 @@ services:
     #   - 10443: HTTPS (TLS with custom certificate)
     # For client trust, import ./containers/certs/wiremock.crt (from the repo root) into your application's trust store.
     wiremock:
-        image: wiremock/wiremock:latest
+        image: docker.io/wiremock/wiremock:latest
+        pull_policy: never
         ports:
             - "127.0.0.1:10080:8080" # WireMock HTTP Port for API routes
             - "127.0.0.1:10443:8443" # WireMock HTTPS Port for API routes
         volumes:
-            - ./extensions:/var/wiremock/extensions
-            - ./__files:/home/wiremock/__files
-            - ./mappings:/home/wiremock/mappings
-            - ./certs:/certs:ro
+            - ./extensions:/var/wiremock/extensions:z
+            - ./__files:/home/wiremock/__files:z
+            - ./mappings:/home/wiremock/mappings:z
+            - ./certs:/certs:ro,z
         command:
             - "--port"
             - "8080"
@@ -171,43 +130,8 @@ services:
         restart: unless-stopped
         container_name: Wiremock
 
-    # Local Azure Blob Storage
-    azurite:
-        image: mcr.microsoft.com/azure-storage/azurite
-        ports:
-            - "127.0.0.1:10000:10000" # Blob service
-            - "127.0.0.1:10001:10001" # Queue service
-            - "127.0.0.1:10002:10002" # Table service
-        volumes:
-            - azurite-data:/data
-        restart: unless-stopped
-        container_name: Azurite
-
-    # Service Bus Emulator using the shared SQL Server Linux instance.
-    service-bus:
-        image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
-        pull_policy: always
-        volumes:
-            - "./service-bus/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json"
-        ports:
-            - "127.0.0.1:10170:5672" # Service Bus AMQP
-            - "127.0.0.1:10171:5300" # Service Bus admin / management
-        environment:
-            SQL_SERVER: "mssql"
-            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" # Password must match the SQL Server Linux container
-            ACCEPT_EULA: "${ACCEPT_EULA}"
-            SQL_WAIT_INTERVAL: "15" # Optional: Time in seconds to wait for SQL to be ready (default is 15 seconds)
-        depends_on:
-            - mssql
-        networks:
-            sb-emulator:
-                aliases:
-                    - sb-emulator
-        restart: unless-stopped
-        container_name: ServiceBus
-
 networks:
-    sb-emulator:
+    default:
 
 volumes:
     smtp4dev-data:
@@ -217,10 +141,4 @@ volumes:
     redisinsight-data:
         driver: local
     seq-data:
-        driver: local
-    cosmos-data:
-        driver: local
-    mssql-data:
-        driver: local
-    azurite-data:
         driver: local

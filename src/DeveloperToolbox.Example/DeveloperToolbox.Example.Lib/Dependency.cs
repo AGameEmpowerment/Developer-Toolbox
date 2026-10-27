@@ -1,6 +1,10 @@
-namespace DeveloperToolbox.Example.Lib;
-
-public sealed class Dependency
+namespace DeveloperToolbox.Example.Lib
 {
-    public string GetMessage() => "Hello from the Developer Toolbox example!";
+    public class Dependency
+    {
+        public string GetMessage()
+        {
+            return "Hello from Dependency!";
+        }
+    }
 }

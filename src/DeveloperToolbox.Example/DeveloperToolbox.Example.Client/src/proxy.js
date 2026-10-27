@@ -1,8 +1,11 @@
 import { match } from "@formatjs/intl-localematcher";
 import { NextResponse } from "next/server";
 import { DEFAULT_LOCALE, getLocaleFromRequest, LOCALES } from "./utils/i18n";
+import { createAuthClient } from "./utils/auth";
 
-export function proxy(request) {
+const auth = createAuthClient();
+
+export async function proxy(request) {
   const language = match(
     getLocaleFromRequest(request),
     LOCALES,
@@ -10,7 +13,10 @@ export function proxy(request) {
   );
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-lang", language);
-  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  const response = auth
+    ? await auth.middleware(request)
+    : NextResponse.next({ request: { headers: requestHeaders } });
+  response.headers.set("x-lang", language);
   response.headers.set("Cache-Control", "no-store, private");
   return response;
 }

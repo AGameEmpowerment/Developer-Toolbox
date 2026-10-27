@@ -1,0 +1,8 @@
+.venv
+tests
+__pycache__
+**/__pycache__
+*.pyc
+.env*
+*.settings.json
+README.md

@@ -1,0 +1,166 @@
+# Validate local developer examples with isolated containers and the existing private npm registry.
+name: Resource Examples Validation
+
+on:
+    pull_request:
+        paths:
+            - "src/DeveloperToolbox.Example/**"
+            - "DeveloperToolbox.Example.slnx"
+            - "src/DeveloperToolbox.Java.Example/**"
+            - "containers/**"
+            - "docker_setup.*"
+            - "docker_pull.*"
+            - "docker_down.*"
+            - "setup/configure_examples.py"
+            - "tests/**"
+            - ".github/workflows/resource-examples-validation.yml"
+    push:
+        paths:
+            - "src/DeveloperToolbox.Example/**"
+            - "DeveloperToolbox.Example.slnx"
+            - "src/DeveloperToolbox.Java.Example/**"
+            - "containers/**"
+            - "docker_setup.*"
+            - "docker_pull.*"
+            - "docker_down.*"
+            - "setup/configure_examples.py"
+            - "tests/**"
+            - ".github/workflows/resource-examples-validation.yml"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    client:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: '24'
+            - name: Install public client dependencies and apply the reviewed mitigation
+              run: npm ci --registry=https://registry.npmjs.org
+            - name: Verify frontend and dependency-security regression tests
+              run: npm run verify
+            - name: Build the standalone frontend against a local synthetic API
+              run: npm run build:test
+
+    examples:
+        runs-on: ubuntu-latest
+        timeout-minutes: 45
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/setup-dotnet@v5
+              with:
+                  dotnet-version: '10.x'
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: '3.14'
+            - name: Restore, build, and test C# examples
+              run: |
+                  dotnet restore DeveloperToolbox.Example.slnx --source https://api.nuget.org/v3/index.json
+                  dotnet build DeveloperToolbox.Example.slnx --no-restore --configuration Release
+                  dotnet test DeveloperToolbox.Example.slnx --no-build --configuration Release
+                  dotnet build-server shutdown
+            - name: Install the free AWS emulator for real SDK checks
+              run: python -m pip install --index-url https://pypi.org/simple "moto[server]==5.2.4"
+            - name: Validate resource initialization and independent example configuration
+              env:
+                  TOOLBOX_TEST_MOTO_API: '1'
+              run: python -m unittest discover -s tests -p "test_*.py"
+            - name: Validate Compose configuration
+              run: |
+                  for group in common azure aws; do
+                      docker compose --env-file containers/.env.example -f "containers/docker-compose-${group}.yml" -p "dev_${group}_shared" config --quiet
+                  done
+            - name: Verify manually stopped containers stay stopped
+              run: python tests/test_container_lifecycle.py --runtime docker
+            - name: Validate infrastructure with the host C# examples
+              run: |
+                  bash tests/prepare_host_images.sh docker
+                  python tests/test_host_examples.py --runtime docker --language csharp
+                  python tests/test_servicebus_containers.py --runtime docker
+            - name: Validate Bash startup and image-pull scripts without services
+              run: |
+                  bash tests/test_environment.sh
+                  bash tests/test_docker_setup.sh
+                  bash tests/test_docker_pull.sh
+                  bash tests/test_ensure_image.sh
+                  bash tests/test_wiremock_certificates.sh
+            - name: Validate PowerShell startup and image-pull scripts without services
+              shell: pwsh
+              run: |
+                  ./tests/test_environment.ps1
+                  ./tests/test_docker_setup.ps1
+                  ./tests/test_docker_pull.ps1
+                  ./tests/test_ensure_image.ps1
+                  ./tests/test_wiremock_certificates.ps1
+
+    java:
+        runs-on: ubuntu-latest
+        timeout-minutes: 45
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/setup-java@v5
+              with:
+                  distribution: temurin
+                  java-version: '25'
+                  cache: maven
+                  cache-dependency-path: src/DeveloperToolbox.Java.Example/**/pom.xml
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: '3.14'
+            - name: Build and test Java SDK, ORM, Functions, and Lambda examples
+              run: mvn --batch-mode --no-transfer-progress -f src/DeveloperToolbox.Java.Example/pom.xml verify
+            - name: Build only infrastructure images
+              run: |
+                  bash tests/prepare_host_images.sh docker
+            - name: Verify host Java SDK calls against isolated infrastructure
+              run: python tests/test_host_examples.py --runtime docker --language java
+
+    node:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/setup-node@v7
+              with:
+                  node-version: '24'
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: '3.14'
+            - name: Install locked Node.js example packages
+              run: npm ci --registry=https://registry.npmjs.org
+            - name: Test SDK and serverless handlers
+              run: npm test
+            - name: Validate isolated infrastructure using host Node.js examples
+              working-directory: .
+              run: |
+                  bash tests/prepare_host_images.sh docker
+                  python tests/test_host_examples.py --runtime docker --language node
+
+    python:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python
+        steps:
+            - uses: actions/checkout@v6
+            - uses: actions/setup-python@v6
+              with:
+                  python-version: '3.14'
+            - name: Install Python example packages
+              run: python -m pip install --index-url https://pypi.org/simple -r requirements.txt
+            - name: Test SDK and serverless handlers
+              run: python -m unittest discover -s tests -p "test_*.py"
+            - name: Validate isolated infrastructure using host Python examples
+              working-directory: .
+              run: |
+                  bash tests/prepare_host_images.sh docker
+                  python tests/test_host_examples.py --runtime docker --language python

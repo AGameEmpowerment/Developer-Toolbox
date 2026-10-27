@@ -32,7 +32,7 @@ function New-TestRepository {
     )
 
     New-Item -ItemType Directory -Path $Path -Force | Out-Null
-    & git -C $Path init --quiet
+    & git -C $Path init --quiet --initial-branch=main
     if ($LASTEXITCODE -ne 0) {
         throw "Unable to initialize test repository '$Path'."
     }
@@ -55,6 +55,7 @@ try {
         Set-Content -LiteralPath (Join-Path $mockBin "podman.cmd") -Value @'
 @echo off
 if "%1"=="info" exit /b 0
+if "%1"=="image" exit /b 0
 exit /b 1
 '@
         Set-Content -LiteralPath (Join-Path $mockBin "devcontainer.cmd") -Value '@echo %*'
@@ -65,7 +66,7 @@ exit 1
 '@
         Set-Content -LiteralPath (Join-Path $mockBin "podman") -Value @'
 #!/usr/bin/env bash
-[[ "$1" == "info" ]]
+[[ "$1" == "info" || "$1" == "image" ]]
 '@
         Set-Content -LiteralPath (Join-Path $mockBin "devcontainer") -Value @'
 #!/usr/bin/env bash
@@ -201,8 +202,8 @@ throw "consumer docker setup must not be selected"
         -Message "Installer replaced an existing target file."
     Assert-Condition -Condition (Test-Path -LiteralPath $existingDevcontainerMarker -PathType Leaf) `
         -Message "Installer replaced an existing target directory."
-    Assert-Condition -Condition (-not (Test-Path -LiteralPath (Join-Path $existingDevcontainer "devcontainer.json"))) `
-        -Message "Installer added files to an existing target directory."
+    Assert-Condition -Condition (Test-Path -LiteralPath (Join-Path $existingDevcontainer "devcontainer.json") -PathType Leaf) `
+        -Message "Installer did not add missing managed files to an existing target directory."
 
     $danglingLinkPath = Join-Path $testRoot "Preserve Dangling Link"
     New-TestRepository -Path $danglingLinkPath

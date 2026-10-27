@@ -46,5 +46,3 @@ if (-not $PSCmdlet.ShouldProcess("local emulator stack", "Start with $ContainerR
 if (-not $?) {
     throw "Developer toolkit launcher failed."
 }
-
-

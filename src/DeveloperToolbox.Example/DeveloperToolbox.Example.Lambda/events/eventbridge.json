@@ -1,0 +1,7 @@
+{
+  "version": "0",
+  "id": "toolbox-event-1",
+  "detail-type": "ToolboxSample",
+  "source": "developertoolbox",
+  "detail": { "message": "Hello EventBridge" }
+}

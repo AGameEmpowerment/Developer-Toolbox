@@ -1,0 +1,472 @@
+{
+  "date": "2026-10-27",
+  "baseCommit": "66f452566f589a05c520d2679b320d020284d5f5",
+  "referenceCommit": "618951fbd522f1a52ea68af130512cc5931a536a",
+  "sourceState": "uncommitted working tree; current source hashes are in test-inventory.json",
+  "coverage": "unavailable; no measured coverage report collected",
+  "images": [
+    {
+      "tag": "dev_azure_shared-mssql:latest",
+      "id": "sha256:500942ad03e704e3240e5e125d28c4e7a6db0c42dc39eaeba78596fc8470e0e5",
+      "build": "passed"
+    },
+    {
+      "tag": "dev_aws_shared-aws-emulator:latest",
+      "id": "sha256:88497a3834f3c558dac110bc60eed421decbac0ae7a6060548054fbbf4967e7a",
+      "build": "passed"
+    },
+    {
+      "tag": "localhost/toolbox-oidc-keycloak:latest",
+      "id": "sha256:c8987ad08291db9716d4f1acce0b68e71be63ac1229d9b88496ee7e71a98be8a",
+      "build": "passed"
+    },
+    {
+      "tag": "dev_aws_shared-aws-init:latest",
+      "id": "sha256:5688ebec12b1a3903f11035c6f5203ba6b792e74229f293927e695d5eca14c5a",
+      "build": "passed"
+    }
+  ],
+  "checks": [
+    {
+      "name": "Compose common/Azure/AWS configuration",
+      "result": "passed; complete rendered definitions match reference after checkout-path normalization"
+    },
+    {
+      "name": ".NET Release build",
+      "result": "passed after restoring patched dependencies; zero build warnings/errors"
+    },
+    {
+      "name": "Client format/lint/verify",
+      "result": "passed"
+    },
+    {
+      "name": "Next.js build:test",
+      "result": "passed"
+    },
+    {
+      "name": "AI adapter generation",
+      "result": "passed"
+    },
+    {
+      "name": "Working-tree source inventory --check",
+      "result": "passed"
+    },
+    {
+      "name": "Git diff --check",
+      "result": "passed"
+    },
+    {
+      "name": "Wiki links",
+      "result": "26 Markdown files; zero broken page links; zero orphans"
+    },
+    {
+      "name": "Final source portability regression",
+      "result": "5 passed; subset of the root suite, not additional authored tests"
+    },
+    {
+      "name": "Java verify and packaging",
+      "result": "passed; all three modules; 117 JUnit cases"
+    },
+    {
+      "name": "Public NuGet vulnerability audit",
+      "result": "passed; 14 solution projects; zero vulnerable package entries"
+    },
+    {
+      "name": "OIDC source contracts",
+      "result": "passed; 8 source checks; separate from live checks"
+    }
+  ],
+  "executions": [
+    {
+      "framework": "NUnit",
+      "area": "DeveloperToolbox.Example.Lib.Tests",
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "discoveredCases": 1,
+      "executedCases": 1,
+      "evidenceSha256": "4187679bd270fffdca41a180b9cb31c157299c4aaec9eb19d9720406e4bb1e89",
+      "evidence": "ignored artifacts/parity/dotnet-remediation TRX"
+    },
+    {
+      "framework": "NUnit",
+      "area": "DeveloperToolbox.Example.App.Tests",
+      "passed": 60,
+      "failed": 0,
+      "skipped": 0,
+      "discoveredCases": 60,
+      "executedCases": 60,
+      "evidenceSha256": "f2826e4b34a3a861d959b8d91f9310e33b5588fb5c3294241b0808ea243bc94a",
+      "evidence": "ignored artifacts/parity/dotnet-remediation TRX"
+    },
+    {
+      "framework": "NUnit",
+      "area": "DeveloperToolbox.Example.Lambda.Tests",
+      "passed": 45,
+      "failed": 0,
+      "skipped": 0,
+      "discoveredCases": 45,
+      "executedCases": 45,
+      "evidenceSha256": "4ea91cb46d33a72ea2e86fe109b4776f7c0f049f9c9d761810ed85a1e87957ce",
+      "evidence": "ignored artifacts/parity/dotnet-remediation TRX"
+    },
+    {
+      "framework": "NUnit",
+      "area": "DeveloperToolbox.Example.Messaging.Tests",
+      "passed": 103,
+      "failed": 0,
+      "skipped": 0,
+      "discoveredCases": 103,
+      "executedCases": 103,
+      "evidenceSha256": "2255da00b5cf4f64189b8125ed7f6c4b997e9e2e5ad98eed78370c9339ff1790",
+      "evidence": "ignored artifacts/parity/dotnet-remediation TRX"
+    },
+    {
+      "framework": "NUnit",
+      "area": "DeveloperToolbox.Example.Functions.Tests",
+      "passed": 178,
+      "failed": 0,
+      "skipped": 0,
+      "discoveredCases": 178,
+      "executedCases": 178,
+      "evidenceSha256": "069bd7c3bedb5b4d395441cc18e528afedee0982195e9ea84511c1d594917948",
+      "evidence": "ignored artifacts/parity/dotnet-remediation TRX"
+    },
+    {
+      "framework": "NUnit",
+      "area": "DeveloperToolbox.Example.Resources.Tests",
+      "passed": 53,
+      "failed": 0,
+      "skipped": 0,
+      "discoveredCases": 53,
+      "executedCases": 53,
+      "evidenceSha256": "f860f62311a2cd0531cf4eac693acbb1006d125759e1fe2ee959ab358c38c40a",
+      "evidence": "ignored artifacts/parity/dotnet-remediation TRX"
+    },
+    {
+      "framework": "NUnit",
+      "area": "DeveloperToolbox.Example.Data.Tests",
+      "passed": 44,
+      "failed": 0,
+      "skipped": 2,
+      "discoveredCases": 46,
+      "executedCases": 44,
+      "evidenceSha256": "e72adf5d98bf06b15075b6dedce4d6569dd680501893d8f805b05322e6d86743",
+      "evidence": "ignored artifacts/parity/dotnet-remediation TRX"
+    },
+    {
+      "framework": "JUnit",
+      "area": "Java/core",
+      "discoveredCases": 68,
+      "executedCases": 68,
+      "passed": 68,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "packaging": "passed",
+      "reports": [
+        {
+          "file": "TEST-developertoolbox.core.ContractsTests.xml",
+          "sha256": "726ea1555352d7a8c55836c0b865790b27df2a56fa0be442dac86381fdfe21b7"
+        },
+        {
+          "file": "TEST-developertoolbox.core.CosmosCertificateTlsTests.xml",
+          "sha256": "e32309e75fdcd7aae3d79f5ac593f9ca90e0c476f546de5c4ed03c35c668370c"
+        },
+        {
+          "file": "TEST-developertoolbox.core.DatabaseSamplesTests.xml",
+          "sha256": "620548ac00717451311cbfa6b437086014f3e4c1cfc11c5598e7d51f30f62cda"
+        },
+        {
+          "file": "TEST-developertoolbox.core.SdkGuardsTests.xml",
+          "sha256": "5bd68d5d1963145df51eca350b3d90f6e0218094c91b0a2bcdd2ae0cbca9b026"
+        }
+      ],
+      "command": "mvn --batch-mode --no-transfer-progress -f src/DeveloperToolbox.Java.Example/pom.xml verify"
+    },
+    {
+      "framework": "JUnit",
+      "area": "Java/functions",
+      "discoveredCases": 31,
+      "executedCases": 31,
+      "passed": 31,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "packaging": "passed",
+      "reports": [
+        {
+          "file": "TEST-developertoolbox.functions.ToolboxFunctionsTests.xml",
+          "sha256": "b7fcda5f6c8c6bad09c7b19c4f21b85c85f2515f86c8a822a15f87a4db2f0b95"
+        }
+      ],
+      "command": "mvn --batch-mode --no-transfer-progress -f src/DeveloperToolbox.Java.Example/pom.xml verify"
+    },
+    {
+      "framework": "JUnit",
+      "area": "Java/lambda",
+      "discoveredCases": 18,
+      "executedCases": 18,
+      "passed": 18,
+      "failed": 0,
+      "errors": 0,
+      "skipped": 0,
+      "packaging": "passed",
+      "reports": [
+        {
+          "file": "TEST-developertoolbox.lambda.LambdaTests.xml",
+          "sha256": "7c45f50de5bbbfb8b789326789cb56451817a1f2b3a819ce7cc89dfe668a1c77"
+        }
+      ],
+      "command": "mvn --batch-mode --no-transfer-progress -f src/DeveloperToolbox.Java.Example/pom.xml verify"
+    },
+    {
+      "framework": "Python unittest",
+      "area": "tests",
+      "authored": 117,
+      "discoveredCases": 117,
+      "passed": 109,
+      "failed": 0,
+      "skipped": 8,
+      "command": "python -m unittest discover -s tests -p test_*.py"
+    },
+    {
+      "framework": "Python unittest",
+      "area": "Python SDK/Functions/Lambda",
+      "authored": 31,
+      "discoveredCases": 31,
+      "passed": 31,
+      "failed": 0,
+      "skipped": 0,
+      "command": "python -m unittest discover -s tests -p test_*.py (Python example virtual environment)"
+    },
+    {
+      "framework": "Vitest",
+      "area": "Node SDK/Functions/Lambda/CLI",
+      "discoveredCases": 86,
+      "passed": 86,
+      "failed": 0,
+      "skipped": 0,
+      "command": "npm test (60-second runner limit; 30-second CLI child bound)"
+    },
+    {
+      "framework": "Vitest",
+      "area": "Next.js client",
+      "discoveredCases": 15,
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "command": "npm run verify"
+    },
+    {
+      "framework": "Node test",
+      "area": "Client dependency-security contracts",
+      "discoveredCases": 18,
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "command": "npm run test:dependency-security"
+    },
+    {
+      "framework": "Standalone PowerShell",
+      "area": "Nine stub/source suites",
+      "scriptsPassed": 9,
+      "scriptsFailed": 0,
+      "scripts": [
+        "test_environment",
+        "test_ensure_image",
+        "test_docker_setup",
+        "test_docker_pull",
+        "test_build_toolbox_image",
+        "test_oidc_contract",
+        "test_git_tag_cleanup",
+        "test_wiremock_certificates",
+        "test_toolbox_bootstrap"
+      ]
+    },
+    {
+      "framework": "Standalone Bash",
+      "area": "Six stub/source suites",
+      "scriptsPassed": 6,
+      "scriptsFailed": 0,
+      "scripts": [
+        "test_environment",
+        "test_ensure_image",
+        "test_docker_setup",
+        "test_docker_pull",
+        "test_wiremock_certificates",
+        "test_toolbox_bootstrap"
+      ],
+      "caseTotals": "not collected; scripts kept separate from framework cases"
+    },
+    {
+      "framework": "Standalone PowerShell",
+      "area": "OIDC live startup",
+      "scripts": 1,
+      "authoredCheckSites": 12,
+      "discoveredCases": 25,
+      "passed": 25,
+      "failed": 0,
+      "skipped": 0,
+      "notRun": 0,
+      "readinessTimeoutSeconds": 300,
+      "upstreamReference": "quay.io/keycloak/keycloak:latest",
+      "upstreamId": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+      "cleanupPassed": true,
+      "evidence": "oidc-startup.json"
+    }
+  ],
+  "dependencyAudit": {
+    "source": "npm install --package-lock-only / npm ci output",
+    "client": {
+      "moderate": 1,
+      "high": 4
+    },
+    "nuget": {
+      "date": "2026-10-27",
+      "projects": 14,
+      "vulnerablePackageEntries": 0,
+      "publicSource": "https://api.nuget.org/v3/index.json",
+      "evidence": "nuget-audit.json",
+      "changes": {
+        "MailKit": "4.18.1 -> 4.18.2 (MimeKit requests PKCS 10.0.13)",
+        "Data PKCS": "direct 10.0.14 reference replaces SqlClient transitive 9.0.11"
+      },
+      "scope": "solution project package graph; not a claim that frontend audit findings were fixed"
+    },
+    "previousNugetFinding": "Inherited System.Security.Cryptography.Pkcs 9.0.11/10.0.0 advisories reported by restore/build. No claim of vulnerability remediation."
+  },
+  "bash": "All six final Bash suites passed under Git Bash on Windows. The bootstrap suite was rerun after an earlier attempt collided with concurrent generated-adapter replacement; the isolated rerun passed.",
+  "outputEvidence": [
+    {
+      "name": "toolbox-dotnet-tests.log",
+      "sha256": "86ef53438820224e1259febcc931a05c6ed470b33a02b69f8001e9eaf31808c9"
+    },
+    {
+      "name": "toolbox-python-tests.log",
+      "sha256": "0e05a673272d17bea010c0901e8f8718baa7d1dea295ec6b7661d07f984da61f"
+    },
+    {
+      "name": "toolbox-python-sdk-tests.log",
+      "sha256": "ab40ae792d6c196b59aed2f530139a497c470b8cc1a1a5218a5588eae74b81b1"
+    },
+    {
+      "name": "toolbox-node-tests-final.log",
+      "sha256": "b3c55f07ef9755882d3471afd02dd9cd5bac073ce931fb53c7a506791151921e"
+    },
+    {
+      "name": "toolbox-client-verify.log",
+      "sha256": "d9d434933bb6e55ec3326931e8fc963d57f9ab59f819267523062cee1203d76b"
+    },
+    {
+      "name": "toolbox-client-build.log",
+      "sha256": "80314153c6a7e3b7082d5ebd2aeda50fe6c0a14f4c57599dc622c3b31e132c88"
+    },
+    {
+      "name": "toolbox-environment.log",
+      "sha256": "90c4095d2e661ba51a57e05bd8b4c3b47bc1fc2cab08f04640746413539a9814"
+    },
+    {
+      "name": "toolbox-ensure_image.log",
+      "sha256": "aa45ec33afec6841e7c5da38b2405bd7118296fe8dc5eaa187db7debde0ea910"
+    },
+    {
+      "name": "toolbox-docker_setup.log",
+      "sha256": "eaaa594152cf1fbd1a15af286d3f6bfb2c1b09d1a2a2cbbac8e184df3fbabf44"
+    },
+    {
+      "name": "toolbox-docker_pull.log",
+      "sha256": "bc89c4db5edd9dcb66f776057a1e443d2848f5dccdd90066cf6acf6346b97b97"
+    },
+    {
+      "name": "toolbox-wiremock_certificates.log",
+      "sha256": "122019e8482c222a78e1a651783afd129b5fee3590d00d00535d66f41d28ff37"
+    },
+    {
+      "name": "toolbox-toolbox_bootstrap-final.log",
+      "sha256": "ee771380d9b9b74acf29c1ea694b1f09cb6eb6d400f9444ad6aea7a848814ed9"
+    },
+    {
+      "name": "toolbox-test_environment.log",
+      "sha256": "642c4ebac6e4bae576f1876a6cb6a95118beb1d82619be4b046cbcc318da0082"
+    },
+    {
+      "name": "toolbox-test_ensure_image.log",
+      "sha256": "1567e4e96c9e37798c28e81e15ee910154bf2e2e5ea749f34c34e23cde2f802f"
+    },
+    {
+      "name": "toolbox-test_docker_setup.log",
+      "sha256": "bdd46a2bcda316adf513e5d959e92885b58cee0547ef5b0b9338cc73a7980122"
+    },
+    {
+      "name": "toolbox-test_docker_pull.log",
+      "sha256": "0de157a9caef8304f493f813ab210fad16e9444e47e0b5d750da5fa204af078c"
+    },
+    {
+      "name": "toolbox-test_build_toolbox_image.log",
+      "sha256": "1e52d11db1ae0027d688046a2d711d1d033df2ddbc64418f8364f909fb980d59"
+    },
+    {
+      "name": "toolbox-test_oidc_contract.log",
+      "sha256": "a915ba55169572096d62e9b0c1ca0e1d85c93c2f15e9ecc53a6809139388f2ca"
+    },
+    {
+      "name": "toolbox-test_git_tag_cleanup.log",
+      "sha256": "1bdaf4c4341561c157083790a778b0f6aaf69746f5adfa67bacb7dd895be6f4f"
+    },
+    {
+      "name": "toolbox-test_wiremock_certificates.log",
+      "sha256": "2064876d37ceb3f563674477ebddbf5a84cd81092ecf4bce8b610ab5adf236b3"
+    },
+    {
+      "name": "toolbox-test_toolbox_bootstrap.log",
+      "sha256": "249a94d03714278d0dbd592018f30836d35ea49e38723860b669dc1fa76b90f5"
+    },
+    {
+      "name": "toolbox-java-verify.log",
+      "sha256": "a0dd2d264f2273e662286ec28d227cd593e735d50cf4ad7a8b022041049d0a6c"
+    },
+    {
+      "name": "toolbox-dotnet-remediation.log",
+      "sha256": "ad32404a6b518680e39613b5b1d052cfd25267980093c5d94e2bec985a9d6c1c"
+    },
+    {
+      "name": "toolbox-oidc-remediation.log",
+      "sha256": "2bb6ecad7b0b83cbf00c6ad120d36ae4e53d65eb4f6029e939c97a8eb465f759"
+    },
+    {
+      "name": "toolbox-nuget-after.json",
+      "sha256": "ecd5dc16995d5165e625801d499800ab645b6bfc0e5969ac9a9dc458a74cb925"
+    }
+  ],
+  "runtimes": {
+    "dotnetSdk": "10.0.402",
+    "node": "24.22.1",
+    "python": "3.15.1 host/virtual environment; samples/devcontainer declare 3.14",
+    "java": "Microsoft OpenJDK 25.0.5.0.2; javac 25.0.5.0.2; Maven 3.10.0",
+    "powershell": "7.6.5",
+    "docker": "29.9.2 Linux/amd64",
+    "maven": "3.10.0"
+  },
+  "priorExecutions": [
+    {
+      "framework": "Standalone PowerShell",
+      "area": "OIDC live startup",
+      "scripts": 1,
+      "authoredCheckSites": 12,
+      "discoveredCases": 25,
+      "passed": 3,
+      "failed": 1,
+      "skipped": 0,
+      "notRun": 21,
+      "failedCheck": "upstream-missing-import-starts-without-requested-realm",
+      "reason": "Unmodified upstream Keycloak did not become ready within the default 180-second window. A separate upstream diagnostic subsequently reached startup after slow cold augmentation and schema initialization.",
+      "cleanupPassed": true
+    }
+  ],
+  "remediationSourceHashes": {
+    "tests/test_oidc_startup.ps1": "8e10dc65a6d8d8eed3c0701b1197a702800ac25dc4d0a058ef4d062b9a307b62",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/DeveloperToolbox.Example.Data.csproj": "cb85f80709e6ab9276de3000ec4f5ae1cbde78687740023793b61d83759d017c",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/DeveloperToolbox.Example.Resources.csproj": "0ce530ea5036e276876842f0f8617e125cd220496004630f38de2f5b7dc2cacf"
+  }
+}

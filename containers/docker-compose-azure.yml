@@ -1,0 +1,126 @@
+# Shared azure development resources
+# These resources are intended for development and testing purposes only.
+# Infrastructure resources only; examples run independently against these endpoints.
+# All services start with an explicit setup/up command. Long-running services use
+# unless-stopped so a developer's manual stop survives engine or machine restarts.
+# Initialization jobs use no restart policy and complete once per explicit startup.
+
+# Keep independent service network namespaces with either Compose provider.
+# A shared Podman pod would make Service Bus and RabbitMQ collide on port 5672.
+x-podman:
+    in_pod: false
+
+services:
+    # Local SQL Server Instance
+    #
+    # Custom build from local Dockerfile in ./mssql.
+    # Rationale: Allows for custom configuration, initialization scripts, or extensions not available in standard images.
+    # Build context: ./mssql (see Dockerfile in that directory).
+    # Environment variables:
+    #   - SA_PASSWORD: SQL Server system administrator password (required)
+    #   - ACCEPT_EULA: Must be set to "Y" to accept the license agreement (required)
+    #   - MSSQL_AGENT_ENABLED: Enables SQL Server Agent (optional, default "true")
+    # For more details on Dockerfile instructions, see: https://docs.docker.com/engine/reference/builder/
+    mssql:
+        # The official SQL Server Linux image is AMD64 only.
+        platform: linux/amd64
+        build:
+            context: ./mssql
+            args:
+                MSSQL_ENGINE_VERSION: "${TOOLBOX_MSSQL_ENGINE_VERSION:-}"
+        environment:
+            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+            SA_PASSWORD: "${MSSQL_SA_PASSWORD}"
+            ACCEPT_EULA: "${ACCEPT_EULA}"
+            MSSQL_AGENT_ENABLED: "true"
+        ports:
+            - "127.0.0.1:10433:1433" # SQL Server Connection Port
+        volumes:
+            - mssql-data:/var/opt/mssql
+        networks:
+            default:
+            sb-emulator:
+                aliases:
+                    - mssql
+        restart: unless-stopped
+        container_name: SqlServer
+        hostname: mssql
+
+    # CosmoDb Server Instance
+    cosmosdb:
+        # Floating vNext Linux variant provides this stack's HTTPS/Explorer endpoints.
+        image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-latest
+        pull_policy: never
+        environment:
+            # HTTPS keeps the latest development image compatible with the .NET SDK.
+            PROTOCOL: "https"
+            ENABLE_EXPLORER: "true"
+            EXPLORER_PROTOCOL: "https"
+        ports:
+            - "127.0.0.1:10081:8081"
+            - "127.0.0.1:10181:1234"
+        volumes:
+            - cosmos-data:/data
+        healthcheck:
+            test: ["CMD-SHELL", "curl --insecure --fail --silent https://127.0.0.1:8081/ >/dev/null || exit 1"]
+            interval: 20s
+            timeout: 10s
+            retries: 15
+            start_period: 60s
+        container_name: CosmoDb
+        restart: unless-stopped
+        hostname: cosmosdb
+
+    # Local Azure Blob Storage
+    azurite:
+        image: mcr.microsoft.com/azure-storage/azurite:latest
+        pull_policy: never
+        ports:
+            - "127.0.0.1:10000:10000" # Blob service
+            - "127.0.0.1:10001:10001" # Queue service
+            - "127.0.0.1:10002:10002" # Table service
+        volumes:
+            - azurite-data:/data
+        restart: unless-stopped
+        container_name: Azurite
+
+    # Service Bus Emulator using the shared SQL Server Linux instance.
+    service-bus:
+        image: mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
+        pull_policy: never
+        volumes:
+            - "./service-bus/Config.json:/ServiceBus_Emulator/ConfigFiles/Config.json:z"
+        ports:
+            - "127.0.0.1:10170:5672" # Service Bus AMQP
+            # The Functions Service Bus binding uses the emulator's standard AMQP port.
+            - "127.0.0.1:5672:5672"
+            - "127.0.0.1:10171:5300" # Service Bus admin / management
+        environment:
+            SQL_SERVER: "mssql"
+            MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" # Password must match the SQL Server Linux container
+            ACCEPT_EULA: "${ACCEPT_EULA}"
+            SQL_WAIT_INTERVAL: "15" # Optional: Time in seconds to wait for SQL to be ready (default is 15 seconds)
+        depends_on:
+            - mssql
+        networks:
+            sb-emulator:
+                aliases:
+                    - sb-emulator
+        restart: unless-stopped
+        container_name: ServiceBus
+
+networks:
+    default:
+    sb-emulator:
+
+volumes:
+    # Setup provisions these external volumes, retaining their original names and data.
+    cosmos-data:
+        name: dev_common_shared_cosmos-data
+        external: true
+    mssql-data:
+        name: dev_common_shared_mssql-data
+        external: true
+    azurite-data:
+        name: dev_common_shared_azurite-data
+        external: true

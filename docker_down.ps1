@@ -32,6 +32,10 @@ if (-not $ScriptDir) { $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.P
 
 $ContainersDir = Join-Path $ScriptDir "containers"
 $CertsDir = Join-Path $ContainersDir "certs"
+$EnvFile = Join-Path $ContainersDir ".env"
+if (-not (Test-Path -LiteralPath $EnvFile)) {
+    $EnvFile = Join-Path $ContainersDir ".env.example"
+}
 $isWindowsPlatform = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
     [System.Runtime.InteropServices.OSPlatform]::Windows
 )
@@ -147,22 +151,27 @@ Write-Host "=== $RuntimeDisplayName Teardown ===" -ForegroundColor Cyan
 if ($ContainerCli) {
     Write-Host "Stopping and removing containers..." -ForegroundColor Yellow
 
-    ## Teardown the shared development collection.
+    ## Teardown the complete shared development collection, including PostgreSQL
+    ## and DynamoDB Local. The label-based cleanup below removes named volumes
+    ## only when the caller explicitly requests volume cleanup.
     if (Test-ContainerComposeAvailable -ContainerCli $ContainerCli) {
-        & $ContainerCli compose `
-            -f (Join-Path $ContainersDir "docker-compose-common.yml") `
-            -p dev_common_shared `
-            down --remove-orphans
-        $composeExitCode = $LASTEXITCODE
-        if ($composeExitCode -ne 0) {
-            Write-Warning "$RuntimeDisplayName compose down failed with exit code $composeExitCode. Continuing with leftover resource cleanup."
+        foreach ($group in @("aws", "azure", "common")) {
+            & $ContainerCli compose `
+                --env-file $EnvFile `
+                -f (Join-Path $ContainersDir "docker-compose-$group.yml") `
+                -p "dev_${group}_shared" `
+                down --remove-orphans
+            $composeExitCode = $LASTEXITCODE
+            if ($composeExitCode -ne 0) {
+                Write-Warning "$RuntimeDisplayName compose down for dev_${group}_shared failed with exit code $composeExitCode. Continuing with leftover resource cleanup."
+            }
         }
     } else {
         Write-Warning "Missing dependency: $RuntimeDisplayName compose support is not available. Skipping compose down and continuing with leftover resource cleanup."
     }
 
     ## Safety net: remove any leftover resources still labeled with this compose project.
-    $projectNames = @("dev_common_shared")
+    $projectNames = @("dev_aws_shared", "dev_azure_shared", "dev_common_shared")
     $composeProjectLabelNames = @("com.docker.compose.project", "io.podman.compose.project")
 
     foreach ($projectName in $projectNames) {

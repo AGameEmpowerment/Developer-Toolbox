@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-Gets the Developer Toolbox and starts its shared local service stack.
+Gets the Edu Developer Toolbox and starts its shared local service stack.
 
 .DESCRIPTION
 Clones or updates AGameEmpowerment/Developer-Toolbox beside the consuming repository,
@@ -134,23 +134,29 @@ if ($existingToolboxRoot) {
         throw "Toolbox checkout '$ToolboxPath' does not have an origin remote."
     }
     if (-not (Test-ToolboxOriginUrl -RemoteUrl $originUrl)) {
-        throw "Toolbox checkout '$ToolboxPath' has unexpected origin '$originUrl'. Expected $toolboxHttpsUrl."
+        throw "Toolbox checkout '$ToolboxPath' has an unexpected origin. Expected $toolboxHttpsUrl."
     }
 
     Write-Output "Using existing Toolbox checkout at $ToolboxPath"
+    $currentBranch = (& git -C $ToolboxPath symbolic-ref --quiet --short HEAD | Out-String).Trim()
+    if ($LASTEXITCODE -eq 1) {
+        throw "Toolbox checkout '$ToolboxPath' has a detached HEAD. Switch to the requested branch '$Branch' with git switch before retrying."
+    }
+    if ($LASTEXITCODE -ne 0 -or -not $currentBranch) {
+        throw "Unable to determine the current branch for Toolbox checkout '$ToolboxPath'."
+    }
+    if ($currentBranch -cne $Branch) {
+        throw "Toolbox checkout '$ToolboxPath' is on branch '$currentBranch', not requested branch '$Branch'. Switch branches explicitly or pass -Branch '$currentBranch'."
+    }
+
     if (-not $NoUpdate) {
         & git @gitAuthenticationArguments -C $ToolboxPath fetch origin --prune
         if ($LASTEXITCODE -ne 0) {
             Write-Warning "Could not fetch Toolbox updates. Continuing with the existing checkout."
         } else {
-            $currentBranch = (& git -C $ToolboxPath rev-parse --abbrev-ref HEAD | Out-String).Trim()
-            if ($currentBranch -eq $Branch) {
-                & git -C $ToolboxPath merge --ff-only "origin/$Branch"
-                if ($LASTEXITCODE -ne 0) {
-                    Write-Warning "Could not fast-forward '$Branch'. Continuing with the existing checkout."
-                }
-            } else {
-                Write-Warning "Toolbox is on '$currentBranch', not '$Branch'. Continuing without changing branches."
+            & git -C $ToolboxPath merge --ff-only "origin/$Branch"
+            if ($LASTEXITCODE -ne 0) {
+                Write-Warning "Could not fast-forward '$Branch'. Continuing with the existing checkout."
             }
         }
     }
@@ -167,7 +173,7 @@ if ($existingToolboxRoot) {
     if (-not $cloneSucceeded) {
         & git @gitAuthenticationArguments clone --branch $Branch $toolboxHttpsUrl $ToolboxPath
         if ($LASTEXITCODE -ne 0) {
-            throw "Toolbox clone failed. Verify GitHub connectivity and authentication, then retry."
+            throw "Toolbox clone failed. Authenticate to GitHub with access to AGameEmpowerment, then retry."
         }
     }
 }
@@ -195,4 +201,3 @@ try {
 
 Write-Output "Toolbox service stack is running."
 Write-Output "Stop it with: pwsh -File '$ToolboxPath/docker_down.ps1' -ContainerRuntime $ContainerRuntime"
-

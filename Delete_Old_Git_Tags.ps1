@@ -2,6 +2,7 @@
         Delete_Old_Tags.ps1
         --------------------
         Purpose:
+                Local developer maintenance only.
                 Clean up old git tags from the repository according to an encoded date in the tag name
                 while preserving important tags and avoiding destructive mass-deletions.
 
@@ -32,8 +33,11 @@
             * Exits early with a message when no tags are found.
             * Dry-run mode is supported via the -DryRun switch; when set the script only emits a report
                 and performs no destructive operations.
-            * When not in DryRun mode, deletions are performed both locally (git tag -d) and remotely
-                (git push origin --delete <tag>).
+            * When not in DryRun mode, deletes explicit refs/tags names remotely first,
+                then locally. A failed remote deletion preserves the local tag.
+            * Rejects remote symbolic tags when advertised by the server. Some older
+                transports omit this metadata; the check cannot detect hidden aliases
+                or prevent concurrent server-side ref changes.
             * A final safeguard prevents deleting all tags; if the deletion set would include every tag,
                 the script aborts without making changes.
 
@@ -60,7 +64,10 @@ $tagNamePattern = '^\d+\.(\d{4})\.(\d{4})\.\d+$'
 $keepRegex = [Regex]::new([Regex]::Escape($KeepSubstring), 'IgnoreCase')
 
 # Retrieve all tags with a consistent sortable creation date (creatordate falls back to commit date for lightweight tags)
-$rawTagLines = git for-each-ref --sort=creatordate --format '%(refname:short)|%(creatordate:iso8601)' refs/tags
+$rawTagLines = git for-each-ref --sort=creatordate --format '%(refname)%09%(creatordate:iso8601)' refs/tags
+if ($LASTEXITCODE -ne 0) {
+    throw "Unable to enumerate Git tags. Git exited with exit code $LASTEXITCODE."
+}
 
 if (-not $rawTagLines -or $rawTagLines.Count -eq 0) {
     Write-Output 'No tags found; nothing to do.'
@@ -68,8 +75,9 @@ if (-not $rawTagLines -or $rawTagLines.Count -eq 0) {
 }
 
 $tagObjects = $rawTagLines | ForEach-Object {
-    $parts = $_ -split '\|',2
-    $name  = $parts[0]
+    # Tabs are forbidden in ref names; pipes and ambiguous shortened names are valid.
+    $parts = $_ -split "`t",2
+    $name  = $parts[0].Substring('refs/tags/'.Length)
     $dateString = $parts[1]
     try { $parsedDate = [DateTime]::Parse($dateString) } catch { $parsedDate = [DateTime]::MinValue }
 
@@ -91,7 +99,7 @@ $tagObjects = $rawTagLines | ForEach-Object {
 }
 
 # Determine newest tag preference order: EncodedDate (if any exist) then Build then CreateDate
-$patterned = $tagObjects | Where-Object { $_.EncodedDate -ne $null }
+$patterned = $tagObjects | Where-Object { $null -ne $_.EncodedDate }
 if ($patterned.Count -gt 0) {
     $newestTag = $patterned | Sort-Object EncodedDate, Build, CreateDate | Select-Object -Last 1
     $newestReason = 'NewestByEncodedDate'
@@ -174,9 +182,27 @@ if ($deletionCandidates.Count -ge $tagObjects.Count) {
 }
 
 foreach ($oldTag in $deletionCandidates) {
+    $remoteTag = git -c protocol.version=2 ls-remote --symref origin "refs/tags/$oldTag"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to inspect remote tag '$oldTag'. Git exited with exit code $LASTEXITCODE; local tags retained."
+    }
+    if (@($remoteTag | Where-Object { $_.StartsWith('ref: ', [StringComparison]::Ordinal) }).Count -gt 0) {
+        throw "Refusing to delete symbolic remote tag '$oldTag'; all selected tags retained."
+    }
+}
+
+foreach ($oldTag in $deletionCandidates) {
     Write-Output "Deleting tag: $oldTag"
-    git tag -d $oldTag | Out-Null
-    git push origin --delete $oldTag | Out-Null
+    # Unqualified push names can resolve to a branch when its remote tag is absent.
+    $tagReference = "refs/tags/$oldTag"
+    git push origin --delete $tagReference | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to delete remote tag '$oldTag'. Git exited with exit code $LASTEXITCODE; local tag retained."
+    }
+    git update-ref --no-deref -d $tagReference | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to delete local tag '$oldTag'. Git exited with exit code $LASTEXITCODE."
+    }
 }
 
 Write-Output 'Tag cleanup complete.'

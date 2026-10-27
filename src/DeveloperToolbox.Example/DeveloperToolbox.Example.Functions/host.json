@@ -1,0 +1,14 @@
+{
+  "version": "2.0",
+  "extensions": {
+    "serviceBus": {
+      "maxConcurrentCalls": 4,
+      "autoCompleteMessages": true
+    },
+    "queues": {
+      "batchSize": 4,
+      "maxDequeueCount": 3,
+      "messageEncoding": "base64"
+    }
+  }
+}

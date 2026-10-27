@@ -1,0 +1,1 @@
+{"Records":[{"messageId":"java-sqs-sample","body":"{\"message\":\"Hello Java SQS\"}","eventSource":"aws:sqs"}]}

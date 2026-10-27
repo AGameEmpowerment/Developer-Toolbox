@@ -42,9 +42,9 @@ Your task is to ensure .NET/C# code in ${selection} meets the best practices spe
 
 ## Testing Standards
 
-- Use MSTest framework with FluentAssertions for assertions
+- Use NUnit with native constraint assertions (`Assert.That`)
 - Follow AAA pattern (Arrange, Act, Assert)
-- Use Moq for mocking dependencies
+- Use NSubstitute for interface mocks; keep stateful simulators where they model resource behavior
 - Test both success and failure scenarios
 - Include null parameter validation tests
 

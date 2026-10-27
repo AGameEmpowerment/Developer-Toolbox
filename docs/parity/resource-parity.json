@@ -1,0 +1,68 @@
+{
+  "date": "2026-10-27",
+  "referenceCommit": "618951fbd522f1a52ea68af130512cc5931a536a",
+  "baseCommit": "66f452566f589a05c520d2679b320d020284d5f5",
+  "sourceState": "uncommitted working tree",
+  "method": "Compare complete docker compose config --format json documents for each group using the example environment and identical project names; normalize absolute checkout paths only.",
+  "groups": {
+    "common": {
+      "matchesReference": true,
+      "services": [
+        "otlp-seq",
+        "redis",
+        "redisinsight",
+        "smtp4dev",
+        "wiremock"
+      ],
+      "images": {
+        "otlp-seq": "docker.io/datalust/seq:latest",
+        "redis": "docker.io/library/redis:latest",
+        "redisinsight": "docker.io/redis/redisinsight:latest",
+        "smtp4dev": "docker.io/rnwood/smtp4dev:latest",
+        "wiremock": "docker.io/wiremock/wiremock:latest"
+      },
+      "buildServices": []
+    },
+    "azure": {
+      "matchesReference": true,
+      "services": [
+        "azurite",
+        "cosmosdb",
+        "mssql",
+        "service-bus"
+      ],
+      "images": {
+        "azurite": "mcr.microsoft.com/azure-storage/azurite:latest",
+        "cosmosdb": "mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-latest",
+        "mssql": null,
+        "service-bus": "mcr.microsoft.com/azure-messaging/servicebus-emulator:latest"
+      },
+      "buildServices": [
+        "mssql"
+      ]
+    },
+    "aws": {
+      "matchesReference": true,
+      "services": [
+        "aws-emulator",
+        "aws-init",
+        "dynamodb",
+        "dynamodb-volume-init",
+        "postgres",
+        "rabbitmq"
+      ],
+      "images": {
+        "aws-emulator": null,
+        "aws-init": null,
+        "dynamodb": "docker.io/amazon/dynamodb-local:latest",
+        "dynamodb-volume-init": "docker.io/amazon/dynamodb-local:latest",
+        "postgres": "docker.io/library/postgres:latest",
+        "rabbitmq": "docker.io/library/rabbitmq:management"
+      },
+      "buildServices": [
+        "aws-emulator",
+        "aws-init"
+      ]
+    }
+  }
+}

@@ -1,0 +1,131 @@
+# Shared aws development resources
+# These resources are intended for development and testing purposes only.
+# Infrastructure resources only; examples run independently against these endpoints.
+# All services start with an explicit setup/up command. Long-running services use
+# unless-stopped so a developer's manual stop survives engine or machine restarts.
+# Initialization jobs use no restart policy and complete once per explicit startup.
+
+# Keep independent service network namespaces with either Compose provider.
+# A shared Podman pod would make Service Bus and RabbitMQ collide on port 5672.
+x-podman:
+    in_pod: false
+
+services:
+    # Local PostgreSQL Instance
+    postgres:
+        image: docker.io/library/postgres:latest
+        pull_policy: never
+        environment:
+            POSTGRES_USER: "${POSTGRES_USER}"
+            POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+            POSTGRES_DB: "${POSTGRES_DB}"
+        ports:
+            - "127.0.0.1:10432:5432" # PostgreSQL connection port
+        healthcheck:
+            test: ["CMD-SHELL", 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+        volumes:
+            # PostgreSQL 18+ stores major-version-specific data below this path.
+            - postgres-data:/var/lib/postgresql
+        restart: unless-stopped
+        container_name: PostgreSql
+        hostname: postgres
+
+    # Named volumes start owned by root; the official emulator runs as dynamodblocal.
+    # Repair ownership without deleting existing development tables or running Java as root.
+    dynamodb-volume-init:
+        image: docker.io/amazon/dynamodb-local:latest
+        pull_policy: never
+        user: "0:0"
+        entrypoint: ["/bin/sh", "-c"]
+        command: ["mkdir -p /home/dynamodblocal/data && chown -R dynamodblocal:dynamodblocal /home/dynamodblocal/data"]
+        volumes:
+            - dynamodb-data:/home/dynamodblocal/data
+        restart: "no"
+
+    # Local Amazon DynamoDB Emulator
+    dynamodb:
+        image: docker.io/amazon/dynamodb-local:latest
+        pull_policy: never
+        command: "-jar DynamoDBLocal.jar -sharedDb -dbPath ./data"
+        working_dir: /home/dynamodblocal
+        ports:
+            - "127.0.0.1:10180:8000" # DynamoDB Local endpoint
+        volumes:
+            - dynamodb-data:/home/dynamodblocal/data
+        depends_on:
+            dynamodb-volume-init:
+                condition: service_completed_successfully
+        restart: unless-stopped
+        container_name: DynamoDb
+        hostname: dynamodb
+
+    # Local messaging broker. These resources are development-only.
+    # Floating management variant includes the local management UI on port 15672.
+    rabbitmq:
+        image: docker.io/library/rabbitmq:management
+        pull_policy: never
+        environment:
+            RABBITMQ_DEFAULT_USER: "${RABBITMQ_DEFAULT_USER:-toolbox}"
+            RABBITMQ_DEFAULT_PASS: "${RABBITMQ_DEFAULT_PASS:-toolbox-local-only}"
+        ports:
+            - "127.0.0.1:10190:5672"
+            - "127.0.0.1:10191:15672"
+        volumes:
+            - rabbitmq-data:/var/lib/rabbitmq
+        healthcheck:
+            test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 12
+            start_period: 30s
+        restart: unless-stopped
+        container_name: RabbitMq
+        hostname: rabbitmq
+
+    # Free Apache-2.0 Moto, built from official Python and the official PyPI package.
+    aws-emulator:
+        build:
+            context: ./aws
+        environment:
+            TOOLBOX_AWS_ENDPOINT: "http://localhost:5000"
+        ports:
+            - "127.0.0.1:10195:5000"
+        healthcheck:
+            test: ["CMD", "python", "/opt/toolbox/aws/health.py"]
+            interval: 10s
+            timeout: 5s
+            retries: 18
+            start_period: 30s
+        restart: unless-stopped
+        container_name: ToolboxAwsEmulator
+
+    # Explicit Python invocation remains portable across Windows and Podman.
+    aws-init:
+        build:
+            context: ./aws
+        entrypoint: ["python", "/opt/toolbox/aws/init.py"]
+        environment:
+            TOOLBOX_AWS_ENDPOINT: "${TOOLBOX_CONTAINER_AWS_ENDPOINT}"
+        depends_on:
+            aws-emulator:
+                condition: service_healthy
+        restart: "no"
+
+networks:
+    default:
+
+volumes:
+    # Setup provisions these external volumes, retaining their original names and data.
+    postgres-data:
+        name: dev_common_shared_postgres-data
+        external: true
+    dynamodb-data:
+        name: dev_common_shared_dynamodb-data
+        external: true
+    rabbitmq-data:
+        name: dev_common_shared_rabbitmq-data
+        external: true

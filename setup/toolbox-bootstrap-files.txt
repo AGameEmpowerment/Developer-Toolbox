@@ -1,5 +1,6 @@
 # Target paths copied into a consuming repository by both installers.
 # Missing root sources resolve from disabled setup/<target-name>_ templates.
+# Directory entries add missing managed files without replacing existing entries.
 setup_toolbox.ps1
 setup_toolbox.sh
 setup/_toolbox.ps1

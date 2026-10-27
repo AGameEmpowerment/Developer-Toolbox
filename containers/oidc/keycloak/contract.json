@@ -1,0 +1,86 @@
+{
+  "contractVersion": 1,
+  "scope": "local-development-only",
+  "sourceOnly": true,
+  "image": {
+    "localTag": "localhost/toolbox-oidc-keycloak:latest",
+    "upstreamBuildArgument": "UPSTREAM_IMAGE",
+    "upstreamDefault": "quay.io/keycloak/keycloak:latest",
+    "contractLabel": "org.developertoolbox.oidc.contract",
+    "contractLabelValue": "1",
+    "user": "inherited non-root upstream user",
+    "addedRuntimeFiles": [
+      "/opt/toolbox-oidc/startup.sh",
+      "/opt/toolbox-oidc/default-realm.template.json"
+    ]
+  },
+  "startup": {
+    "entrypoint": "/opt/toolbox-oidc/startup.sh",
+    "command": ["start-dev", "--import-realm"],
+    "nativeExecutable": "/opt/keycloak/bin/kc.sh",
+    "diagnosticPassthrough": ["--version"],
+    "configurationFailureExitCode": 78,
+    "configurationDiagnosticPrefix": "TOOLBOX_OIDC_E_",
+    "configurationDiagnosticCodes": ["COMMAND", "HOSTNAME", "PROFILE", "REALM", "SECRET", "CALLBACK", "IMPORT_DIRECTORY", "IMPORT_COUNT", "IMPORT", "WRITE"],
+    "profileEnvironment": "TOOLBOX_OIDC_PROFILE",
+    "defaultProfile": "default",
+    "profiles": ["default", "project"],
+    "realmEnvironment": "TOOLBOX_OIDC_REALM",
+    "realmPattern": "^[A-Za-z0-9_-]{1,128}$",
+    "hostnameEnvironment": "KC_HOSTNAME",
+    "hostnameRequirement": "exact absolute HTTP(S) origin; orchestrator validates routing and effective discovery issuer",
+    "importPath": "/opt/keycloak/data/import/<realm>-realm.json",
+    "importRequirement": "exactly one entry in import storage: readable regular realm file without symbolic-link ancestors; matching JSON realm validated externally",
+    "projectMetadataDirectory": "/opt/project-identity/",
+    "nativeExec": true,
+    "optimizedStartup": false
+  },
+  "default": {
+    "realm": "toolbox-local",
+    "usersAndRealmRoles": ["admin", "user"],
+    "managementGrants": false,
+    "applicationDomainGrants": false,
+    "clientId": "toolbox-local-web",
+    "clientType": "confidential",
+    "grantTypes": ["authorization_code"],
+    "grantTypesMeaning": "required startup qualification capability; native refresh issuance is not disabled or qualified by this list",
+    "pkce": "S256",
+    "requiredRuntimeSecrets": [
+      "TOOLBOX_OIDC_ADMIN_PASSWORD",
+      "TOOLBOX_OIDC_USER_PASSWORD",
+      "TOOLBOX_OIDC_CLIENT_SECRET"
+    ],
+    "secretPattern": "^[A-Za-z0-9_-]{24,128}$",
+    "callbackEnvironment": "TOOLBOX_OIDC_CALLBACK_URI",
+    "callbackRequirement": "one exact absolute HTTP(S) URI; no wildcard, userinfo or fragment",
+    "templatePath": "/opt/toolbox-oidc/default-realm.template.json",
+    "templateHandling": "copy only in default mode with private permissions; native Keycloak environment placeholders"
+  },
+  "project": {
+    "defaultUsersImported": false,
+    "defaultSecretsRequired": false,
+    "importOwner": "consuming orchestrator",
+    "descriptor": "non-secret profile.json, externally compared with final native import",
+    "runtimeDescriptorParser": false,
+    "implicitTemplateImport": false,
+    "automaticRealmMerge": false
+  },
+  "readiness": {
+    "providerPort": 8080,
+    "managementPort": 9000,
+    "healthEnvironment": "KC_HEALTH_ENABLED=true",
+    "orderedChecks": [
+      "bounded management /health/ready success",
+      "exact expected realm issuer and discovery endpoints",
+      "usable public signing JWKS from the expected realm"
+    ],
+    "probeOwner": "external orchestrator or test driver"
+  },
+  "lifecycle": {
+    "automatedState": "fresh owned writable state per run",
+    "secrets": "generated at runtime; never image layers, build arguments, Git or public receipts",
+    "cleanupOwner": "consuming orchestrator",
+    "imageSelection": "resolve and freeze local image IDs in one engine connection/store before starting",
+    "rebuild": "rebuild base, rebuild derived image without pulling unpublished base, recreate container"
+  }
+}

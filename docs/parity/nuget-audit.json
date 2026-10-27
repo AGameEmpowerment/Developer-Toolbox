@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "parameters": "--vulnerable --include-transitive",
+  "sources": [
+    "https://api.nuget.org/v3/index.json"
+  ],
+  "projects": [
+    {
+      "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/DeveloperToolbox.Example.App.csproj"
+    },
+    {
+      "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Lib/DeveloperToolbox.Example.Lib.csproj"
+    },
+    {
+      "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/DeveloperToolbox.Example.Data.csproj"
+    },
+    {
+      "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Functions/DeveloperToolbox.Example.Functions.csproj"
+    },
+    {
+      "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Lambda/DeveloperToolbox.Example.Lambda.csproj"
+    },
+    {
+      "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/DeveloperToolbox.Example.Messaging.csproj"
+    },
+    {
+      "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/DeveloperToolbox.Example.Resources.csproj"
+    },
+    {
+      "path": "tests/DeveloperToolbox.Example.App.Tests/DeveloperToolbox.Example.App.Tests.csproj"
+    },
+    {
+      "path": "tests/DeveloperToolbox.Example.Data.Tests/DeveloperToolbox.Example.Data.Tests.csproj"
+    },
+    {
+      "path": "tests/DeveloperToolbox.Example.Functions.Tests/DeveloperToolbox.Example.Functions.Tests.csproj"
+    },
+    {
+      "path": "tests/DeveloperToolbox.Example.Lambda.Tests/DeveloperToolbox.Example.Lambda.Tests.csproj"
+    },
+    {
+      "path": "tests/DeveloperToolbox.Example.Lib.Tests/DeveloperToolbox.Example.Lib.Tests.csproj"
+    },
+    {
+      "path": "tests/DeveloperToolbox.Example.Messaging.Tests/DeveloperToolbox.Example.Messaging.Tests.csproj"
+    },
+    {
+      "path": "tests/DeveloperToolbox.Example.Resources.Tests/DeveloperToolbox.Example.Resources.Tests.csproj"
+    }
+  ],
+  "date": "2026-10-27",
+  "baseCommit": "66f452566f589a05c520d2679b320d020284d5f5",
+  "sourceState": "uncommitted working tree",
+  "command": "dotnet list DeveloperToolbox.Example.slnx package --vulnerable --include-transitive --source https://api.nuget.org/v3/index.json --format json"
+}

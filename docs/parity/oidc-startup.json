@@ -1,0 +1,225 @@
+{
+  "schemaVersion": 1,
+  "kind": "toolbox-oidc-startup",
+  "runId": "oidc-startup-cfb5939a0c3140dc85b95717ba1cbb1e",
+  "timestampUtc": "2026-10-27T17:03:53.1893243+00:00",
+  "startedAtUtc": "2026-10-27T16:57:35.3392474+00:00",
+  "completedAtUtc": "2026-10-27T17:03:53.1933610+00:00",
+  "sources": [
+    {
+      "dirty": true,
+      "inputHashes": [
+        {
+          "path": "tests/test_oidc_startup.ps1",
+          "sha256": "8e10dc65a6d8d8eed3c0701b1197a702800ac25dc4d0a058ef4d062b9a307b62"
+        },
+        {
+          "path": "containers/oidc/keycloak/Dockerfile",
+          "sha256": "38c21beab366dd0b7df832ed465924d90f745366fcf0d67135f0b577103adca6"
+        },
+        {
+          "path": "containers/oidc/keycloak/startup.sh",
+          "sha256": "6c4e3ec674d2b82f3b3b38e57850d07115e2aa12322673d3e23031f484fa6178"
+        },
+        {
+          "path": "containers/oidc/keycloak/default-realm.template.json",
+          "sha256": "c91c4571b3d840e0c19c60cad200553e5b50cd268ced27930f0cb7aae50277c1"
+        },
+        {
+          "path": "containers/oidc/keycloak/contract.json",
+          "sha256": "766214e5d09131dca5010261abaf3fc5b72a65db6d19a651cfd3a7a9f7220824"
+        },
+        {
+          "path": "containers/oidc/examples/project.Dockerfile",
+          "sha256": "604c394abae49583a5d072f76334023432b6cb1804db6c50ecd5b224e81671f6"
+        },
+        {
+          "path": "containers/oidc/examples/profile.json",
+          "sha256": "e7fe9b862e0da2cd1ef32cc207b5c993c0958ce0f857d66e0d5236df54cf2812"
+        }
+      ],
+      "commit": "66f452566f589a05c520d2679b320d020284d5f5",
+      "repository": "Developer-Toolbox"
+    }
+  ],
+  "engine": {
+    "measured": {
+      "name": "docker-desktop",
+      "os": "linux",
+      "architecture": "x86_64",
+      "version": "29.9.2"
+    },
+    "runtime": "docker",
+    "context": "desktop-linux",
+    "hostOs": "Microsoft Windows 10.0.26200"
+  },
+  "platform": "linux/amd64",
+  "images": {
+    "sourceRevisionLabel": "66f452566f589a05c520d2679b320d020284d5f5",
+    "platform": "linux/amd64",
+    "derivedReference": "",
+    "contractVersion": "1",
+    "derivedQualification": "not run: no DerivedImageName supplied",
+    "baseId": "sha256:c8987ad08291db9716d4f1acce0b68e71be63ac1229d9b88496ee7e71a98be8a",
+    "derivedId": null,
+    "upstreamId": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+    "addedLayers": 2,
+    "upstreamReference": "quay.io/keycloak/keycloak:latest",
+    "baseReference": "localhost/toolbox-oidc-keycloak:latest",
+    "addedBytes": 41991
+  },
+  "profile": {
+    "selections": [
+      "default",
+      "project",
+      "upstream-empty-import-comparison"
+    ],
+    "topology": "owned bridge, host loopback published ports",
+    "issuerReachability": "host PowerShell HTTP smoke"
+  },
+  "command": {
+    "imageName": "localhost/toolbox-oidc-keycloak:latest",
+    "prerequisites": [
+      "PowerShell 7.3+",
+      "reachable selected engine",
+      "prebuilt base and upstream images in that engine store"
+    ],
+    "outputPath": "artifacts/parity/oidc-startup-remediation",
+    "upstreamImage": "quay.io/keycloak/keycloak:latest",
+    "executable": "pwsh",
+    "script": "tests/test_oidc_startup.ps1",
+    "derivedImageName": "",
+    "readinessTimeoutSeconds": 300,
+    "containerRuntime": "docker"
+  },
+  "inventory": {
+    "discoveredExpandedCases": 25,
+    "authoredDefinitionMethod": "literal Invoke-Check call sites, excluding function declaration",
+    "snapshots": 0,
+    "framework": "standalone PowerShell",
+    "standaloneScripts": 1,
+    "parameterExpansion": "10 input rejections, 4 import rejections, 2 HTTP persona logins",
+    "authoredDefinitions": 12,
+    "discoveredHttpPersonaCases": 2,
+    "browserExecutions": 0,
+    "area": "real-container startup",
+    "executedHttpPersonaCases": 2
+  },
+  "checks": [
+    {
+      "name": "image-metadata-and-lean-layer-lineage",
+      "result": "passed"
+    },
+    {
+      "name": "native-version-without-startup-inputs",
+      "result": "passed"
+    },
+    {
+      "name": "image-files-match-current-source-hashes",
+      "result": "passed"
+    },
+    {
+      "name": "upstream-missing-import-starts-without-requested-realm",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-invalid-profile",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-missing-hostname",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-hostname-with-path",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-missing-secret",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-short-secret",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-unsafe-secret",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-wildcard-callback",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-conflicting-default-realm",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-invalid-project-realm",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-missing-project-import",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-directory-import",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-symlink-import",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-unreadable-import",
+      "result": "passed"
+    },
+    {
+      "name": "preflight-extra-import",
+      "result": "passed"
+    },
+    {
+      "name": "default-readiness-discovery-and-signing-jwks",
+      "result": "passed"
+    },
+    {
+      "name": "effective-non-root-pid-one-and-private-import",
+      "result": "passed"
+    },
+    {
+      "name": "default-admin-code-login-and-management-denial",
+      "result": "passed"
+    },
+    {
+      "name": "default-user-code-login-and-management-denial",
+      "result": "passed"
+    },
+    {
+      "name": "native-sigterm-shutdown",
+      "result": "passed"
+    },
+    {
+      "name": "project-readiness-without-default-secrets",
+      "result": "passed"
+    },
+    {
+      "name": "project-replaces-default-users-and-realm",
+      "result": "passed"
+    }
+  ],
+  "results": {
+    "passed": 25,
+    "framework": "standalone PowerShell",
+    "environmentFailures": 0,
+    "notRun": 0,
+    "area": "real-container startup",
+    "failed": 0,
+    "skipped": 0,
+    "unexecutedAfterFailure": "none"
+  },
+  "coverage": "unavailable",
+  "cleanup": {
+    "scope": "uniquely owned containers, network and non-secret fixture directory",
+    "passed": true
+  }
+}

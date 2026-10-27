@@ -1,0 +1,20 @@
+[project]
+name = "toolbox-si-example-python"
+version = "0.1.1"
+requires-python = ">=3.14"
+description = "Local-only developer toolbox SDK and serverless examples"
+dependencies = [
+  "boto3==1.43.111",
+  "azure-servicebus==7.15.0",
+  "azure-storage-blob==12.31.0",
+  "azure-storage-queue==12.18.0",
+  "azure-data-tables==12.7.0",
+  "azure-functions==2.3.0",
+  "azure-cosmos==4.17.1",
+  "pika==1.4.4",
+  "redis==8.1.0",
+  "requests==2.34.2",
+]
+
+[tool.setuptools.packages.find]
+include = ["toolbox_samples*"]

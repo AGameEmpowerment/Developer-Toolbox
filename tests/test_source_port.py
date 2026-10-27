@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 import xml.etree.ElementTree as element_tree
 from pathlib import Path
@@ -16,7 +17,7 @@ class SourcePortTests(unittest.TestCase):
             REPOSITORY_ROOT / "DeveloperToolbox.Example.slnx",
             EXAMPLE_ROOT / "DeveloperToolbox.Example.App",
             EXAMPLE_ROOT / "DeveloperToolbox.Example.Lib",
-            EXAMPLE_ROOT / "DeveloperToolbox.Example.Tests",
+            REPOSITORY_ROOT / "tests" / "DeveloperToolbox.Example.Lib.Tests",
             EXAMPLE_ROOT / "DeveloperToolbox.Example.Client",
             REPOSITORY_ROOT / "devops" / "DeveloperToolbox.Example.Lib.nuspec",
             REPOSITORY_ROOT / "devops" / "PrepNuget.ps1",
@@ -35,12 +36,18 @@ class SourcePortTests(unittest.TestCase):
         blocked_terms = (
             "jf" + "rog",
             "fest" + "ack",
-            "ics" + "-eng",
-            "church" + "ofjesuschrist",
+            "ic" + "s-eng",
+            "ch" + "urchofjesuschrist",
             "art" + "ifactory",
             "sonar" + "qube",
         )
-        roots = (EXAMPLE_ROOT, REPOSITORY_ROOT / "devops")
+        roots = (
+            REPOSITORY_ROOT / "src",
+            REPOSITORY_ROOT / "devops",
+            REPOSITORY_ROOT / "containers",
+            REPOSITORY_ROOT / ".devcontainer",
+            REPOSITORY_ROOT / "setup",
+        )
         text_extensions = {
             ".css",
             ".cs",
@@ -50,6 +57,11 @@ class SourcePortTests(unittest.TestCase):
             ".jsx",
             ".md",
             ".mjs",
+            ".py",
+            ".java",
+            ".xml",
+            ".sh",
+            ".yaml",
             ".npmrc",
             ".ps1",
             ".slnx",
@@ -60,16 +72,20 @@ class SourcePortTests(unittest.TestCase):
         violations = []
 
         for root in roots:
-            for path in root.rglob("*"):
+            source_paths = []
+            for directory, folders, filenames in os.walk(root):
+                folders[:] = [
+                    folder for folder in folders
+                    if folder.lower() not in {"bin", "obj", "node_modules", ".next", ".venv", "target", "__pycache__"}
+                ]
+                source_paths.extend(Path(directory) / name for name in filenames)
+            for path in source_paths:
                 is_text_file = (
                     path.suffix.lower() in text_extensions
                     or path.name.lower() in extensionless_names
                     or path.name.lower() in named_files
                 )
                 if not path.is_file() or not is_text_file:
-                    continue
-                normalized_parts = {part.lower() for part in path.parts}
-                if normalized_parts.intersection({"bin", "obj", "node_modules", ".next"}):
                     continue
                 content = path.read_text(encoding="utf-8").lower()
                 for term in blocked_terms:

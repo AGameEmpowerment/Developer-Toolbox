@@ -20,10 +20,10 @@ paths:
 
 ### Test Structure
 
-- **Usings**: Start with `using Microsoft.Playwright;` and either `using Microsoft.Playwright.Xunit;` or `using Microsoft.Playwright.NUnit;` or `using Microsoft.Playwright.MSTest;` for MSTest.
-- **Organization**: Create test classes that inherit from `PageTest` (available in NUnit, xUnit, and MSTest packages) or use `IClassFixture<PlaywrightFixture>` for xUnit with custom fixtures. Group related tests for a feature in the same test class.
-- **Setup**: Use `[SetUp]` (NUnit), `[TestInitialize]` (MSTest), or constructor initialization (xUnit) for setup actions common to all tests (e.g., navigating to a page).
-- **Titles**: Use the appropriate test attribute (`[Test]` for NUnit, `[Fact]` for xUnit, `[TestMethod]` for MSTest) with descriptive method names following C# naming conventions (e.g., `SearchForMovieByTitle`).
+- **Usings**: Start with `using Microsoft.Playwright;` and `using Microsoft.Playwright.NUnit;`.
+- **Organization**: Inherit test classes from NUnit `PageTest`. Group related tests for a feature in the same class.
+- **Setup**: Use NUnit `[SetUp]` and `[TearDown]` for per-test setup and cleanup.
+- **Titles**: Use NUnit `[Test]` with descriptive method names following C# naming conventions (e.g., `SearchForMovieByTitle`).
 
 ### File Organization
 
@@ -42,7 +42,7 @@ paths:
 
 ```csharp
 using Microsoft.Playwright;
-using Microsoft.Playwright.Xunit;
+using Microsoft.Playwright.NUnit;
 using static Microsoft.Playwright.Assertions;
 
 namespace PlaywrightTests;
@@ -56,7 +56,7 @@ public class MovieSearchTests : PageTest
         await Page.GotoAsync("https://debs-obrien.github.io/playwright-movies-app");
     }
 
-    [Fact]
+    [Test]
     public async Task SearchForMovieByTitle()
     {
         await Test.StepAsync("Activate and perform search", async () =>

@@ -1,8 +1,8 @@
 #!/bin/bash
 # Pull container images required by the shared development stack.
 #
-# Most services are declared as image-based services in
-# containers/docker-compose-common.yml, so we let the selected runtime pull those
+# Image-based services, including PostgreSQL and DynamoDB Local, are declared in
+# containers/docker-compose-{common,azure,aws}.yml, so the selected runtime pulls them
 # directly. The local SQL Server service is built from containers/mssql, so we
 # also pull its base image explicitly.
 
@@ -141,60 +141,54 @@ assert_compose_available() {
 }
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-COMPOSE_FILE="${SCRIPT_DIR}/containers/docker-compose-common.yml"
-SQL_BASE_IMAGE="mcr.microsoft.com/mssql/server:latest"
+ENV_FILE="${SCRIPT_DIR}/containers/.env"
+ENV_EXAMPLE_FILE="${SCRIPT_DIR}/containers/.env.example"
 CONTAINER_CLI="$(resolve_container_runtime "$CONTAINER_RUNTIME")"
 RUNTIME_DISPLAY_NAME="$(format_runtime_display_name "$CONTAINER_CLI")"
 assert_runtime_ready "$CONTAINER_CLI" "$RUNTIME_DISPLAY_NAME"
 assert_compose_available "$CONTAINER_CLI" "$RUNTIME_DISPLAY_NAME"
 
-echo "${RUNTIME_DISPLAY_NAME} images and container setup started."
+echo "${RUNTIME_DISPLAY_NAME} missing-image preparation started."
 
-registry_mirrors=()
-if [[ "$CONTAINER_CLI" == "docker" ]]; then
-    docker_info="$("$CONTAINER_CLI" info 2>/dev/null || true)"
-    while IFS= read -r mirror; do
-        registry_mirrors+=("$mirror")
-    done < <(printf '%s\n' "$docker_info" | awk '/Registry Mirrors:/ { in_mirrors=1; next } in_mirrors && $0 ~ /^[[:space:]]+https?:\/\// { gsub(/^[[:space:]]+/, "", $0); print; next } in_mirrors { in_mirrors=0 }')
-fi
-
-if [[ "$CONTAINER_CLI" == "docker" && ${#registry_mirrors[@]} -gt 0 ]]; then
-    echo "${RUNTIME_DISPLAY_NAME} registry mirrors detected:"
-    for mirror in "${registry_mirrors[@]}"; do
-        echo "  $mirror"
-    done
-fi
-
-echo "Pulling compose-managed images from ${COMPOSE_FILE}..."
-if ! "$CONTAINER_CLI" compose -f "${COMPOSE_FILE}" pull; then
-    echo "Failed to pull compose-managed images." >&2
-
-    if [[ "$CONTAINER_CLI" == "docker" && ${#registry_mirrors[@]} -gt 0 ]]; then
-        echo "Docker is configured to use registry mirror(s). If one is unavailable, pulls will fail before reaching the upstream registry." >&2
-        echo "Configured mirror(s):" >&2
-        for mirror in "${registry_mirrors[@]}"; do
-            echo "  $mirror" >&2
-        done
-        echo "Check Docker Desktop > Settings > Docker Engine, or %APPDATA%/Docker/daemon.json, to remove or fix the mirror." >&2
-    fi
-
+# Match setup's additive environment preparation before Compose parses any services.
+# Read assignments as data; never source or evaluate developer configuration.
+if [[ ! -f "$ENV_EXAMPLE_FILE" ]]; then
+    echo ".env.example not found. Cannot prepare the image-pull environment." >&2
     exit 1
 fi
-
-echo "Pulling SQL Server base image for containers/mssql/Dockerfile: ${SQL_BASE_IMAGE}..."
-if ! "$CONTAINER_CLI" pull "${SQL_BASE_IMAGE}"; then
-    echo "Failed to pull '${SQL_BASE_IMAGE}'." >&2
-
-    if [[ "$CONTAINER_CLI" == "docker" && ${#registry_mirrors[@]} -gt 0 ]]; then
-        echo "Docker is configured to use registry mirror(s). If one is unavailable, pulls will fail before reaching the upstream registry." >&2
-        echo "Configured mirror(s):" >&2
-        for mirror in "${registry_mirrors[@]}"; do
-            echo "  $mirror" >&2
-        done
-        echo "Check Docker Desktop > Settings > Docker Engine, or %APPDATA%/Docker/daemon.json, to remove or fix the mirror." >&2
+if [[ ! -f "$ENV_FILE" ]]; then
+    cp "$ENV_EXAMPLE_FILE" "$ENV_FILE"
+    echo "Created containers/.env from .env.example."
+fi
+missing_settings=0
+existing_keys=$'\n'
+while IFS= read -r existing_assignment || [[ -n "$existing_assignment" ]]; do
+    existing_assignment="${existing_assignment%$'\r'}"
+    if [[ "$existing_assignment" =~ ^[[:space:]]*(export[[:space:]]+)?([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*= ]]; then
+        existing_keys+="${BASH_REMATCH[2]}"$'\n'
     fi
-
-    exit 1
+done < "$ENV_FILE"
+while IFS= read -r assignment || [[ -n "$assignment" ]]; do
+    assignment="${assignment%$'\r'}"
+    if [[ "$assignment" =~ ^[[:space:]]*([A-Za-z_][A-Za-z0-9_]*)[[:space:]]*= ]]; then
+        key="${BASH_REMATCH[1]}"
+        if [[ "$existing_keys" != *$'\n'"${key}"$'\n'* ]]; then
+            # A leading newline also protects files without a final newline.
+            printf '\n%s\n' "$assignment" >> "$ENV_FILE"
+            existing_keys+="${key}"$'\n'
+            missing_settings=$((missing_settings + 1))
+        fi
+    fi
+done < "$ENV_EXAMPLE_FILE"
+if (( missing_settings > 0 )); then
+    echo "Added ${missing_settings} missing settings to containers/.env."
 fi
 
-echo "${RUNTIME_DISPLAY_NAME} images and container setup completed."
+source "${SCRIPT_DIR}/.devcontainer/ensure_image.sh"
+images=()
+for group in common azure aws; do
+    while IFS= read -r image; do images+=("$image"); done < <(sed -nE 's/^[[:space:]]+image:[[:space:]]*([^[:space:]]+).*/\1/p' "${SCRIPT_DIR}/containers/docker-compose-${group}.yml")
+done
+images+=(mcr.microsoft.com/mssql/server:latest docker.io/library/python:latest)
+while IFS= read -r image; do ensure_toolbox_image "$CONTAINER_CLI" "$image" || exit 1; done < <(printf '%s\n' "${images[@]}" | sort -u)
+echo "${RUNTIME_DISPLAY_NAME} missing-image preparation completed."

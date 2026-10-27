@@ -8,9 +8,9 @@
 *.suo
 *.user
 *.userosscache
-*.sln.docstates
+*.slnx.docstates
 *.env
-.claude/settings.local.json
+containers/examples.settings.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -430,7 +430,7 @@ FodyWeavers.xsd
 *.msp
 
 #merge files
-*.sln.iml
+*.slnx.iml
 *.orig
 nugetlibs/
 
@@ -450,3 +450,7 @@ tmp/
 .dotnet/
 .agent_work/
 .playwright-mcp/
+
+# Developer resource sample settings can contain local credentials.
+src/DeveloperToolbox.Example/**/local.settings.json
+src/DeveloperToolbox.Example/**/appsettings.json

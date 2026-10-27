@@ -2,56 +2,86 @@
 name: Toolbox Bootstrap Validation
 
 on:
-  pull_request:
-    paths:
-      - ".devcontainer/**"
-      - ".agents/skills/toolbox-repository-bridge/**"
-      - ".github/workflows/toolbox-bootstrap-validation.yml"
-      - ".gitattributes"
-      - "Install-ToolboxSetup.ps1"
-      - "install_toolbox_setup.sh"
-      - "setup/**"
-      - "start_developer_toolkit.ps1"
-      - "start_developer_toolkit.sh"
-      - "tests/test_toolbox_bootstrap.*"
-  push:
-    paths:
-      - ".devcontainer/**"
-      - ".agents/skills/toolbox-repository-bridge/**"
-      - ".github/workflows/toolbox-bootstrap-validation.yml"
-      - ".gitattributes"
-      - "Install-ToolboxSetup.ps1"
-      - "install_toolbox_setup.sh"
-      - "setup/**"
-      - "start_developer_toolkit.ps1"
-      - "start_developer_toolkit.sh"
-      - "tests/test_toolbox_bootstrap.*"
-  workflow_dispatch:
+    pull_request:
+        paths:
+            - ".agents/skills/toolbox-repository-bridge/**"
+            - ".claude/skills/toolbox-repository-bridge/**"
+            - ".devcontainer/**"
+            - ".gitattributes"
+            - ".github/workflows/toolbox-bootstrap-validation.yml"
+            - "Install-ToolboxSetup.ps1"
+            - "Build-ToolboxImage.ps1"
+            - "containers/oidc/**"
+            - "tests/test_oidc_startup.ps1"
+            - "tests/test_oidc_contract.ps1"
+            - "tests/oidc/**"
+            - "install_toolbox_setup.sh"
+            - "setup/**"
+            - "start_developer_toolkit.ps1"
+            - "start_developer_toolkit.sh"
+            - "tests/test_toolbox_bootstrap.ps1"
+            - "tests/test_build_toolbox_image.ps1"
+            - "tests/test_toolbox_bootstrap.sh"
+    push:
+        paths:
+            - ".agents/skills/toolbox-repository-bridge/**"
+            - ".claude/skills/toolbox-repository-bridge/**"
+            - ".devcontainer/**"
+            - ".gitattributes"
+            - ".github/workflows/toolbox-bootstrap-validation.yml"
+            - "Install-ToolboxSetup.ps1"
+            - "Build-ToolboxImage.ps1"
+            - "containers/oidc/**"
+            - "tests/test_oidc_startup.ps1"
+            - "tests/test_oidc_contract.ps1"
+            - "tests/oidc/**"
+            - "install_toolbox_setup.sh"
+            - "setup/**"
+            - "start_developer_toolkit.ps1"
+            - "start_developer_toolkit.sh"
+            - "tests/test_toolbox_bootstrap.ps1"
+            - "tests/test_build_toolbox_image.ps1"
+            - "tests/test_toolbox_bootstrap.sh"
+    workflow_dispatch:
 
 permissions:
-  contents: read
+    contents: read
 
 jobs:
-  bash-bootstrap:
-    name: Bash bootstrap tests
-    runs-on: ubuntu-latest
+    bash-bootstrap:
+        name: Bash bootstrap tests
+        runs-on: ubuntu-latest
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v6
 
-      - name: Run Bash bootstrap tests
-        shell: bash
-        run: bash ./tests/test_toolbox_bootstrap.sh
+            - name: Run Bash bootstrap tests
+              shell: bash
+              run: ./tests/test_toolbox_bootstrap.sh
 
-  powershell-bootstrap:
-    name: PowerShell bootstrap tests
-    runs-on: windows-latest
+    powershell-bootstrap:
+        name: PowerShell bootstrap tests (${{ matrix.os }})
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os:
+                    - ubuntu-latest
+                    - windows-latest
 
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v6
 
-      - name: Run PowerShell bootstrap tests
-        shell: pwsh
-        run: ./tests/test_toolbox_bootstrap.ps1
+            - name: Run PowerShell bootstrap tests
+              shell: pwsh
+              run: ./tests/test_toolbox_bootstrap.ps1
+
+            - name: Verify local image builds without an engine
+              shell: pwsh
+              run: ./tests/test_build_toolbox_image.ps1
+
+            - name: Verify source-only OIDC contracts without an engine
+              shell: pwsh
+              run: ./tests/test_oidc_contract.ps1

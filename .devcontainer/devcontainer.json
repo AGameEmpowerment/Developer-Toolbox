@@ -1,19 +1,23 @@
 {
   "name": "Com.AGameEmpowerment.DevContainer",
 
-  // Ubuntu 24.04 with the released .NET 10 SDK, git, and PowerShell preinstalled.
-  // The maintained 2-10.0 line replaces the frozen 1-10.0 release-candidate image.
+  // SDK major 10 matches the .NET 10 projects; latest could jump to a newer major.
   "image": "mcr.microsoft.com/devcontainers/dotnet:2-10.0",
 
-  // Match the smallest GitHub Codespaces machine. Running the complete optional
-  // local emulator stack can require more memory.
+  // Required for the local-development-only Docker-in-Docker daemon.
+  "privileged": true,
+
+  // Match the smallest GitHub Codespaces machine. The optional local emulator stack
+  // can require a larger machine when several services run at the same time.
   "hostRequirements": {
     "cpus": 2,
     "memory": "8gb",
     "storage": "32gb"
   },
 
-  // Features to add to the dev container. More info: https://containers.dev/features.
+  // Features cover the technologies represented by this developer toolbox. The base
+  // image provides the current .NET SDK and git; additional SDKs remain available
+  // for reusable samples and migration guidance. More info: https://containers.dev/features.
   "features": {
     // Azure Developer CLI for Azure deployment workflows
     "ghcr.io/azure/azure-dev/azd:latest": {
@@ -24,6 +28,10 @@
       "version": "latest",
       "installBicep": true
     },
+    // AWS CLI for the local SQS, SNS, EventBridge, S3, and Lambda examples
+    "ghcr.io/devcontainers/features/aws-cli:1": {
+      "version": "latest"
+    },
     // Common utilities including Zsh and Oh My Zsh
     "ghcr.io/devcontainers/features/common-utils:2": {
       "installZsh": true,
@@ -32,8 +40,8 @@
       "upgradePackages": false,
       "configureZshAsDefaultShell": false
     },
-    // Docker-in-Docker for container development
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+    // Docker-in-Docker runs the Toolbox emulator stack through the repository's delegated launcher
+    "ghcr.io/devcontainers/features/docker-in-docker:4": {
       "moby": true,
       "azureDnsAutoDetection": true,
       "installDockerBuildx": true,
@@ -41,12 +49,11 @@
       "version": "latest",
       "dockerDashComposeVersion": "latest"
     },
-    // Additional .NET SDK versions and workloads (base image already has .NET 10.0)
+    // Toolbox samples target .NET 10; 8.0 and 9.0 stay for consumer repos that copy this devcontainer.
     // Note: The 'aspire' workload was deprecated; Aspire now uses NuGet packages + CLI
-    // Aspire templates are installed via postCreateCommand below
     "ghcr.io/devcontainers/features/dotnet:2": {
       "version": "none",
-      "additionalVersions": "8.0,9.0",
+      "additionalVersions": "8.0,9.0,10.0",
       "workloads": "wasm-tools"
     },
     // GitHub CLI for repository management
@@ -54,14 +61,14 @@
       "installDirectlyFromGitHubRelease": true,
       "version": "latest"
     },
-    // Node.js 24 LTS with npm, yarn, and pnpm for frontend development
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "24",
+    // Use the current Node.js LTS for reusable JavaScript tooling.
+    "ghcr.io/devcontainers/features/node:2": {
+      "version": "lts",
       "nodeGypDependencies": true,
       "nvmVersion": "latest"
     },
     // PowerShell for scripting
-    "ghcr.io/devcontainers/features/powershell:1": {
+    "ghcr.io/devcontainers/features/powershell:2": {
       "version": "latest"
     },
     // Git with latest version
@@ -69,20 +76,20 @@
       "ppa": true,
       "version": "latest"
     },
-    // Java JDK for any Java-based tooling (optional, kept minimal)
+    // Java 25 is a primary language; Maven builds the SDK and serverless examples.
     "ghcr.io/devcontainers/features/java:1": {
-      "version": "21",
+      "version": "25",
       "installGradle": false,
-      "installMaven": false
+      "installMaven": true
     },
     // Terraform for infrastructure as code
     "ghcr.io/devcontainers/features/terraform:1": {
       "version": "latest",
       "tflint": "latest"
     },
-    // Python for scripting and tooling
+    // Python 3.14 is a primary language and matches the serverless samples.
     "ghcr.io/devcontainers/features/python:1": {
-      "version": "latest",
+      "version": "3.14",
       "installTools": true
     }
   },
@@ -92,7 +99,6 @@
     "vscode": {
       "settings": {
         "terminal.integrated.defaultProfile.linux": "pwsh",
-        "terminal.integrated.defaultProfile.windows": "PowerShell",
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "[csharp]": {
@@ -106,95 +112,43 @@
         },
         "files.trimTrailingWhitespace": true,
         "files.insertFinalNewline": true,
-        "dotnet.defaultSolution": "disable",
         "eslint.workingDirectories": [{ "mode": "auto" }],
         "npm.packageManager": "npm"
       },
-      // VS Code extensions to install in the dev container.
+      // Required extensions installed in the dev container.
       "extensions": [
+        "AmazonWebServices.aws-toolkit-vscode",
         "Anthropic.claude-code",
-        // Core Editor Enhancements
-        "DotJoshJohnson.xml",
-        "EditorConfig.EditorConfig",
+        "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "mechatroner.rainbow-csv",
-        "redhat.vscode-yaml",
-        "yzhang.markdown-all-in-one",
-        "streetsidesoftware.code-spell-checker",
-
-        // GitHub & Git
         "GitHub.copilot",
         "GitHub.copilot-chat",
-        "GitHub.vscode-github-actions",
-        "GitHub.vscode-pull-request-github",
-        "eamodio.gitlens",
-
-        // AI Agents
-        "openai.chatgpt",
-
-        // .NET & C# Development
-        "ms-dotnettools.vscode-dotnet-runtime",
-        "ms-dotnettools.csdevkit",
         "ms-dotnettools.csharp",
-        "ms-dotnettools.dotnet-maui",
-        "ms-azuretools.vscode-bicep",
-
-        // JavaScript, TypeScript & React
-        "dbaeumer.vscode-eslint",
-        "dsznajder.es7-react-js-snippets",
-        "burkeholland.simple-react-snippets",
-        "ms-vscode.vscode-typescript-next",
-        "bradlc.vscode-tailwindcss",
-        "styled-components.vscode-styled-components",
-
-        // Database & SQL
-        "ms-mssql.mssql",
-        "ms-mssql.sql-database-projects",
-
-        // API Development & Testing
-        "humao.rest-client",
-        "rangav.vscode-thunder-client",
-        "42Crunch.vscode-openapi",
-
-        // Azure & Cloud
-        "ms-vscode.vscode-node-azure-pack",
-        "ms-azuretools.vscode-docker",
-        "ms-azuretools.vscode-azurefunctions",
-
-        // PowerShell
+        "ms-dotnettools.csdevkit",
         "ms-vscode.powershell",
-
-        // Collaboration
-        "ms-vsliveshare.vsliveshare",
-
-        // Testing
-        "formulahendry.dotnet-test-explorer",
-        "ms-playwright.playwright",
-
-        // Infrastructure as Code
-        "hashicorp.terraform",
-
-        // Productivity
-        "ritwickdey.LiveServer",
-        "formulahendry.auto-rename-tag",
-        "christian-kohler.path-intellisense"
+        "openai.chatgpt",
+        "sonarsource.sonarlint-vscode"
       ]
     }
   },
 
-  // Prepare tools without restoring packages or starting the optional emulator stack.
+  // Prepare the toolchain after the container is created. The hook intentionally does
+  // not restore credentialed packages or start the local emulator stack.
   "postCreateCommand": "pwsh -File ${containerWorkspaceFolder}/.devcontainer/post_devcontainer.ps1",
 
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // Port 3000 is the conventional Next.js development port used by the sample
+  // client. The remaining ports mirror the host bindings from
+  // <toolbox>/containers/docker-compose-common.yml, docker-compose-azure.yml,
+  // and docker-compose-aws.yml in the external Developer-Toolbox checkout.
+  // Those Compose files are the source of truth; these entries make their local-development-
+  // only emulator endpoints available through the consuming devcontainer.
   "forwardPorts": [
-    3000, // React dev server (Vite/Create React App)
-    4010, // Custom Docker HTTP
-    4020, // Custom Docker HTTPS
-    5000, // ASP.NET HTTP
-    5001, // ASP.NET HTTPS
-    5173, // Vite dev server
-    7071, // Azure Functions
-    8080, // General web server
+    3000, // Next.js sample client
+    5672, // Azure Functions Service Bus trigger (standard emulator AMQP port)
+    7071, // Azure Functions sample
+    7072, // Java Azure Functions
+    7073, // Node.js Azure Functions
+    7074, // Python Azure Functions
     10000, // Azurite Blob
     10001, // Azurite Queue
     10002, // Azurite Table
@@ -209,42 +163,23 @@
     10150, // Seq
     10170, // Service Bus AMQP
     10171, // Service Bus management
+    10180, // DynamoDB Local
     10181, // Cosmos DB Data Explorer
+    10190, // RabbitMQ AMQP
+    10191, // RabbitMQ management
+    10195, // Moto AWS emulator SQS/SNS/EventBridge/S3
+    10432, // PostgreSQL
     10433, // SQL Server
     10443 // WireMock HTTPS
   ],
 
   "portsAttributes": {
     "3000": {
-      "label": "React Dev Server",
-      "protocol": "http"
-    },
-    "4010": {
-      "label": "http-docker",
-      "protocol": "http"
-    },
-    "4020": {
-      "label": "https-docker",
-      "protocol": "https"
-    },
-    "5000": {
-      "label": "ASP.NET HTTP",
-      "protocol": "http"
-    },
-    "5001": {
-      "label": "ASP.NET HTTPS",
-      "protocol": "https"
-    },
-    "5173": {
-      "label": "Vite Dev Server",
+      "label": "Next.js sample client",
       "protocol": "http"
     },
     "7071": {
-      "label": "Azure Functions",
-      "protocol": "http"
-    },
-    "8080": {
-      "label": "Web Server",
+      "label": "Azure Functions sample",
       "protocol": "http"
     },
     "10080": {
@@ -267,9 +202,24 @@
       "label": "Seq",
       "protocol": "http"
     },
+    "10180": {
+      "label": "DynamoDB Local",
+      "protocol": "http"
+    },
     "10181": {
       "label": "Cosmos DB Data Explorer",
       "protocol": "https"
+    },
+    "10191": {
+      "label": "RabbitMQ management",
+      "protocol": "http"
+    },
+    "10195": {
+      "label": "Moto AWS gateway",
+      "protocol": "http"
+    },
+    "10432": {
+      "label": "PostgreSQL"
     },
     "10443": {
       "label": "WireMock HTTPS",

@@ -11,5 +11,3 @@ if [[ ! -f "$LAUNCHER" ]]; then
 fi
 
 exec bash "$LAUNCHER" "$@"
-
-

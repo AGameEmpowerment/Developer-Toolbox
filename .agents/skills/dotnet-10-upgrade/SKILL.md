@@ -213,7 +213,7 @@ After applying this skill:
 
 ---
 
-## Notes for ICS Teams
+## Modernization guidance
 
 This skill is intentionally conservative.
 Stability and supportability are more important than adopting new features.

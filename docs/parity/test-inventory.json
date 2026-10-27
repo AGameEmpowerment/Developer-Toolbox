@@ -1,0 +1,1854 @@
+{
+  "date": "2026-10-27",
+  "sourceCommit": "66f452566f589a05c520d2679b320d020284d5f5",
+  "repository": "AGameEmpowerment/Developer-Toolbox",
+  "method": "Working-tree lexical declaration inventory; Python functions use AST. SHA-256 hashes use exact checkout bytes. No parameter, fixture, browser or role expansion. Source markers are not discovered cases or execution results.",
+  "executed": "Not collected by this source-only inventory; execution evidence is reported separately",
+  "coverage": "Unavailable: no measured coverage report generated or imported",
+  "files": [
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/scripts/tests/braces-depth-guard.test.mjs",
+      "sha256": "9433447283885b71c6a815e69497491d8f7aa7b44caddc0761cd943223b52a83",
+      "framework": "Node test",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 18,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/proxy.test.js",
+      "sha256": "5c18661636a120e75e0a783f4c55579ebe32dc2ef7e5d87845c4c9e056741074",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 2,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/examples.test.js",
+      "sha256": "3fe333d5f8733169d73a12db292d4d71f059f594dbe19ac31b5effe0ccd0874b",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 3,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/i18n.test.js",
+      "sha256": "4b1025344d2aae4edd7028fac69167ebf63a86bb2e680ad87be2edfe61974a01",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 4,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/testHelpers.jsx",
+      "sha256": "74aadacaa709adbff28381b108f0bb987bb11fa9247598f09ac32c844ba6ff6a",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 2,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/vitest.setup.test.mjs",
+      "sha256": "09b720009c5a704f9dccdbfe00e08953bd9c56ed297fd52a20f7a0aa9a435e63",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 2,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/tests/cli.test.mjs",
+      "sha256": "70783e51ce35da433c7fe14b9a2e745dd404a850b1ae7a93b4149ba4748a7a9c",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node",
+      "counts": {
+        "authoredCallSites": 3,
+        "parameterizedCallSites": 3
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/tests/samples.test.mjs",
+      "sha256": "78ebd31a039c1dd11a48cc8e01428cb7ef5f82a7dbf9e478cbaf8872bc85641c",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node",
+      "counts": {
+        "authoredCallSites": 33,
+        "parameterizedCallSites": 9
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/tests/test_samples.py",
+      "sha256": "e35af15813fa03740724150cd097c0da2a4967ee39386f45a8bc5a5904a62a2b",
+      "framework": "Python test functions",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python",
+      "counts": {
+        "authoredFunctions": 31
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/ContractsTests.java",
+      "sha256": "b7a1fe29c195c1798fa10efd2ed2baf6988d4cb6f2c4c3a61657698617a14ade",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/core",
+      "counts": {
+        "testAnnotations": 16,
+        "authoredAttributedMethodDeclarations": 16
+      },
+      "definitions": [
+        {
+          "method": "localHostAllowsOnlyKnownHosts",
+          "line": 14
+        },
+        {
+          "method": "localHostRejectsRemoteAndAmbiguousNames",
+          "line": 16
+        },
+        {
+          "method": "endpointGuardRejectsUnsafeUris",
+          "line": 18
+        },
+        {
+          "method": "endpointGuardAcceptsComposeAws",
+          "line": 19
+        },
+        {
+          "method": "credentialsMustBeConfigured",
+          "line": 20
+        },
+        {
+          "method": "certificateImportRejectsCloudBeforeFilesystemOrNetwork",
+          "line": 21
+        },
+        {
+          "method": "certificateImportPreservesExistingStore",
+          "line": 26
+        },
+        {
+          "method": "dotenvIsDataOnlyAndExpandsPriorAssignments",
+          "line": 31
+        },
+        {
+          "method": "dotenvDecodesQuotedCredentialsAndPreservesLiteralDollars",
+          "line": 36
+        },
+        {
+          "method": "dotenvSupportsBomFinalAssignmentsAndEscapedWhitespace",
+          "line": 50
+        },
+        {
+          "method": "dotenvMalformedValuesFailWithoutExposingCredentials",
+          "line": 61
+        },
+        {
+          "method": "workEnvelopeRejectsMalformedInput",
+          "line": 67
+        },
+        {
+          "method": "workEnvelopeRoundtripAndBounds",
+          "line": 68
+        },
+        {
+          "method": "lambdaEnvelopeRejectsMalformedInput",
+          "line": 74
+        },
+        {
+          "method": "lambdaContractPreservesUnicodeAndBounds",
+          "line": 75
+        },
+        {
+          "method": "envelopesRejectTrailingJsonAndGarbage",
+          "line": 80
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/CosmosCertificateTlsTests.java",
+      "sha256": "790fc9a05354cdbec999a2a397be56e548fbff35935534156a01b90253ad4db6",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/core",
+      "counts": {
+        "testAnnotations": 2,
+        "authoredAttributedMethodDeclarations": 2
+      },
+      "definitions": [
+        {
+          "method": "importsSelfSignedLocalCertificateWithMatchingSubjectAlternativeName",
+          "line": 69
+        },
+        {
+          "method": "rejectsLocalServerCertificateForAnotherHostnameWithoutWritingTrustStore",
+          "line": 85
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/DatabaseSamplesTests.java",
+      "sha256": "39967e2fd3de05a33423d406495bbcf47ece0dc72cdb15089e01f214c9f74d1f",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/core",
+      "counts": {
+        "testAnnotations": 7,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "sqlServerPreservesUnicodeIdentifiersAndMessages",
+          "line": 11
+        },
+        {
+          "method": "postgresUsesItsUnicodeCapableCharacterType",
+          "line": 14
+        },
+        {
+          "method": "committedMessagesAreIdempotentAndRetainOriginalText",
+          "line": 47
+        },
+        {
+          "method": "schemaDemoExercisesCommittedInsertParameterizedQueryAndRollback",
+          "line": 55
+        },
+        {
+          "method": "failedWriteRollsBackAndPropagates",
+          "line": 58
+        },
+        {
+          "method": "concurrentDuplicateDeliveryCommitsExactlyOnce",
+          "line": 68
+        },
+        {
+          "method": "invalidSourceHasNoDatabaseSideEffects",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/SdkGuardsTests.java",
+      "sha256": "4ca8d0b6008d785adcdbfb4301949920686664038513d03dc8dd64f9777a157d",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/core",
+      "counts": {
+        "testAnnotations": 7,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "wireMockCleanupFailureCannotReportSuccess",
+          "line": 11
+        },
+        {
+          "method": "azureTransportCanInitializeWithoutMixedNettyMajors",
+          "line": 34
+        },
+        {
+          "method": "awsExamplesRejectCloudBeforeCreatingClients",
+          "line": 41
+        },
+        {
+          "method": "azureStorageRejectsCloudAccounts",
+          "line": 47
+        },
+        {
+          "method": "azureStorageRejectsProxyAndDuplicateSettings",
+          "line": 53
+        },
+        {
+          "method": "serviceBusRejectsCloudAndAmbiguousConfig",
+          "line": 59
+        },
+        {
+          "method": "unknownResourceHasNoSideEffects",
+          "line": 64
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/functions/src/test/java/developertoolbox/functions/ToolboxFunctionsTests.java",
+      "sha256": "2df86e350644a49c85b6a28ca37aec8558b7c4ed4e60f3bee856af9223e8cfea",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/functions",
+      "counts": {
+        "testAnnotations": 6,
+        "authoredAttributedMethodDeclarations": 6
+      },
+      "definitions": [
+        {
+          "method": "dispatchesAllSdkAndNativeQueuePublisherSamples",
+          "line": 20
+        },
+        {
+          "method": "unknownResourceReturns404WithoutDispatch",
+          "line": 28
+        },
+        {
+          "method": "providerFailuresReturnSanitized500",
+          "line": 32
+        },
+        {
+          "method": "nativeBindingsPersistValidatedWorkToExpectedDatabase",
+          "line": 38
+        },
+        {
+          "method": "failedCommitPropagatesForNativeTriggerRetry",
+          "line": 45
+        },
+        {
+          "method": "malformedQueueWorkDoesNotTouchDatabase",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/lambda/src/test/java/developertoolbox/lambda/LambdaTests.java",
+      "sha256": "0d701939cefea03a05b3802228bba6a46cdbcc9b29b99527a1bb9f36c80e74ee",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/lambda",
+      "counts": {
+        "testAnnotations": 11,
+        "authoredAttributedMethodDeclarations": 11
+      },
+      "definitions": [
+        {
+          "method": "httpReturnsJsonSharedContract",
+          "line": 13
+        },
+        {
+          "method": "httpDecodesValidBase64Unicode",
+          "line": 18
+        },
+        {
+          "method": "httpRejectsInvalidUtf8RatherThanReplacementDecoding",
+          "line": 22
+        },
+        {
+          "method": "httpReturns400ForMalformedAndInvalidMessages",
+          "line": 27
+        },
+        {
+          "method": "eventBridgeReadsDetail",
+          "line": 28
+        },
+        {
+          "method": "eventBridgeRejectsMissingDetail",
+          "line": 29
+        },
+        {
+          "method": "sqsCommitsValidRecordsAndReturnsOnlyIndividualFailures",
+          "line": 30
+        },
+        {
+          "method": "sqsReturnsFailureWhenCommitLeavesInsufficientResponseBudget",
+          "line": 41
+        },
+        {
+          "method": "exhaustedBudgetReturnsFailuresWithoutSideEffects",
+          "line": 49
+        },
+        {
+          "method": "sqsMissingIdsFailBatchBecausePartialFailureCannotIdentifyRecord",
+          "line": 55
+        },
+        {
+          "method": "sqsNullInputFails",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.App.Tests/LiveValidationTests.cs",
+      "sha256": "c0cd8f1c618b16180ab49fd0c90c117d32ffce593788d698b216f8dd6e21b628",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.App.Tests",
+      "counts": {
+        "Test": 7,
+        "TestCase": 13,
+        "authoredAttributedMethodDeclarations": 10
+      },
+      "definitions": [
+        {
+          "method": "TryParse_NoResources_SelectsOnlyInfrastructureResources",
+          "line": 10
+        },
+        {
+          "method": "TryParse_SelectedResources_NormalizesAndDeduplicatesInRequestedOrder",
+          "line": 23
+        },
+        {
+          "method": "TryParse_InvalidTimeout_ReturnsSafeUsageError",
+          "line": 37
+        },
+        {
+          "method": "RunAsync_InvalidValidationArguments_DoesNotConstructClients",
+          "line": 50
+        },
+        {
+          "method": "RunAsync_AllChecksPass_ReturnsSuccessWithoutPrintingProviderResults",
+          "line": 63
+        },
+        {
+          "method": "RunAsync_OneFailure_ContinuesAndKeepsDiagnosticsSecretSafe",
+          "line": 82
+        },
+        {
+          "method": "RunAsync_CheckTimeout_AwaitsCleanupBeforeNextCheck",
+          "line": 107
+        },
+        {
+          "method": "RunAsync_CallerAlreadyCanceled_ReportsUnexecutedChecks",
+          "line": 129
+        },
+        {
+          "method": "RunAsync_ProviderReturnsAfterCallerCancellation_DoesNotReportSuccess",
+          "line": 143
+        },
+        {
+          "method": "RunAsync_ProviderCancelsWithoutBudgetExpiration_ReportsFailure",
+          "line": 165
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.App.Tests/SampleApplicationTests.cs",
+      "sha256": "94b8f72a1fc46206b919f0864bba39376e435d1544fa742a02b2f0637bc467fa",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.App.Tests",
+      "counts": {
+        "Test": 6,
+        "TestCase": 5,
+        "TestCaseSource": 1,
+        "authoredAttributedMethodDeclarations": 9
+      },
+      "definitions": [
+        {
+          "method": "RunAsync_NoArguments_PrintsGreetingWithoutStartingClients",
+          "line": 14
+        },
+        {
+          "method": "RunAsync_Help_PrintsAllResourcesWithoutStartingClients",
+          "line": 29
+        },
+        {
+          "method": "RunAsync_UnknownResource_ReturnsUsageErrorWithoutStartingClients",
+          "line": 44
+        },
+        {
+          "method": "RunAsync_SupportedResource_CallsOnlySelectedExampleWithCallerToken",
+          "line": 58
+        },
+        {
+          "method": "RunAsync_ProviderFails_ReturnsFailureWithoutPrintingSecrets",
+          "line": 84
+        },
+        {
+          "method": "RunAsync_HostConfigurationFails_ReturnsSafeFailure",
+          "line": 98
+        },
+        {
+          "method": "RunAsync_ProviderCanceled_ReturnsFailureAndForwardsCancellation",
+          "line": 111
+        },
+        {
+          "method": "RunAsync_ValidateSelectedResources_ReusesRunnerAndCallsOnlyRequestedChecks",
+          "line": 130
+        },
+        {
+          "method": "RunAsync_ValidateServiceBusWithoutRoundTripValidator_DoesNotFallBackToSendOnlySamples",
+          "line": 149
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.App.Tests/ToolboxEnvironmentTests.cs",
+      "sha256": "57b17b0e4b776420f071aded69d6241602be416c4d9f15255999f5bc69baa754",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.App.Tests",
+      "counts": {
+        "Test": 3,
+        "TestCase": 8,
+        "authoredAttributedMethodDeclarations": 4
+      },
+      "definitions": [
+        {
+          "method": "Parse_CanonicalReferences_ProtectConnectionComponentsAndKeepEnvironmentSecretsLiteral",
+          "line": 12
+        },
+        {
+          "method": "Parse_QuotedAndUnquotedAssignments_PreserveDataWithoutExecutingCommands",
+          "line": 42
+        },
+        {
+          "method": "Parse_InvalidSettings_RejectWithoutIncludingSecretValues",
+          "line": 66
+        },
+        {
+          "method": "Read_DotenvWithoutJson_AllowsIndependentHostConfigurationAndLaterOverrides",
+          "line": 73
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Data.Tests/DatabaseConfigurationTests.cs",
+      "sha256": "37dc80474dc725793f0ab7ddd7f92b5ff724af2ff57c59b111aa738dda454d1f",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Data.Tests",
+      "counts": {
+        "TestCase": 32,
+        "Test": 1,
+        "authoredAttributedMethodDeclarations": 10
+      },
+      "definitions": [
+        {
+          "method": "TransactionSample_InvalidText_RejectsBeforeRequiringConfiguration",
+          "line": 15
+        },
+        {
+          "method": "TransactionSample_OversizedText_RejectsBeforeRequiringConfiguration",
+          "line": 24
+        },
+        {
+          "method": "DatabaseOperation_MissingConnection_ReportsOnlyRequiredSetting",
+          "line": 36
+        },
+        {
+          "method": "DatabaseOperation_PreCanceled_StopsBeforeConnecting",
+          "line": 47
+        },
+        {
+          "method": "SaveMessage_MaximumBounds_AcceptsValidationBeforeRequiringDatabase",
+          "line": 64
+        },
+        {
+          "method": "AddToolboxDatabases_MissingProviderSettings_ResolvesOneLazySingleton",
+          "line": 73
+        },
+        {
+          "method": "DatabaseOperation_MissingContainerComponent_ReportsSettingWithoutCredentials",
+          "line": 90
+        },
+        {
+          "method": "DatabaseOperation_ContainerCredentialsWithDelimiters_PreservesLocalDatabase",
+          "line": 103
+        },
+        {
+          "method": "DatabaseOperation_ExplicitConnection_TakesPrecedenceOverContainerComponents",
+          "line": 118
+        },
+        {
+          "method": "DatabaseOperation_UnsafeContainerDestination_RejectsBeforeConnecting",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Data.Tests/DatabaseIntegrationTests.cs",
+      "sha256": "f0dbf9f48892655e140254591e3ccaf76522ba9904f95b707d567043452152f4",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Data.Tests",
+      "counts": {
+        "TestCase": 2,
+        "authoredAttributedMethodDeclarations": 1
+      },
+      "definitions": [
+        {
+          "method": "SaveMessageAsync_ConcurrentRedelivery_InsertsOneRow",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Data.Tests/DatabaseSamplesTests.cs",
+      "sha256": "88135d9e6a61f072e21f0f8e376c47f54b63e1529fdc2441618ccd43685b835a",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Data.Tests",
+      "counts": {
+        "TestCase": 6,
+        "Test": 5,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "SaveSqlServerMessageAsync_EmptyFields_RejectsBeforeConnecting",
+          "line": 12
+        },
+        {
+          "method": "SavePostgresMessageAsync_OversizedFields_RejectsBeforeConnecting",
+          "line": 21
+        },
+        {
+          "method": "SqlServerAsync_RemoteDatabase_RejectsBeforeConnecting",
+          "line": 29
+        },
+        {
+          "method": "SqlServerAsync_FailoverPartner_RejectsBeforeConnecting",
+          "line": 36
+        },
+        {
+          "method": "PostgresAsync_DifferentDatabase_RejectsBeforeConnecting",
+          "line": 46
+        },
+        {
+          "method": "PostgresAsync_MissingPassword_RejectsBeforeConnecting",
+          "line": 53
+        },
+        {
+          "method": "Contexts_SameModel_EnforceStableMessageKeyAndPayloadBounds",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Functions.Tests/FunctionRegistrationTests.cs",
+      "sha256": "9abf90bdf10a808610b8c3601dba16f7ee69e07966dec334973261ec1e2e4f97",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Functions.Tests",
+      "counts": {
+        "Test": 2,
+        "authoredAttributedMethodDeclarations": 2
+      },
+      "definitions": [
+        {
+          "method": "AddToolboxFunctionSamples_ResourceHttpHandler_DisablesRedirectsAndProxies",
+          "line": 12
+        },
+        {
+          "method": "AddToolboxFunctionSamples_WithoutCredentials_ResolvesBothFunctionsWithoutNetworkCalls",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Functions.Tests/QueueFunctionsTests.cs",
+      "sha256": "4c9da4ada52791d2088e21139d703534dc626dc0adb97c2f9fcf818089d49536",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Functions.Tests",
+      "counts": {
+        "TestCase": 21,
+        "TestCaseSource": 1,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "Trigger_ValidOrRepeatedMessage_PersistsAndLogsOutcome",
+          "line": 15
+        },
+        {
+          "method": "Trigger_InvalidEnvelope_RejectsBeforeDatabaseWrite",
+          "line": 44
+        },
+        {
+          "method": "Trigger_MalformedJson_PropagatesParsingFailure",
+          "line": 56
+        },
+        {
+          "method": "Trigger_BoundaryPayload_IsAccepted",
+          "line": 66
+        },
+        {
+          "method": "Trigger_DatabaseFailure_PropagatesWithoutSuccessLog",
+          "line": 78
+        },
+        {
+          "method": "Trigger_CanceledInvocation_ForwardsCancellationAndDoesNotLogSuccess",
+          "line": 91
+        },
+        {
+          "method": "Trigger_NullMessage_RejectsBeforeDatabaseWrite",
+          "line": 106
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Functions.Tests/QueuePublishersTests.cs",
+      "sha256": "69d0aa746641fc24c8c5a11baf6a4b5b07db8024220d21024377e5b2f204a33e",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Functions.Tests",
+      "counts": {
+        "TestCase": 45,
+        "Test": 5,
+        "authoredAttributedMethodDeclarations": 16
+      },
+      "definitions": [
+        {
+          "method": "ServiceBusAsync_ValidWork_PublishesStableEnvelopeToDedicatedEntity",
+          "line": 17
+        },
+        {
+          "method": "ServiceBusAsync_ComposeHost_AcceptsOnlyConfiguredLocalEmulator",
+          "line": 35
+        },
+        {
+          "method": "ServiceBusAsync_RepeatedCalls_ReusesClientAndCreatesIndependentMessageIds",
+          "line": 44
+        },
+        {
+          "method": "ServiceBusAsync_NoncanonicalOrDuplicateFields_RejectsBeforeFactoryUse",
+          "line": 71
+        },
+        {
+          "method": "ServiceBusAsync_UnsafeEndpoint_RejectsBeforeFactoryUse",
+          "line": 87
+        },
+        {
+          "method": "ServiceBusAsync_CanonicalLocalConnection_MatchesSdkSelectedEndpoint",
+          "line": 101
+        },
+        {
+          "method": "ServiceBusAsync_DisallowedConfiguration_RejectsBeforeFactoryUse",
+          "line": 126
+        },
+        {
+          "method": "ServiceBusAsync_MissingEmulatorConfiguration_RejectsWithoutNetworkCalls",
+          "line": 137
+        },
+        {
+          "method": "Publisher_EmptyText_RejectsBeforeCreatingClients",
+          "line": 149
+        },
+        {
+          "method": "Publisher_OversizedText_RejectsBeforeCreatingClients",
+          "line": 159
+        },
+        {
+          "method": "StorageQueueAsync_BoundaryText_CreatesQueueAndPublishesCompatibleJsonEnvelope",
+          "line": 168
+        },
+        {
+          "method": "StorageQueueAsync_RemoteEndpoint_RejectsBeforeFactoryUse",
+          "line": 187
+        },
+        {
+          "method": "StorageQueueAsync_ComposeHost_AcceptsAzuriteEndpoint",
+          "line": 198
+        },
+        {
+          "method": "Publisher_SdkFailure_PropagatesAndDisposesSender",
+          "line": 212
+        },
+        {
+          "method": "Publisher_CanceledInvocation_ForwardsTokenToSdk",
+          "line": 233
+        },
+        {
+          "method": "DisposeAsync_UnusedPublisher_DoesNotCreateAnSdkClient",
+          "line": 249
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Functions.Tests/ResourceFunctionsTests.cs",
+      "sha256": "cba1c960bded3eaa22b2a2c7704a0c09b47cc759a69f06fb23d7c60daae665db",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Functions.Tests",
+      "counts": {
+        "TestCaseSource": 4,
+        "Test": 2,
+        "TestCase": 3,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "RunAsync_SupportedRoute_ReturnsJsonAndForwardsCancellation",
+          "line": 17
+        },
+        {
+          "method": "RunAsync_UppercaseRoute_UsesTheSameResource",
+          "line": 49
+        },
+        {
+          "method": "RunAsync_UnknownRoute_Returns404WithoutInvokingResources",
+          "line": 60
+        },
+        {
+          "method": "RunAsync_ResourceFailure_PropagatesInsteadOfReturningSuccess",
+          "line": 73
+        },
+        {
+          "method": "RunAsync_CanceledInvocation_PropagatesTheInvocationToken",
+          "line": 83
+        },
+        {
+          "method": "RunAsync_MissingRoute_RejectsBeforeCallingResources",
+          "line": 97
+        },
+        {
+          "method": "RunAsync_NullRequest_RejectsBeforeCallingResources",
+          "line": 106
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Lambda.Tests/FunctionTests.cs",
+      "sha256": "b4a6df6909d796453ebfb5ffa77a4e5079ff2d25e4f35e2e7aacce24a430b224",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Lambda.Tests",
+      "counts": {
+        "TestCase": 26,
+        "Test": 19,
+        "authoredAttributedMethodDeclarations": 27
+      },
+      "definitions": [
+        {
+          "method": "ReadMessage_ValidBoundary_PreservesMessage",
+          "line": 17
+        },
+        {
+          "method": "ReadMessage_EmptyBody_RejectsInput",
+          "line": 26
+        },
+        {
+          "method": "ReadMessage_MalformedJson_RejectsInput",
+          "line": 32
+        },
+        {
+          "method": "ReadMessage_InvalidContract_RejectsInput",
+          "line": 42
+        },
+        {
+          "method": "ReadMessage_TooLong_RejectsInput",
+          "line": 48
+        },
+        {
+          "method": "HandleHttp_NullRequest_ReturnsBadRequest",
+          "line": 55
+        },
+        {
+          "method": "HandleHttp_OversizedBody_ReturnsBadRequest",
+          "line": 64
+        },
+        {
+          "method": "HandleHttp_Base64Body_ReturnsDecodedMessage",
+          "line": 77
+        },
+        {
+          "method": "HandleHttp_Base64WithInvalidUtf8_ReturnsBadRequest",
+          "line": 90
+        },
+        {
+          "method": "HandleHttp_MalformedBody_ReturnsBadRequest",
+          "line": 105
+        },
+        {
+          "method": "HandleEvent_EventBridgeEnvelope_ReadsDetail",
+          "line": 115
+        },
+        {
+          "method": "HandleEvent_InvalidEnvelope_RejectsInput",
+          "line": 127
+        },
+        {
+          "method": "HandleHttp_InvalidBody_ReturnsSafeErrorWithoutLoggingPayload",
+          "line": 134
+        },
+        {
+          "method": "HandleHttp_ValidBody_LogsCompletionWithoutPayloadContents",
+          "line": 146
+        },
+        {
+          "method": "HandleEvent_ValidPayload_LogsWithoutPayloadContents",
+          "line": 158
+        },
+        {
+          "method": "HandleSqs_ValidRecord_PersistsStableIdentityAndAcknowledges",
+          "line": 169
+        },
+        {
+          "method": "HandleSqs_DuplicateDelivery_AcknowledgesAlreadyPersistedWork",
+          "line": 182
+        },
+        {
+          "method": "HandleSqs_MixedBatch_ContinuesAndRetriesOnlyFailedRecords",
+          "line": 191
+        },
+        {
+          "method": "HandleSqs_CanceledPersistence_ReportsRetryAndContinuesBatch",
+          "line": 209
+        },
+        {
+          "method": "HandleSqs_EmptyBatch_AcknowledgesWithoutResolvingDatabase",
+          "line": 221
+        },
+        {
+          "method": "HandleSqs_InsufficientExecutionTime_RetriesWithoutStartingDatabaseWork",
+          "line": 230
+        },
+        {
+          "method": "HandleSqs_ExecutionBudgetExpires_RetriesInflightAndUnstartedRecords",
+          "line": 242
+        },
+        {
+          "method": "HandleSqs_PersistenceReturnsAfterBudgetCancellation_RetriesWithoutSuccessLog",
+          "line": 256
+        },
+        {
+          "method": "HandleSqs_NullBatch_RejectsInput",
+          "line": 280
+        },
+        {
+          "method": "HandleSqs_MessageIdBoundary_RejectsOnlyOversizedIdentity",
+          "line": 287
+        },
+        {
+          "method": "HandleSqs_InvalidRecords_ReportsEachFailedMessage",
+          "line": 298
+        },
+        {
+          "method": "HandleSqs_MissingMessageId_RejectsUnreportableFailure",
+          "line": 309
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Lib.Tests/DependencyTests.cs",
+      "sha256": "73b27fb8818cd21369047095f85e261b4e6fbb3e4675add8e4979f17995ca411",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Lib.Tests",
+      "counts": {
+        "Test": 1,
+        "authoredAttributedMethodDeclarations": 1
+      },
+      "definitions": [
+        {
+          "method": "GetMessage_NewDependency_ReturnsDefaultSampleGreeting",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Messaging.Tests/LocalServiceBusConnectionTests.cs",
+      "sha256": "3bf44410d3270ad8db5b7ac6b1957f34574e246fcfee8113e9a620a41f15c1ce",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Messaging.Tests",
+      "counts": {
+        "TestCase": 24,
+        "Test": 2,
+        "authoredAttributedMethodDeclarations": 5
+      },
+      "definitions": [
+        {
+          "method": "Read_CanonicalLocalConnection_MatchesSdkSelectedEndpoint",
+          "line": 13
+        },
+        {
+          "method": "Read_NoncanonicalOrDuplicateFields_RejectsAmbiguousConnection",
+          "line": 39
+        },
+        {
+          "method": "Read_UnsafeEndpoint_RejectsConnection",
+          "line": 52
+        },
+        {
+          "method": "Read_EmulatorTextInsideKeyName_RejectsMissingFlag",
+          "line": 60
+        },
+        {
+          "method": "Read_EmulatorFlagIsFalse_RejectsLocalEndpointWithoutEmulatorMode",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Messaging.Tests/MessagingSamplesReceiveTests.cs",
+      "sha256": "b30ea533c61e7d3ada77b814ceb1bf2f9b30f5e0a16e0cf23f8b4975446bbccd",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Messaging.Tests",
+      "counts": {
+        "TestCase": 10,
+        "Test": 6,
+        "authoredAttributedMethodDeclarations": 8
+      },
+      "definitions": [
+        {
+          "method": "ReceiveAsync_MissingQueueOrCorrelation_RejectsBeforeReceiving",
+          "line": 15
+        },
+        {
+          "method": "ReceiveAsync_UnmatchedWork_HidesOnceUntilMatchingMessageAndRestoresEntireBatch",
+          "line": 25
+        },
+        {
+          "method": "ReceiveAsync_DuplicateCorrelatedDelivery_RestoresEveryUnsettledMessage",
+          "line": 41
+        },
+        {
+          "method": "ReceiveAsync_UnrelatedBodyMentionsCorrelation_RestoresItAndDeletesOnlyMatchingEnvelope",
+          "line": 59
+        },
+        {
+          "method": "ReceiveAsync_MatchingMessageDoesNotArrive_RestoresUnmatchedWorkAfterTimeout",
+          "line": 72
+        },
+        {
+          "method": "ReceiveAsync_PollingIsCanceled_RestoresUnmatchedWorkAndPreservesCancellation",
+          "line": 85
+        },
+        {
+          "method": "ReceiveAsync_PollingAndRestorationFail_ReportsBothProviderFailures",
+          "line": 98
+        },
+        {
+          "method": "ReceiveAsync_RestorationFailsAfterMatch_ReportsProviderFailure",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Messaging.Tests/MessagingSamplesTests.cs",
+      "sha256": "abd817de26e72ffdfebd4a88cb0977764a130d3d37d4f2ef95f644a049b0dba6",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Messaging.Tests",
+      "counts": {
+        "Test": 4,
+        "TestCase": 37,
+        "authoredAttributedMethodDeclarations": 13
+      },
+      "definitions": [
+        {
+          "method": "SqsAsync_ValidRequest_SendsAndDeletesOnlyCorrelatedMessage",
+          "line": 17
+        },
+        {
+          "method": "SnsAsync_ValidRequest_PublishesAndReceivesSubscriptionDelivery",
+          "line": 32
+        },
+        {
+          "method": "EventBridgeAsync_ValidRequest_PublishesContractAndReceivesEnvelope",
+          "line": 45
+        },
+        {
+          "method": "EventBridgeAsync_RejectedEntry_StopsBeforeReceivingAndReturnsSafeError",
+          "line": 61
+        },
+        {
+          "method": "AwsSample_ProviderFailure_PreservesProviderException",
+          "line": 75
+        },
+        {
+          "method": "AwsSample_InvalidEndpoint_RejectsBeforeProviderAccess",
+          "line": 98
+        },
+        {
+          "method": "AwsSample_ComposeEndpoint_UsesCanonicalEmulatorHost",
+          "line": 112
+        },
+        {
+          "method": "Sample_CanceledRequest_StopsBeforeProviderAccess",
+          "line": 125
+        },
+        {
+          "method": "RabbitMqAsync_MissingPassword_RejectsBeforeConnecting",
+          "line": 146
+        },
+        {
+          "method": "RabbitMqAsync_InvalidDestination_RejectsBeforeConnecting",
+          "line": 157
+        },
+        {
+          "method": "NativeSample_ComposeDestinationAndCancellation_ValidatesBeforeConnecting",
+          "line": 170
+        },
+        {
+          "method": "ServiceBusSample_InvalidConnection_RejectsBeforeConnecting",
+          "line": 185
+        },
+        {
+          "method": "ServiceBusSample_MalformedConnection_RejectsBeforeConnecting",
+          "line": 194
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Messaging.Tests/ServiceBusValidationSamplesTests.cs",
+      "sha256": "ba2b39b5298f52f764823873ca1cb95f1057e2ab3af6577372c408e999ce63b0",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Messaging.Tests",
+      "counts": {
+        "TestCase": 10,
+        "Test": 10,
+        "authoredAttributedMethodDeclarations": 14
+      },
+      "definitions": [
+        {
+          "method": "ValidateAsync_CorrelatedDelivery_CompletesOnlyOwnedMessage",
+          "line": 11
+        },
+        {
+          "method": "ValidateQueueAsync_LocalEndpoint_PreservesCustomTransportAddress",
+          "line": 35
+        },
+        {
+          "method": "ValidateQueueAsync_UnmatchedWork_RetainsLocksUntilLaterCorrelatedDelivery",
+          "line": 45
+        },
+        {
+          "method": "ValidateQueueAsync_NoCorrelation_TimesOutAndAbandonsUnmatchedWork",
+          "line": 55
+        },
+        {
+          "method": "ValidateQueueAsync_CanceledPolling_UsesIndependentCleanupToken",
+          "line": 68
+        },
+        {
+          "method": "ValidateTopicAsync_CompletionFails_PropagatesProviderFailureAndAbandonsUnrelatedWork",
+          "line": 82
+        },
+        {
+          "method": "ValidateQueueAsync_PollingAndCleanupFail_ReportsBothFailures",
+          "line": 95
+        },
+        {
+          "method": "ValidateQueueAsync_CleanupFailsAfterCompletion_ReportsFailure",
+          "line": 109
+        },
+        {
+          "method": "ValidateQueueAsync_ReceiverCloseFails_ReportsFailureAfterAbandoningUnrelatedWork",
+          "line": 122
+        },
+        {
+          "method": "ValidateQueueAsync_SendAndReceiverCloseFail_PreservesBothFailures",
+          "line": 134
+        },
+        {
+          "method": "ValidateQueueAsync_SendFails_PropagatesWithoutPolling",
+          "line": 147
+        },
+        {
+          "method": "ValidateAsync_PreCanceledRequest_StopsBeforeCreatingClient",
+          "line": 161
+        },
+        {
+          "method": "ValidateQueueAsync_InvalidConnection_RejectsBeforeCreatingClient",
+          "line": 174
+        },
+        {
+          "method": "ValidateTopicAsync_MalformedConnection_RejectsBeforeCreatingClient",
+          "line": 184
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Resources.Tests/AwsResourceSamplesTests.cs",
+      "sha256": "e82e92ef90193798f59ca1b731c0cb8c4f3a37bf0262d8eca6dd1cb1b2f92d85",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Resources.Tests",
+      "counts": {
+        "Test": 13,
+        "TestCase": 2,
+        "authoredAttributedMethodDeclarations": 14
+      },
+      "definitions": [
+        {
+          "method": "S3Async_Success_UsesConfiguredBucketAndDeletesOnlyUploadedObject",
+          "line": 15
+        },
+        {
+          "method": "S3Async_MismatchedRead_DeletesOwnObjectAndFailsVerification",
+          "line": 44
+        },
+        {
+          "method": "S3Async_CanceledRead_CleansUpAndPreservesCancellation",
+          "line": 55
+        },
+        {
+          "method": "S3Async_UploadFails_DoesNotDeleteAnObjectItDidNotCreate",
+          "line": 71
+        },
+        {
+          "method": "S3Async_ReadAndCleanupFail_SurfacesBothProviderFailures",
+          "line": 82
+        },
+        {
+          "method": "S3Async_CleanupFails_DoesNotReportSuccessfulRoundTrip",
+          "line": 95
+        },
+        {
+          "method": "DynamoDbAsync_NewTable_CreatesStringPartitionKeyAndReadsConsistently",
+          "line": 105
+        },
+        {
+          "method": "DynamoDbAsync_ExistingTable_ReusesTableWithoutDeletingIt",
+          "line": 129
+        },
+        {
+          "method": "DynamoDbAsync_CreateDenied_DoesNotContinueOrSuppressProviderFailure",
+          "line": 140
+        },
+        {
+          "method": "DynamoDbAsync_CanceledWhileTableIsCreating_DoesNotWriteAnItem",
+          "line": 151
+        },
+        {
+          "method": "DynamoDbAsync_MismatchedRead_RemovesOnlyOwnItem",
+          "line": 164
+        },
+        {
+          "method": "DynamoDbAsync_CanceledRead_CleansUpWithIndependentToken",
+          "line": 175
+        },
+        {
+          "method": "DynamoDbAsync_ReadAndCleanupFail_PreservesBothFailures",
+          "line": 191
+        },
+        {
+          "method": "AwsResourceAsync_RemoteEndpoint_RejectsBeforeInvokingClientFactory",
+          "line": 205
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Resources.Tests/AzureCleanupTests.cs",
+      "sha256": "cdba5dd90f251bff64c3e325fb8a7ad2038462858244c1685dcb34a02a01230e",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Resources.Tests",
+      "counts": {
+        "Test": 3,
+        "authoredAttributedMethodDeclarations": 3
+      },
+      "definitions": [
+        {
+          "method": "BlobAsync_VerifiedRead_DeletesOnlyCreatedBlobWithBoundedToken",
+          "line": 12
+        },
+        {
+          "method": "BlobAsync_CanceledRead_CleansUpWithIndependentToken",
+          "line": 25
+        },
+        {
+          "method": "BlobAsync_ReadAndCleanupFail_PreservesBothFailures",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Resources.Tests/AzureQueueAndTableTests.cs",
+      "sha256": "47d760477190417d36d86da3591e83cbdf921f7148c90c06d2c2278432e18713",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Resources.Tests",
+      "counts": {
+        "Test": 5,
+        "TestCase": 2,
+        "authoredAttributedMethodDeclarations": 6
+      },
+      "definitions": [
+        {
+          "method": "StorageQueueAsync_RoundTrip_UsesIsolatedQueueAndDeletesReceivedMessageBeforeQueue",
+          "line": 14
+        },
+        {
+          "method": "StorageQueueAsync_InvalidRead_RemovesQueueWithoutAcknowledgingMessage",
+          "line": 30
+        },
+        {
+          "method": "StorageQueueAsync_CanceledRead_DeletesQueueWithIndependentToken",
+          "line": 42
+        },
+        {
+          "method": "TableAsync_RoundTrip_UsesStableKeysAndRemovesOnlyCreatedEntity",
+          "line": 56
+        },
+        {
+          "method": "TableAsync_MismatchedRead_RemovesEntityAndRejectsWrongValue",
+          "line": 74
+        },
+        {
+          "method": "TableAsync_CanceledRead_RemovesEntityWithIndependentToken",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Resources.Tests/ResourceSamplesTests.cs",
+      "sha256": "c64515435595a05ab9c4b1d7aee2261942fff8fbf7b0b10e42797f5e67e57cca",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Resources.Tests",
+      "counts": {
+        "TestCaseSource": 1,
+        "TestCase": 8,
+        "Test": 10,
+        "authoredAttributedMethodDeclarations": 13
+      },
+      "definitions": [
+        {
+          "method": "ResourceAsync_RemoteDestination_RejectsBeforeConnecting",
+          "line": 29
+        },
+        {
+          "method": "ResourceAsync_UnsafeDestination_RejectsBeforeConnecting",
+          "line": 44
+        },
+        {
+          "method": "CosmosAsync_MissingEmulatorKey_ExplainsInvokedSampleOnly",
+          "line": 52
+        },
+        {
+          "method": "SeqAsync_Success_SendsCorrelatedClefAndConfiguredKey",
+          "line": 62
+        },
+        {
+          "method": "SeqAsync_ServerRejectsEvent_SurfacesHttpFailure",
+          "line": 89
+        },
+        {
+          "method": "HttpSample_LocalRedirect_RejectsBeforeReportingSuccess",
+          "line": 101
+        },
+        {
+          "method": "SeqAsync_Cancellation_PropagatesToHttp",
+          "line": 120
+        },
+        {
+          "method": "WireMockAsync_Success_RemovesExactlyTheCreatedMapping",
+          "line": 135
+        },
+        {
+          "method": "WireMockAsync_MismatchedRead_StillRemovesMapping",
+          "line": 165
+        },
+        {
+          "method": "WireMockAsync_CanceledRead_CleansUpWithIndependentToken",
+          "line": 181
+        },
+        {
+          "method": "WireMockAsync_CreateRejected_DoesNotDeleteOtherMappings",
+          "line": 208
+        },
+        {
+          "method": "WireMockAsync_ReadAndCleanupFail_PreservesBothFailures",
+          "line": 224
+        },
+        {
+          "method": "WireMockAsync_CleanupRejected_DoesNotReportSuccess",
+          "line": 238
+        }
+      ]
+    },
+    {
+      "source": "tests/test_ai_assets.py",
+      "sha256": "95606309f3ea9fd521e7934813bbaab43c07ebba380346a8c665d61b4cedbceb",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 7
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_architecture_inventory.py",
+      "sha256": "b176865d491117bba907690d2ef85ee09b0356efc6fc7cabfcaa17cf2aa36894",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 8
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_aws_resources.py",
+      "sha256": "6c6f39b3006bbdc85f3473524bc221b6437209ff905b935d9111d120624633ea",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 14
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_build_toolbox_image.ps1",
+      "sha256": "f519216b776ab808cc0a28e1213367e6c314f34137abea012eed66854ae70dd4",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_configure_examples.py",
+      "sha256": "e026064e850b74c7b2f4c2eb18fe69ae380d19b2ece506b4e08741c4f20e8201",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 28
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_container_lifecycle_helpers.py",
+      "sha256": "6eead943ebac1a665499ecb028df608ec2a2d7bf628727da01a3de84d550373f",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 7
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_docker_pull.ps1",
+      "sha256": "92d60568d34ffa6bbefdf0be6058ce2cd8ee5ca21f2449a646a4c590af65b86b",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_docker_pull.sh",
+      "sha256": "3ee7362517019152872cb93296bc7410782396fe34398f0e0585d9736f964694",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_docker_setup.ps1",
+      "sha256": "8578f2f19e5da99d638c48c8da8c0fd0733164f935e65b58684430ffaf8021cc",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_docker_setup.sh",
+      "sha256": "9d213e27b4fc2c1a1b04ff0863bad04376f7ee65974a359a28872bd0b0642b83",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_ensure_image.ps1",
+      "sha256": "5552c6d78539a4aab128c8d9e50c3b6a0a3640cfef55867b46363ac227353e78",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_ensure_image.sh",
+      "sha256": "0322f3c76e5925259d0b19c61f0ff980b4a1d90de98c71ef25d4c4f8323c626a",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_environment.ps1",
+      "sha256": "895998f23e072f7994df902dc0e94c70333d4a5e579bf807191bd1233535f525",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_environment.sh",
+      "sha256": "79b0ae983e8bf1c5449046a72f783b80ef36935e2aaccad021a5d3a64f309fc3",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_git_tag_cleanup.ps1",
+      "sha256": "8a25c094de7094efe7e57e9722c870ca76036a0d9badf6c5f3e81076aa7ac70b",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_host_example_helpers.py",
+      "sha256": "9eb3a8780fc183921a16d9293124cb6dc93616837bd6d4359fa9bad52f1c15bc",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 19
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_moto_integration.py",
+      "sha256": "5836d4552d479b7f0a90c9a4ff0f9515e5abe6e5ef11643d27943e66a4078205",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 6
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_oidc_contract.ps1",
+      "sha256": "ffa522aa3e17e40d4d54d3cacdb0624d276aa345e4ea77c39b33e28654c95c9e",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_oidc_startup.ps1",
+      "sha256": "8e10dc65a6d8d8eed3c0701b1197a702800ac25dc4d0a058ef4d062b9a307b62",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_review_inventory.py",
+      "sha256": "e5ef06a5c4738529d7bf21895a7a160512256e4dfa13f30f36e8ec076b986bf0",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 4
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_servicebus_container_helpers.py",
+      "sha256": "36954045472e38db170869b577b9828a57653b3529d22b8d9bb5d7c3f69e5d33",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 6
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_shared_container_helpers.py",
+      "sha256": "f479f0cc300ce4bcf7c2e3b429a9679cbb192a8313ceab6fa49880819eefc6c2",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 4
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_source_port.py",
+      "sha256": "70df1130d512841e5e94339412b3a4bc2e34b3ca02fb44b290ae0f54671a74e7",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 5
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_toolbox_bootstrap.ps1",
+      "sha256": "8c859d2862e16e928a9a351eab2ebb892c2ecde33a28bca3c0f6366d7bdc4f90",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_toolbox_bootstrap.sh",
+      "sha256": "e730ffff5d30747e3ec2dec11626e9509699dd5cf21247ffddcd8f529ffd8f20",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_wiki_inventory.py",
+      "sha256": "517648774839faabef53c55377fa9b4cda2b81c130d2ab0381f8d9af77a96a75",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 9
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_wiremock_certificates.ps1",
+      "sha256": "7d1017e635614e22d028d33484eb633df3f5e7412d9c35071033d06c5f4fef10",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_wiremock_certificates.sh",
+      "sha256": "f270ff42529056108f4bd4636e3ec5df3dd81688741b497041f78e7bde59b638",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    }
+  ],
+  "sourceState": "Uncommitted working tree based on sourceCommit; not a committed baseline",
+  "sourceManifest": {
+    ".agents/skills/appinsights-instrumentation/scripts/appinsights.ps1": "0fc8204905c4c2a2a99b42b48aac2e3dfe569e01a63b75624bb6c6a926b18f10",
+    ".agents/skills/azure-architecture-autopilot/scripts/cli.py": "1b6583c0aad2260a86817a72f28baedb99ce516892941b8fb3254318cfd8a606",
+    ".agents/skills/azure-architecture-autopilot/scripts/generator.py": "914ed0d1956319143807cc59afb3503d610f49c4129488d8883aa24e37a4bac7",
+    ".agents/skills/azure-architecture-autopilot/scripts/icons.py": "521b81c5efb37429d2ddf097dc0659d19b9db17cac3154ab908b53d281ed15d0",
+    ".agents/skills/github-wiki/scripts/wiki_inventory.ps1": "6bab8c0d8076338be3b85c51516c631d6013b969c2ed3132d4e106cf08e17d34",
+    ".agents/skills/github-wiki/scripts/wiki_inventory.py": "6b35718096842cd01a31f8029e28bb254724c9a844f852a44f6c0a3d8b5fab10",
+    ".agents/skills/skill-creator/eval-viewer/generate_review.py": "6c622d12871b706ba1b242a3d40c13b29c8e4d5a08701aaf3160d3d36c7b2364",
+    ".agents/skills/skill-creator/scripts/aggregate_benchmark.py": "16c5a53e4cbf55a679a42c244cba39cee463d99ce507ecc9fafc4cb4e0a133e0",
+    ".agents/skills/skill-creator/scripts/generate_report.py": "6c7cfaeedc9da685bb7f1202f06ec95d3b9b5a4630ff981972a1a04e9129aee6",
+    ".agents/skills/skill-creator/scripts/improve_description.py": "6d9ac165ec88483ca78d59c60e499e50aaa344c1573ec6426b08d59f7111a8a8",
+    ".agents/skills/skill-creator/scripts/package_skill.py": "2cd9a9891844516fd30466eae30e4a9b9a199802522de3fb12f59a063fba58ab",
+    ".agents/skills/skill-creator/scripts/quick_validate.py": "0ddffd28e5afc285e7bf964f0bfd610d21092c13b6f095145f1fb08df9eee882",
+    ".agents/skills/skill-creator/scripts/run_eval.py": "13d3098b673f926bc27396533990121a3be662bb17027b2df89cffa0601773fa",
+    ".agents/skills/skill-creator/scripts/run_loop.py": "f004cc47a95a131d4ec4d82e9cdc1539d6d71c56102052d02e5dd23aed322dcc",
+    ".agents/skills/skill-creator/scripts/utils.py": "b396f920bfbb422822427d800656ab125876e1e42ae242ed3c9380338f9d0833",
+    ".agents/skills/webapp-testing/assets/test-helper.js": "e57bae72c4f3ed5b6c196e4bac0dc6e304497f30107bdc136cc2b79a1d92d09c",
+    ".agents/skills/webapp-testing/test-helper.js": "e57bae72c4f3ed5b6c196e4bac0dc6e304497f30107bdc136cc2b79a1d92d09c",
+    ".devcontainer/ensure_image.ps1": "9379f33635d15a0abe3a24a3081cd1c81886284cc038cc5efb44c7ae100b8b56",
+    ".devcontainer/ensure_image.sh": "47c01f569e3b6c7c76d0f40e2e289c1c95c0aae58560c576c4f94ac25c53c3f9",
+    ".devcontainer/post_devcontainer.ps1": "f7594dfd9a79f04307f6dde9134bb4679065776414e6182853875cae23472c5b",
+    ".devcontainer/start_devcontainer.ps1": "ff98a6ce909caaff420e49a75545cf34d007b20f4ace4c54a99e9504730397d3",
+    ".devcontainer/start_devcontainer.sh": "46765667894fb39813195f6fa6f9fe3b89b7e58680d3277b6f671648c920415a",
+    ".devcontainer/start_developer_toolkit.ps1": "d377ac88528f2512fae3bca5a3e963c3740c5851543763ce101a85337faa0ac8",
+    ".devcontainer/start_developer_toolkit.sh": "0bfa4ec058188b0071674cad47e046bde205e4667d54c298da81564dd1e729b6",
+    ".github/scripts/run-copilot-setup.ps1": "a0f25409b0978f397170ff9e1c21dbe72d5e1ba83e308d8b45a6464b8a5ad2ee",
+    ".github/scripts/validate-copilot-setup.js": "d8d316afd74dc19de8dbae74fa4ccf4b094ad61b38217957a1a3a4e5bd36ce0f",
+    "Build-ToolboxImage.ps1": "1bcc54042c6f116edff2c2b5ac804e225c1abb4a0f2028a9f84c1e9d82d99d43",
+    "Delete_Old_Git_Tags.ps1": "1127428e5302b3943e8ea5337be0f48a859d55d3850dcc33a0b588309659204c",
+    "Install-ToolboxSetup.ps1": "911434aa06c7e40031fd5d7326d3cb31d1b8529ea6decb1fb5f54e8f3819c043",
+    "containers/aws/health.py": "93b6d32d1f65fb3e1a498ac86d0f22bcbb3c88d80bd799f12cf2a54cacf40274",
+    "containers/aws/init.py": "c6f1da900ec34aeb491d6484705e8da22323113800eb2c5d298d9a40092a6cd0",
+    "containers/aws/local_session.py": "1ac9c5aec94c13874437765f25a4cbfaa653f04556cdd262d5f1678fb2936e08",
+    "containers/aws/run_emulator.py": "de51fa5faf1f531430156ae1c3387bc3225ffd944ac6b9d2983d2b0dff8a1598",
+    "containers/certs/Generate-WireMockCert.ps1": "dff14e42ffaed1199143b83b26d4afba7676306f64a0bd0e60ff995452259b3b",
+    "containers/certs/generate-wiremock-cert.sh": "11ab1b216d309e47cda1c948b9b9088a741bae8698e102c99789bf723f353339",
+    "containers/environment.ps1": "2ee1710dc15e03f1dec09900e7c16a0eceaf969d79e7c24bb1419b4928e44ec6",
+    "containers/environment.sh": "ef3ba1a752c8a7411ab598323801bdaafb393ef5a557ffcb11054c36a4a2e3cc",
+    "containers/mssql/db-init.sh": "e67b73bfd4ea20280df13c497595578cec0fde78d0b3811e7cc762dee09db262",
+    "containers/mssql/entrypoint.sh": "d65cd1a790faf2dc387a0ab1355a3eb683a8549c38aec6ff4cdeff2105addcb9",
+    "containers/oidc/keycloak/startup.sh": "6c4e3ec674d2b82f3b3b38e57850d07115e2aa12322673d3e23031f484fa6178",
+    "devops/PrepNuget.ps1": "83c696013f4b6f746d00c63b3a9cb617476a224e4f80cb23bc44a26ca9e60a9b",
+    "docker_down.ps1": "b578e3d4cf08165af9f7847193d5deb2ded832396a97b0cd2aebad454cd1a92c",
+    "docker_down.sh": "2370d2a1518409a5ee368bc1e23a3f05aa704624543da5e331b659b495a589a8",
+    "docker_pull.ps1": "6ac8ff512c40b29e7c6f2cded74e1fe9b2891b401bf8243ce2c888c0b76b80e5",
+    "docker_pull.sh": "08b4458bc9242add504a508113c924a8f3101c9ab75f2590a1a0ddf59035baad",
+    "docker_setup.ps1": "a90801ea136c5cd98e5c7b30dd39e29b25e1630d83a9c1f88667c0b54600b90c",
+    "docker_setup.sh": "45da37181bb79cfae2a1e7b6482ba36db849146ea7e21e2c2d45d459d18c5e8c",
+    "docs/architecture/inventory-source.py": "b2ef194a222f1ae66612e645d1c76a885c41b60d39175fc422db6206f6a92426",
+    "docs/reviews/inventory-source.py": "9b2d7863fbac0f426f12071011ee6add012d109daa6f89b69eeb8ca4baef1e87",
+    "install_toolbox_setup.sh": "1e135ff483ecaa48727deb2e2f183600a85dad52f51c2abbc8a68c1ad8567e55",
+    "setup/_toolbox.ps1": "0e049e917cd94fb0a44acd0296c674a5b5de4e521f7854ca512bc1e369331c0c",
+    "setup/_toolbox.sh": "849defac98c56af6e960a66029eb29a9ba2bd5e206305662920660fa1e2d3b12",
+    "setup/configure_examples.py": "8a1ef195ea0382f18ed8580fa53054cd643cf19e9bdcce8e1230b9383c32b9f1",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/DeveloperToolbox.Example.App.csproj": "05b023ca7b3738bea245e9111efcf48c43ecf54a096b1dc15b28e6453c664a7e",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/LiveValidation.cs": "baacfc452090b3594790b41bb347c41f9c5b37a1ee38e36e428560816d805602",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/Program.cs": "6daa4c80abdef03dd161d62836db66647b45b1fc169cec0b80e28b38d9f72f58",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/SampleApplication.cs": "056808d72ac58249cca7739a71edad1dba81c1939b01bb20ca527a25286bfffa",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/ToolboxEnvironment.cs": "805c5d454d6ce4a27e351be103addea059d9b99be8275c876808f2cc5220b93d",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/eslint.config.mjs": "1dc32c9ff641ae048f442604e4d971a33856ff31798b365ab242170451fc6925",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/next.config.mjs": "371cecf6595ae127ad19881e57299a0eec83eeb33e0473f17160fc348ff016eb",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/prettier.config.mjs": "24b8dddd948973b33882233c82ed61f84b38d3ac666673375476e1057fe94d94",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/scripts/apply-braces-depth-guard.mjs": "4cd732cc3452d0a5e22a47e60b0a8e8a7d5f6667ca19ce4d0a376cfb372f460a",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/scripts/tests/braces-depth-guard.test.mjs": "9433447283885b71c6a815e69497491d8f7aa7b44caddc0761cd943223b52a83",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/app/examples/[id]/page.jsx": "3e31cb088bdceae409f488ed9909b5d948cf7031632bc9bac7a5eb318bb0cd55",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/app/examples/error.jsx": "12b8d851c81e30168e8d59aefb973298b9fb6c4a7391b7e6dcb886c5584921a9",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/app/examples/layout.jsx": "ba623cbe879c7a83eb357d86c079e62e02942032c6c7f427adebe84564655e97",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/app/examples/not-found.jsx": "1e5b48b39b828da4705dd215412d470ba14d29deed14a1b3244b67927b262e8d",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/app/examples/page.jsx": "688caf103dc7376ca874bf9ced9a544c2094ae03e04e575094cc39b87db4670b",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/app/global-error.jsx": "35046c9f0dc0a6979d89fab11a9e3ac637ff78cc28999e0b943f8fd7aa789f41",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/app/layout.jsx": "2eed0d50ffe47315d153cb50bb39f32e7369349bad6a2b7ee1806e491a149f9c",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/app/not-found.jsx": "ed0c04c5bb2ff7a13907476cc75b813fb37fe8c609cc69728310d46e14a06b59",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/app/page.jsx": "51251e64d5b419aa4e437038bd091bcb161b52d11e9e3edd3d684a8ffda8a612",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/components/Main.jsx": "a4ba215a3bd6b64c24e7b7b059c8f7b17f2a34200c97b6df9c1d1531f06b80e3",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/components/Main.test.jsx": "d6202873dc7a264d630a8532d87e4f7e9a59e4a201158442447dd21e212f18bf",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/components/NotFound.jsx": "8ed8c482f11b05d4710c32bed57b5829c9e8c87772fe5b39ac7ed08163dfe3c7",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/components/NotFound.test.jsx": "549a7de5ddac5b7d8b3cf44e2eb648c5fb38d024dd147c35bf86b847071b7da3",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/components/PageWrapper.jsx": "c3744ab20ca9f962fcd0073a1e1a22d12fe0ad9f205f53998527289d533f4d72",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/components/SharedLayoutDisclaimer.jsx": "37e97b020729407b0c0c9a6d11d16f60e06c2b3df81a441d8b39512674de4cef",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/dictionaries/index.js": "46dc12731468e9d4c03ba76d2f1065a9760f9a97d6be9d14b10456a5384dc3f3",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/proxy.js": "22cdf7a3651335e01042a999e8ecf0f00066584020ac9b87468c8bed4b3046b4",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/proxy.test.js": "5c18661636a120e75e0a783f4c55579ebe32dc2ef7e5d87845c4c9e056741074",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/auth.js": "2fe27b1c3125ec1194bea6446fd43fd61da021e9f68fa4e886e26ea904765e98",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/examples.js": "edc835e616459c14c72b9f5a61c538f17a8641ffa86513fb81a0e43a956ea785",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/examples.test.js": "3fe333d5f8733169d73a12db292d4d71f059f594dbe19ac31b5effe0ccd0874b",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/i18n.js": "e4c82b186102785cb30d5e23d0921d3da4e174eff7d9b1e2e77d804c7a9eb44d",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/i18n.test.js": "4b1025344d2aae4edd7028fac69167ebf63a86bb2e680ad87be2edfe61974a01",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/testHelpers.jsx": "74aadacaa709adbff28381b108f0bb987bb11fa9247598f09ac32c844ba6ff6a",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/stylelint.config.mjs": "c5745db6de2cb12bcec0b478e554bd37371a2b1ca7a6ae9d592f952a0622de2b",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/vitest.config.mjs": "211cac4b66b113008d6b24dcbc5a750c67d884ca8fd6cbfddf97bb02ac8b728f",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/vitest.setup.mjs": "111386c4b24851596c3620c4182a2af62132953df894768ab01ea60b373b7015",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/vitest.setup.test.mjs": "09b720009c5a704f9dccdbfe00e08953bd9c56ed297fd52a20f7a0aa9a435e63",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/DatabaseRegistration.cs": "f61fb171f02ab1d582cadd76a33a15ee24445c6763f02c647b065be8ea9834f5",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/DatabaseSamples.cs": "a1311a28e2a68c3edee9b3673398ea0c5aac8ae4ffec6595f76ae80f64d6282c",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/DeveloperToolbox.Example.Data.csproj": "cb85f80709e6ab9276de3000ec4f5ae1cbde78687740023793b61d83759d017c",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/IDatabaseSamples.cs": "52ec8fff3b9a36a8af8296010423e50f247cc3ce5c6e236cd34e9d5b47b086f2",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/SampleContexts.cs": "c0545c1e8ee6018ef9f2dc326db8a50e8ad9d0f88c86cc5f0990bf01efa3ac4b",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/SampleMessage.cs": "32ad86a09bcab5009955dde5f5ea969e64d370f61d6056297a1c05c51f3ba941",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Functions/AssemblyInfo.cs": "0531f9823cc2638519e244924d9c3bebc7971d8e1e44e9557de1134f76ff09a2",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Functions/DeveloperToolbox.Example.Functions.csproj": "e45a1aa58479a2b0b6044ee0366dfc539b406f55159fe4487a3b79dc5bce5349",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Functions/FunctionRegistration.cs": "324225ce32bbc33c16d6dd208e44610cf2c52dad00d597621894c62012d2e670",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Functions/IQueuePublishers.cs": "04133cb51cd5c00ce1bf786c37bad5db9c2e1422a87b198ec9cf5cb77c0c7b44",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Functions/Program.cs": "b6e23f3d257cda8dbe7713a72b018b959dadaf4191c0de2896a0a7ddfffa500a",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Functions/QueueFunctions.cs": "04f0663860c496611498dd3e4f8bc52ef2644f4385a14b6b206e0aa723898f2a",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Functions/QueuePublishers.cs": "037ae973ef5412bca8e633dbd5ba77ef820120ce125211494c4e775edcfc21cf",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Functions/ResourceFunctions.cs": "acaff6b52115f16df2d38dfd92b4b890a228587ca554711c6491f282035b38b3",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Lambda/DeveloperToolbox.Example.Lambda.csproj": "b4b02715657e6c67afd49eef8ae4f1ad92ec4333a9acfdc1d9d0852e87a20be4",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Lambda/Function.cs": "2dfa03c4de98c383bc9563b47c014235cff5677482caed2303556e65a7a8e773",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Lib/Dependency.cs": "fd15d519e9fcbc2fcee21bd5a7ec080c6f17fd7ac8ff84b80b1c85c69465edf8",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Lib/DeveloperToolbox.Example.Lib.csproj": "2c82dae7a6492e5dc0d99b6b5a5d1c89a4702b892f71757981e46302949d6115",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/DeveloperToolbox.Example.Messaging.csproj": "c4e57d41850d32d840369f0a408d1eaebbb2b9e7c5a3ca1d5b6d0230a6f058a9",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/IMessagingSamples.cs": "a9a66d49104b384c7c35f8fb2e30e1ccaa4201d4ce731ff89acfa6f2c9b1621a",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/LocalServiceBusConnection.cs": "faa5873c98d15eabb8a7525f149df403507fe0c3e7816986b5b871452e4e98ff",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/MessagingSamples.cs": "f7aa33f5602877544bdd328ef56dea52c3d80ab97afd1a14af89a3cf4238105b",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/ServiceBusValidationSamples.cs": "737d62f894642c0c3f3edd9593c450f50578fcad9adbb331b60660a993c2b0b0",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/src/cli.mjs": "5cfee4f1e7314585c4f53b9d181bb094ff0527c7dbde3fdd8f3bc9db74c5383f",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/src/config.mjs": "b28716b7b90fd69a01f337c63610f14ffabd55b1f046176ecca6317c6e227332",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/src/functions/samples-post.mjs": "c1505809a25118fa10bd140640bd0b2bba6a77dccae3335b87ea309c135e62f2",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/src/functions/work-post.mjs": "6ca0f265fc367b75634e0e0db53d0e197f34cab9ab69d475208bb18ea7f8252a",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/src/functions/work-queue.mjs": "dc1ab493426a022fac54fcc33d62a83236f7af28afbae75280bdf05dc3b27031",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/src/handlers.mjs": "546d5c26965997b3b08b6f790861fde548f42822a146fc1dc389405a86a87ace",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/src/lambda.mjs": "6122d61ca51d3aa1f7e3d51e3bd5dafc858fd2b58becb56118c335d0b082ecb9",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/src/resources.mjs": "114bef391a7628def0e95af164555e0e185b08073278b8b5b003b503b7acee6b",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/tests/cli.test.mjs": "70783e51ce35da433c7fe14b9a2e745dd404a850b1ae7a93b4149ba4748a7a9c",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/tests/samples.test.mjs": "78ebd31a039c1dd11a48cc8e01428cb7ef5f82a7dbf9e478cbaf8872bc85641c",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/function_app.py": "e64da75d97da7ac1c188cdaa12c3bfe3593d745d4daac3dc308a48933c7d9992",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/lambda_handler.py": "d43e51dde21c7daa9c6a83dcf00d409b6493e72416597018100306f2c41f36f0",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/tests/test_samples.py": "e35af15813fa03740724150cd097c0da2a4967ee39386f45a8bc5a5904a62a2b",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/toolbox_samples/__init__.py": "81c097fb558cca8abf2e3630ad65aeefb2b8791b8cadf0668a81d2566eb79608",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/toolbox_samples/cli.py": "ea5b52a606ed32017564ccecf703b9ff2bd22674ecec080538be2c702b20e6a6",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/toolbox_samples/config.py": "e4898a4c42419fc56172613fec3167cba5d434030cfb63d853c45eeb7f362793",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/toolbox_samples/handlers.py": "d574bf0b2c140232280cf19e629fc3c0181e272b6eb562f00342377fccb1d1a6",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/toolbox_samples/resources.py": "1435f1bec7f39f7b8ef5bef9acc2cd780c98b509de85f2cf5d515465e91271f9",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/AssemblyInfo.cs": "0e4aea3bd4257ebb2f606d39d040ae5345750d198f62e58ca8db73ee45410557",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/DeveloperToolbox.Example.Resources.csproj": "0ce530ea5036e276876842f0f8617e125cd220496004630f38de2f5b7dc2cacf",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/IResourceSamples.cs": "58b11984f54896de6a9cc14799040f4ef4af85d4eea92a27f7b06047d7c2bbda",
+    "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/ResourceSamples.cs": "0d5352a55bd6f7c19585b7f96591d6941a203e55940c6c1804052029532ea08b",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/CosmosCertificate.java": "4d21b8c37ff1c8fc71a1feb43bf6009981ca4fe9eda94c744fe2c7f76ab1249b",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/DatabaseSamples.java": "240ad1cb0784bee2e98c9f63dad063cbd3461770fdc521db41080f736020d431",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/JsonMessage.java": "e4070cf8704c557bbf09e8173347020cf8e57d9450daa587b7ef274efdbefc66",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/Main.java": "0413181d5668dd85788fe55e5604004b5167c3bb83e4fc1b019d721783ea9099",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/MessageStore.java": "20112830416ae615027a889f266620385df053c6d71dd7964285f83bf2db8945",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/SampleMessage.java": "0327d8cf8dc30b3d72c25bd40d93e4cee0d1e305af9764a18b4228bf9026739c",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/SampleRunner.java": "cd3900f3ce8c36046ec365b36325c4cf60b6438ace60b2bccb830aa32d405958",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/SdkSamples.java": "604851112cf2a09a73e46ac79d91403741b05fdcbc28aba9c8e913d38d6b3662",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/Settings.java": "8fd247968b3c17313028a1daf603b170c50115932698cf7e3edf41599bae2834",
+    "src/DeveloperToolbox.Java.Example/core/src/main/java/developertoolbox/core/WorkItem.java": "3a4b62ac4ccb48cc525db447dc59a3e484b0c369e2567e16604071f406ce3b13",
+    "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/ContractsTests.java": "b7a1fe29c195c1798fa10efd2ed2baf6988d4cb6f2c4c3a61657698617a14ade",
+    "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/CosmosCertificateTlsTests.java": "790fc9a05354cdbec999a2a397be56e548fbff35935534156a01b90253ad4db6",
+    "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/DatabaseSamplesTests.java": "39967e2fd3de05a33423d406495bbcf47ece0dc72cdb15089e01f214c9f74d1f",
+    "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/SdkGuardsTests.java": "4ca8d0b6008d785adcdbfb4301949920686664038513d03dc8dd64f9777a157d",
+    "src/DeveloperToolbox.Java.Example/functions/src/main/java/developertoolbox/functions/ToolboxFunctions.java": "095901274a2209fc33a53a79d99852e0527545903b392d2eaad0731840a454e5",
+    "src/DeveloperToolbox.Java.Example/functions/src/test/java/developertoolbox/functions/ToolboxFunctionsTests.java": "2df86e350644a49c85b6a28ca37aec8558b7c4ed4e60f3bee856af9223e8cfea",
+    "src/DeveloperToolbox.Java.Example/lambda/src/main/java/developertoolbox/lambda/EventFunction.java": "6f481bf33867c9c4cc0c1e3f7497cf231fa2923ae59ea9b0f03106934e06bf92",
+    "src/DeveloperToolbox.Java.Example/lambda/src/main/java/developertoolbox/lambda/HttpFunction.java": "8c16848ee988137bd2164fe224855a719f9e0109e48e4e68223994bb0eaf634e",
+    "src/DeveloperToolbox.Java.Example/lambda/src/main/java/developertoolbox/lambda/SqsFunction.java": "dea565db7b8c08f1da02d81a9c688162f204c6e2b146c4c5acb1b5f4939ae875",
+    "src/DeveloperToolbox.Java.Example/lambda/src/test/java/developertoolbox/lambda/LambdaTests.java": "0d701939cefea03a05b3802228bba6a46cdbcc9b29b99527a1bb9f36c80e74ee",
+    "start_developer_toolkit.ps1": "bd6d31b809b847916705fa3c65191c21e4839a5794ba014b41b349fcdb0fae48",
+    "start_developer_toolkit.sh": "4bb309c8aa4d4dc4eb3c5b7da677158067306eb0e3b9c7c7b12d1bbd6c8b35d2",
+    "sync_ai_assets.ps1": "09da652cb134a28b7780227ef1ea415ff9f0839c4b7c755bdf8ceedbe8400ee0",
+    "tests/DeveloperToolbox.Example.App.Tests/AssemblyInfo.cs": "3e1f2446703a0b90e22762174ec01d5533ddd6610bf86e6fc839278dc1c43672",
+    "tests/DeveloperToolbox.Example.App.Tests/DeveloperToolbox.Example.App.Tests.csproj": "8a059a28f006285fc50ff8adff43c8ec88c4b2f9368d83b2d46cfa3c4eabb6c7",
+    "tests/DeveloperToolbox.Example.App.Tests/LiveValidationTests.cs": "c0cd8f1c618b16180ab49fd0c90c117d32ffce593788d698b216f8dd6e21b628",
+    "tests/DeveloperToolbox.Example.App.Tests/SampleApplicationTests.cs": "94b8f72a1fc46206b919f0864bba39376e435d1544fa742a02b2f0637bc467fa",
+    "tests/DeveloperToolbox.Example.App.Tests/ToolboxEnvironmentTests.cs": "57b17b0e4b776420f071aded69d6241602be416c4d9f15255999f5bc69baa754",
+    "tests/DeveloperToolbox.Example.Data.Tests/AssemblyInfo.cs": "3e1f2446703a0b90e22762174ec01d5533ddd6610bf86e6fc839278dc1c43672",
+    "tests/DeveloperToolbox.Example.Data.Tests/DatabaseConfigurationTests.cs": "37dc80474dc725793f0ab7ddd7f92b5ff724af2ff57c59b111aa738dda454d1f",
+    "tests/DeveloperToolbox.Example.Data.Tests/DatabaseIntegrationTests.cs": "f0dbf9f48892655e140254591e3ccaf76522ba9904f95b707d567043452152f4",
+    "tests/DeveloperToolbox.Example.Data.Tests/DatabaseSamplesTests.cs": "88135d9e6a61f072e21f0f8e376c47f54b63e1529fdc2441618ccd43685b835a",
+    "tests/DeveloperToolbox.Example.Data.Tests/DeveloperToolbox.Example.Data.Tests.csproj": "349f56c218fd6fe03c5d4e6aa7bbd99a20adcbdf3eccfdd7e4e2ac5a5be6411e",
+    "tests/DeveloperToolbox.Example.Functions.Tests/AssemblyInfo.cs": "1df530bbfe17c429d7fc8bb770b2dfa139f948062364b9677f7cfcc37efc689b",
+    "tests/DeveloperToolbox.Example.Functions.Tests/DeveloperToolbox.Example.Functions.Tests.csproj": "6a84bf0df0886b71a93d84b1523ccf46009cc33314d7174c5883dd05382ec5aa",
+    "tests/DeveloperToolbox.Example.Functions.Tests/FunctionRegistrationTests.cs": "9abf90bdf10a808610b8c3601dba16f7ee69e07966dec334973261ec1e2e4f97",
+    "tests/DeveloperToolbox.Example.Functions.Tests/QueueFunctionsTests.cs": "4c9da4ada52791d2088e21139d703534dc626dc0adb97c2f9fcf818089d49536",
+    "tests/DeveloperToolbox.Example.Functions.Tests/QueuePublishersTests.cs": "69d0aa746641fc24c8c5a11baf6a4b5b07db8024220d21024377e5b2f204a33e",
+    "tests/DeveloperToolbox.Example.Functions.Tests/ResourceFunctionsTests.cs": "cba1c960bded3eaa22b2a2c7704a0c09b47cc759a69f06fb23d7c60daae665db",
+    "tests/DeveloperToolbox.Example.Functions.Tests/SampleFakes.cs": "d3f181185255fbbb6f508b9323057c8f8be5d0ec1fbe0e3366be568f0c96d896",
+    "tests/DeveloperToolbox.Example.Functions.Tests/WorkerHttpFakes.cs": "d394e5923cf27461f21fd6686965169807f84df241d4a3744f0d9ce556e15424",
+    "tests/DeveloperToolbox.Example.Lambda.Tests/AssemblyInfo.cs": "1df530bbfe17c429d7fc8bb770b2dfa139f948062364b9677f7cfcc37efc689b",
+    "tests/DeveloperToolbox.Example.Lambda.Tests/DeveloperToolbox.Example.Lambda.Tests.csproj": "0954c517c6c252aa571993224d9c32fccc47d80c0ea9faa561881daaa3d17618",
+    "tests/DeveloperToolbox.Example.Lambda.Tests/FunctionTests.cs": "b4a6df6909d796453ebfb5ffa77a4e5079ff2d25e4f35e2e7aacce24a430b224",
+    "tests/DeveloperToolbox.Example.Lib.Tests/AssemblyInfo.cs": "3e1f2446703a0b90e22762174ec01d5533ddd6610bf86e6fc839278dc1c43672",
+    "tests/DeveloperToolbox.Example.Lib.Tests/DependencyTests.cs": "73b27fb8818cd21369047095f85e261b4e6fbb3e4675add8e4979f17995ca411",
+    "tests/DeveloperToolbox.Example.Lib.Tests/DeveloperToolbox.Example.Lib.Tests.csproj": "e6021353296755a588f243603e7bdf65e4d260c86e256d5ca5aee5c0728282ba",
+    "tests/DeveloperToolbox.Example.Messaging.Tests/AssemblyInfo.cs": "b3268b14da8f71cd486597e99f2f286cef8bd780af37bfaf294d8303da0e6639",
+    "tests/DeveloperToolbox.Example.Messaging.Tests/DeveloperToolbox.Example.Messaging.Tests.csproj": "8e176ffe44a2e129a357e6aebac194a07dc5414d62a762789fcc192cda7c2891",
+    "tests/DeveloperToolbox.Example.Messaging.Tests/LocalServiceBusConnectionTests.cs": "3bf44410d3270ad8db5b7ac6b1957f34574e246fcfee8113e9a620a41f15c1ce",
+    "tests/DeveloperToolbox.Example.Messaging.Tests/MessagingSamplesReceiveTests.cs": "b30ea533c61e7d3ada77b814ceb1bf2f9b30f5e0a16e0cf23f8b4975446bbccd",
+    "tests/DeveloperToolbox.Example.Messaging.Tests/MessagingSamplesTests.cs": "abd817de26e72ffdfebd4a88cb0977764a130d3d37d4f2ef95f644a049b0dba6",
+    "tests/DeveloperToolbox.Example.Messaging.Tests/ServiceBusValidationSamplesTests.cs": "ba2b39b5298f52f764823873ca1cb95f1057e2ab3af6577372c408e999ce63b0",
+    "tests/DeveloperToolbox.Example.Resources.Tests/AssemblyInfo.cs": "b3268b14da8f71cd486597e99f2f286cef8bd780af37bfaf294d8303da0e6639",
+    "tests/DeveloperToolbox.Example.Resources.Tests/AwsResourceSamplesTests.cs": "e82e92ef90193798f59ca1b731c0cb8c4f3a37bf0262d8eca6dd1cb1b2f92d85",
+    "tests/DeveloperToolbox.Example.Resources.Tests/AzureCleanupTests.cs": "cdba5dd90f251bff64c3e325fb8a7ad2038462858244c1685dcb34a02a01230e",
+    "tests/DeveloperToolbox.Example.Resources.Tests/AzureQueueAndTableTests.cs": "47d760477190417d36d86da3591e83cbdf921f7148c90c06d2c2278432e18713",
+    "tests/DeveloperToolbox.Example.Resources.Tests/DeveloperToolbox.Example.Resources.Tests.csproj": "2026ad452b2884c36cc8a42a8a9e65ca3868dbf9504ab017530cfcabe1202075",
+    "tests/DeveloperToolbox.Example.Resources.Tests/ResourceSamplesTests.cs": "c64515435595a05ab9c4b1d7aee2261942fff8fbf7b0b10e42797f5e67e57cca",
+    "tests/container_test_support.py": "7298f79a7222517ba7b27b12d283d303bf6f0ddf9e04c707d6a2b3436ec1d12e",
+    "tests/prepare_host_images.sh": "54af6d19600f328f6520e345564bad075d32ab0e885d805c63f7989021814b90",
+    "tests/test_ai_assets.py": "95606309f3ea9fd521e7934813bbaab43c07ebba380346a8c665d61b4cedbceb",
+    "tests/test_architecture_inventory.py": "b176865d491117bba907690d2ef85ee09b0356efc6fc7cabfcaa17cf2aa36894",
+    "tests/test_aws_resources.py": "6c6f39b3006bbdc85f3473524bc221b6437209ff905b935d9111d120624633ea",
+    "tests/test_build_toolbox_image.ps1": "f519216b776ab808cc0a28e1213367e6c314f34137abea012eed66854ae70dd4",
+    "tests/test_configure_examples.py": "e026064e850b74c7b2f4c2eb18fe69ae380d19b2ece506b4e08741c4f20e8201",
+    "tests/test_container_lifecycle.py": "6b6fe873b3fa0dc6ed0c63bd385b78721d7a72fcb12fb4bf451f2e6c45edd5ba",
+    "tests/test_container_lifecycle_helpers.py": "6eead943ebac1a665499ecb028df608ec2a2d7bf628727da01a3de84d550373f",
+    "tests/test_docker_pull.ps1": "92d60568d34ffa6bbefdf0be6058ce2cd8ee5ca21f2449a646a4c590af65b86b",
+    "tests/test_docker_pull.sh": "3ee7362517019152872cb93296bc7410782396fe34398f0e0585d9736f964694",
+    "tests/test_docker_setup.ps1": "8578f2f19e5da99d638c48c8da8c0fd0733164f935e65b58684430ffaf8021cc",
+    "tests/test_docker_setup.sh": "9d213e27b4fc2c1a1b04ff0863bad04376f7ee65974a359a28872bd0b0642b83",
+    "tests/test_ensure_image.ps1": "5552c6d78539a4aab128c8d9e50c3b6a0a3640cfef55867b46363ac227353e78",
+    "tests/test_ensure_image.sh": "0322f3c76e5925259d0b19c61f0ff980b4a1d90de98c71ef25d4c4f8323c626a",
+    "tests/test_environment.ps1": "895998f23e072f7994df902dc0e94c70333d4a5e579bf807191bd1233535f525",
+    "tests/test_environment.sh": "79b0ae983e8bf1c5449046a72f783b80ef36935e2aaccad021a5d3a64f309fc3",
+    "tests/test_git_tag_cleanup.ps1": "8a25c094de7094efe7e57e9722c870ca76036a0d9badf6c5f3e81076aa7ac70b",
+    "tests/test_host_example_helpers.py": "9eb3a8780fc183921a16d9293124cb6dc93616837bd6d4359fa9bad52f1c15bc",
+    "tests/test_host_examples.py": "55102a2eb8a968903ee02e9461213b94680ed44999d21812339fe6736a4269c6",
+    "tests/test_moto_integration.py": "5836d4552d479b7f0a90c9a4ff0f9515e5abe6e5ef11643d27943e66a4078205",
+    "tests/test_oidc_contract.ps1": "ffa522aa3e17e40d4d54d3cacdb0624d276aa345e4ea77c39b33e28654c95c9e",
+    "tests/test_oidc_startup.ps1": "8e10dc65a6d8d8eed3c0701b1197a702800ac25dc4d0a058ef4d062b9a307b62",
+    "tests/test_review_inventory.py": "e5ef06a5c4738529d7bf21895a7a160512256e4dfa13f30f36e8ec076b986bf0",
+    "tests/test_servicebus_container_helpers.py": "36954045472e38db170869b577b9828a57653b3529d22b8d9bb5d7c3f69e5d33",
+    "tests/test_servicebus_containers.py": "f6b37481c664b84b810a236f9ab506233858648d39181387da075b8670c49cef",
+    "tests/test_shared_container_helpers.py": "f479f0cc300ce4bcf7c2e3b429a9679cbb192a8313ceab6fa49880819eefc6c2",
+    "tests/test_source_port.py": "70df1130d512841e5e94339412b3a4bc2e34b3ca02fb44b290ae0f54671a74e7",
+    "tests/test_toolbox_bootstrap.ps1": "8c859d2862e16e928a9a351eab2ebb892c2ecde33a28bca3c0f6366d7bdc4f90",
+    "tests/test_toolbox_bootstrap.sh": "e730ffff5d30747e3ec2dec11626e9509699dd5cf21247ffddcd8f529ffd8f20",
+    "tests/test_wiki_inventory.py": "517648774839faabef53c55377fa9b4cda2b81c130d2ab0381f8d9af77a96a75",
+    "tests/test_wiremock_certificates.ps1": "7d1017e635614e22d028d33484eb633df3f5e7412d9c35071033d06c5f4fef10",
+    "tests/test_wiremock_certificates.sh": "f270ff42529056108f4bd4636e3ec5df3dd81688741b497041f78e7bde59b638"
+  }
+}

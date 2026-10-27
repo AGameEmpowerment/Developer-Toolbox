@@ -1,302 +1,313 @@
-# Developer Toolbox: Project Template and Environment Setup
+---
+post_title: Developer Toolbox
+author1: Michael Carey
+post_slug: developer-toolbox
+microsoft_alias: n/a
+featured_image: n/a
+categories: [documentation]
+tags: [developer-toolbox, local-development]
+ai_note: AI assisted
+summary: Shared local infrastructure with independent C#, Java, Node.js, and Python examples.
+post_date: 2026-10-13
+---
 
-This repository is a starter template for building developer-ready environments and baseline project scaffolding. It is intentionally biased toward Microsoft-centric, Azure-first workloads (ASP.NET, Azure Functions, SQL Server, Terraform, Docker, PowerShell) while still supporting Node.js/React and general polyglot tooling. It is best aligned with:
+Developer Toolbox provides shared local infrastructure, independent C#,
+Java, Node.js, and Python examples, a Next.js client, Dev Container automation,
+delivery templates, and a cross-tool AI engineering library.
 
-- .NET and ASP.NET Core services and APIs
-- Azure-hosted solutions (Azure CLI, Azure Developer CLI, Bicep)
-- Containerized local dev dependencies (SQL Server, Service Bus, SMTP, WireMock)
-- CI/CD with Azure DevOps or GitHub workflows
-- Infrastructure-as-Code with Terraform
+> [!IMPORTANT]
+> This repository is for local development. Containers, pipelines, manifests,
+> NuSpec files, scripts, samples, and AI assets are templates or examples,
+> and are not production-ready. Review and adapt them before production use.
 
-If your project is not Azure/.NET-centric, you can still use this template, but you should selectively remove tooling, containers, and instructions that do not apply.
+## Choose Your Starting Point
 
-## What this template includes
+| Task | Guide |
+| --- | --- |
+| Set up this checkout | [Quick start](#quick-start) and [wiki setup guide](https://github.com/AGameEmpowerment/Developer-Toolbox/wiki/Getting-Started) |
+| Refresh an existing checkout | [Keep your checkout on main](#keep-your-checkout-on-main) |
+| Add Toolbox support to another project | [Bootstrap installation](#install-toolbox-support-in-another-repository) and [complete installation guide](https://github.com/AGameEmpowerment/Developer-Toolbox/wiki/Installing-Toolbox-Support) |
+| Start or inspect local resources | [Container guide](containers/readme.md) and [AWS guide](containers/aws/README.md) |
+| Design or customize local identity | [OIDC base images and project customizations](docs/guides/local-oidc.md) |
+| Build a local base or project image | [Local image build command](docs/guides/local-oidc.md#build-images-locally) |
+| Choose image versions and pull behavior | [Container image policy](docs/guides/container-image-policy.md) |
+| Run an example in your language | [Language guides](#sample-applications) |
+| Use or maintain AI guidance | [AI library](.ai/README.md) and [skill registry](.ai/skills/INDEX.md) |
+| Review current limitations and evidence | [Wiki review findings](https://github.com/AGameEmpowerment/Developer-Toolbox/wiki/Review-Findings) |
+| Refresh the wiki after a merge | [Wiki maintenance and commit history](https://github.com/AGameEmpowerment/Developer-Toolbox/wiki/Wiki-Maintenance-and-Commit-History) |
 
-- Dev Container configuration with .NET 8/9/10, Node.js 24, Azure CLI, Azure Developer CLI, Docker, Terraform, PowerShell, Python, Java, GitHub CLI, and a curated VS Code extension pack.
-- Containerized local dependencies via Docker Compose.
-- DevOps scaffolding, pipeline placeholders, and manifests.
-- Cross-platform, non-overwriting installers for adding Toolbox support to another Git repository.
-- Public Copilot, Codex, and Claude assets with generated cross-tool discovery adapters.
-- A generic .NET 10 and Next.js sample under `src/DeveloperToolbox.Example` with unit tests and public-only dependencies.
-- Default repository standards (CODEOWNERS, CONTRIBUTING, CHANGELOG, LICENSE, .editorconfig, .gitattributes, .gitignore).
+## What Is Included
 
-## Choose your setup path
+| Path | Contents |
+| --- | --- |
+| `.devcontainer/` | .NET 10 base, .NET 8/9/10, Java 25, Node 24, Python 3.14, Docker-in-Docker, editor tools, and launchers |
+| `containers/` | Three Compose groups with 13 long-running resource services and two initialization jobs |
+| `src/` | Seven .NET application/library projects, three Java modules, Node.js/Python SDK and serverless examples, and a Next.js client |
+| `tests/` | Seven NUnit projects, Python helper regressions, shell setup/bootstrap suites, and opt-in disposable resource fixtures |
+| `setup/` | Consumer bootstrap templates, copy manifest, and optional example settings generator |
+| `devops/` | Five disabled Azure DevOps pipeline examples, four Cloud Foundry manifests, NuSpec packaging, and a Terraform placeholder |
+| `.ai/` and `.agents/skills/` | Canonical engineering policy, 47 instructions, 55 roles, 45 prompts, 13 collections, and 63 shared skills |
+| `.github/`, `.claude/`, `.codex/` | Platform configuration and generated native AI adapters |
+| `docs/` | [OIDC implementation plan](docs/local-oidc-plan.md), local identity guide, dated review evidence and execution limits |
 
-Use one of the options below based on your environment and preferences.
+Shared images contain infrastructure and required initialization only. Sample
+applications run separately in your developer environment. Starting the shared
+resources requires no application language SDK or real cloud credentials.
 
-Install command references:
+## Local OIDC Image
 
-- [INSTALL-WINDOWS-WINGET.md](INSTALL-WINDOWS-WINGET.md) – Windows-only winget commands for required and optional tools.
-- [INSTALL-LINUX-APT.md](INSTALL-LINUX-APT.md) – Linux-only apt and npm commands for required and optional tools.
+Build the reusable local Keycloak base with Docker or Podman:
 
-### Option A: Dev Containers (recommended)
-
-Use this if you want a consistent, preconfigured environment without installing every tool locally.
-
-1. Install Docker Desktop.
-2. Install Visual Studio Code and the Dev Containers extension.
-3. Open this repository in VS Code and select “Reopen in Container.”
-4. The container will run post-create setup and install the tools described in the dev container configuration.
-
-This path follows the workloads defined in .devcontainer/devcontainer.json and includes Azure, .NET, Node.js, Terraform, and Docker tooling out of the box.
-
-### Option B: Local setup on Windows (winget)
-
-This is the fastest local setup for Windows 10/11.
-
-1. Clone the repository.
-2. Install tools using winget:
-    - .NET SDK 8, 9, 10
-    - OpenJDK
-    - PowerShell
-    - Git
-    - Docker Desktop
-    - Visual Studio 2022
-    - SQL Server Express (optional if using containers)
-
-3. Start the containerized dependencies:
-    - Run docker_setup.ps1
-
-4. Stop containers when finished:
-    - Run docker_down.ps1
-
-### Option C: Local setup on Linux (apt)
-
-Use this if you want native tooling on Linux without Dev Containers.
-
-1. Install prerequisites using apt:
-    - Git
-    - Docker Engine / Docker Compose
-    - PowerShell
-    - .NET SDK 8, 9, 10
-    - OpenJDK
-    - Node.js 24 (optional)
-
-2. Start the containerized dependencies:
-    - Run docker_setup.sh
-
-3. Stop containers when finished:
-    - Run docker_down.sh
-
-### Option D: Node.js-focused setup (npm)
-
-Use this if you only need frontend tooling or Node.js-based automation.
-
-1. Install Node.js 24 (nvm or system package manager).
-2. Install project dependencies with npm.
-3. Run your Node.js workflow locally.
-4. Start containerized dependencies only if needed.
-
-## Database and local services
-
-The Docker Compose stack provides SQL Server, Cosmos DB, Redis and RedisInsight,
-smtp4dev, Seq with OTLP ingestion, WireMock, Azurite, and the Azure Service Bus
-emulator. Every host port is bound to `127.0.0.1`; this is a local-development
-topology, not a deployment topology.
-
-WireMock HTTPS certificate generation uses `keytool`, which is provided by a Java Development Kit (JDK). If you plan to generate WireMock certificates locally, install OpenJDK (recommended) and ensure `keytool` is available on your PATH.
-
-Use the following example connection string for local development:
-
-```text
-Server=127.0.0.1,10433;Database=ProjectExample;User Id=sa;Password=<local-password>;TrustServerCertificate=True;
+```powershell
+./Build-ToolboxImage.ps1
 ```
 
-Security note: the provided password is for local development only. Do not reuse it in production. Store secrets in your secret manager or environment configuration.
+The default `oidc` profile produces `localhost/toolbox-oidc-keycloak:latest`.
+Use `-ContainerRuntime docker` or `-ContainerRuntime podman` to select an engine.
+Applications derive their own images and supply their own runtime realms,
+clients, callbacks and synthetic users. Keep both builds in the same engine
+and image store. See the [startup contract](containers/oidc/keycloak/README.md),
+[local identity guide](docs/guides/local-oidc.md), and
+[implementation status](docs/local-oidc-plan.md).
 
-## How to customize this template for your project
+## Quick Start
 
-Use this checklist to adapt the template for your own repository.
+### Dev Container
 
-1. Update the root README and project metadata files.
-2. Keep or remove containers based on what your app needs.
-3. Keep or remove DevOps scaffolding based on your CI/CD platform.
-4. Decide whether to use Dev Containers or local tool installation.
-5. Update or replace the LICENSE and CODEOWNERS for your organization.
-6. Remove example content you do not want to maintain.
+Install Git, Docker with a running engine, Visual Studio Code, and the Dev
+Containers extension. For the command-line flow below, also install PowerShell
+7 and GitHub CLI, authenticate `gh` if needed:
 
-Recommended priority for copying into a new repository:
+```powershell
+gh repo clone AGameEmpowerment/Developer-Toolbox -- --branch main
+Set-Location Developer-Toolbox
+pwsh -File ./.devcontainer/start_devcontainer.ps1
+```
 
-- High priority:
-    - .ai (canonical instructions, agents, prompts, and collections)
-    - .agents/skills (canonical shared skill implementations)
-    - .github, .claude, and .codex (tool adapters and repository automation)
-    - devops (pipelines, manifests, and structure)
-    - src (starting point for application code)
-    - .editorconfig, .gitattributes, .gitignore
-    - README, LICENSE, CODEOWNERS
-- Medium priority:
-    - containers and Docker scripts
-    - Visual Studio settings files
-    - authoring and contributing docs
-- Low priority:
-    - example content or sample solutions you do not need
+The Bash host launcher is `./.devcontainer/start_devcontainer.sh`. Opening the
+folder and choosing **Dev Containers: Reopen in Container** is also supported.
+For either script launcher, install the Dev Container CLI or Node.js with `npx`
+on the host; the editor reopen workflow can be used without that separate CLI.
+The post-create hook prepares optional tooling and certificates; it leaves the
+resource stack stopped and does not restore credentialed packages.
 
-## Add Toolbox support to another repository
+Inside the Dev Container, start the resources when needed:
 
-The bootstrap installers copy only missing integration files. They preserve
-every existing file, directory, and symbolic link in the target repository.
+```powershell
+./start_developer_toolkit.ps1
+```
 
-Windows:
+Or use `./start_developer_toolkit.sh`. These guarded commands require a Dev
+Container or Codespace. The outer host engine and the inner Docker-in-Docker
+daemon are separate; host containers are not the inner service stack.
+
+The frontend and language examples use public package registries. No private
+package credentials are required. Keep application credentials outside the checkout.
+
+### Native Host
+
+Use the [Windows toolchain guide](INSTALL-WINDOWS-WINGET.md) or
+[Linux/WSL guide](INSTALL-LINUX-APT.md). Install the SDK for the examples you
+choose; installing all four languages is unnecessary.
+
+```powershell
+./docker_setup.ps1 -ContainerRuntime auto
+```
+
+```bash
+./docker_setup.sh --runtime auto
+```
+
+Automatic selection prefers a reachable Docker engine, then Podman. Podman
+requires Linux server version 6 or later and a compatible Compose provider.
+Docker is the supported Dev Container baseline; a rootful Podman machine for
+the outer container remains a best-effort option. See the
+[wiki setup guide](https://github.com/AGameEmpowerment/Developer-Toolbox/wiki/Getting-Started)
+for explicit engine selection and prerequisites.
+
+### Keep Your Checkout on Main
+
+An existing checkout can remain on a feature branch after its PR is merged.
+Commit or stash local changes and finish any pending merge before switching
+branches. From the repository root, update local `main` from GitHub:
+
+```powershell
+git fetch origin
+git switch main
+git pull --ff-only origin main
+git rev-parse main origin/main
+git diff main origin/main -- README.md
+```
+
+These Git commands also work in Bash. Matching commit hashes confirm local
+`main` matches the fetched remote; an empty diff confirms the README matches.
+If local `main` has extra or divergent commits, inspect them before proceeding.
+The fast-forward-only pull stops on divergence so you can preserve local work.
+
+A squash merge creates a new commit on `main`, so the old PR branch can show
+different history even when its changes are already merged. Switch to updated
+`main` and create any follow-up branch there rather than merging `main` back
+into a completed PR branch.
+
+## Local Development Services
+
+Setup creates ignored `containers/.env`, adds missing template keys, generates
+managed `auto` passwords/keys, prepares WireMock trust material, prepares missing images,
+and builds/starts all three groups. Explicit local values are preserved.
+
+| Group / Compose file | Services and host endpoints |
+| --- | --- |
+| `dev_common_shared` / `docker-compose-common.yml` | Redis `10120`; RedisInsight UI `10121`; smtp4dev SMTP `10130`, UI `10140`; Seq UI/API `10150`; WireMock HTTP `10080`, HTTPS `10443` |
+| `dev_azure_shared` / `docker-compose-azure.yml` | SQL Server `10433`; Cosmos HTTPS `10081`, Explorer HTTPS `10181`; Azurite Blob/Queue/Table `10000–10002`; Service Bus AMQP `5672` and `10170`, management `10171` |
+| `dev_aws_shared` / `docker-compose-aws.yml` | PostgreSQL `10432`; DynamoDB Local `10180`; RabbitMQ AMQP `10190`, UI `10191`; Moto S3/SQS/SNS/EventBridge `10195` |
+
+Host ports bind to loopback. The AWS group also runs `dynamodb-volume-init` and
+`aws-init` as one-shot jobs. Moto uses in-memory state, restores its default
+topology on restart, and does not execute Lambda handlers. It needs no account,
+license token, or engine socket.
+
+Long-running services use `unless-stopped`: manual stops persist until an
+explicit start or setup run. Normal teardown retains ten named data volumes.
+Relocated Azure/AWS volumes keep their original `dev_common_shared_*` names;
+run setup once before direct Compose startup on a fresh installation.
+
+Inspect all groups and stop them without deleting data:
+
+```powershell
+foreach ($group in @('common', 'azure', 'aws')) {
+    docker compose --env-file containers/.env `
+      -f "containers/docker-compose-$group.yml" -p "dev_${group}_shared" ps
+}
+./docker_down.ps1 -ContainerRuntime auto
+```
+
+The Bash teardown is `./docker_down.sh --runtime auto`. Preserve `.env` when
+retaining data: initialized database/broker passwords and Seq's storage key stay
+with their volumes. Volume deletion requires explicit cleanup and force flags.
+
+Most local images intentionally follow floating current tags. Cosmos follows
+`vnext-latest`; SQL Server and Full-Text Search are coupled to matching builds;
+the client runtime uses `node:24-slim`. This policy accepts upstream changes for
+developer tooling. Production adopters must use tested immutable tags or digests.
+
+## Sample Applications
+
+| Example | Runtime and behavior | Guide |
+| --- | --- | --- |
+| C# | .NET 10; EF Core SQL Server/PostgreSQL, 18 SDK/resource commands, Functions, and Lambda handlers | [C# examples](src/DeveloperToolbox.Example/README.md) |
+| Java | JDK 25 and Maven; Hibernate transactions, SDK checks, Functions, and Lambda handlers | [Java examples](src/DeveloperToolbox.Java.Example/README.md) |
+| Node.js | Node 24; 15 SDK checks, native Functions queues, Blob/S3 receipts, and Lambda handlers | [Node.js examples](src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/README.md) |
+| Python | Python 3.14; 15 SDK checks, native Functions queues, Blob/S3 receipts, and Lambda handlers | [Python examples](src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/README.md) |
+| Next.js client | Node 24, Next.js 16.4, React 19.3, public semantic UI, four locales, and example routes | [Client guide](src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/README.md) |
+
+The C# console and Java CLI can read `containers/.env` directly via
+`TOOLBOX_ENV_FILE`. The optional settings generator writes ignored C# application,
+per-language Functions, and shared Node/Python JSON settings. Existing JSON is
+retained unless `--force` is explicitly requested:
+
+```powershell
+python setup/configure_examples.py
+```
+
+A .NET-only developer can use the console without Python:
+
+```powershell
+$env:TOOLBOX_ENV_FILE = (Resolve-Path containers/.env).Path
+dotnet build src/DeveloperToolbox.Example/DeveloperToolbox.Example.App --configuration Release
+dotnet run --project src/DeveloperToolbox.Example/DeveloperToolbox.Example.App --configuration Release --no-build -- validate sqlserver postgres storage-queue
+```
+
+`validate` uses already-running resources and returns `0` for success, `1` for
+failed/timed-out/canceled checks, and `2` for invalid arguments. The cooperative
+per-operation timeout defaults to 45 seconds; cleanup can extend elapsed time.
+Validation writes synthetic data, including retained database messages, mail,
+and Seq events. It does not change container lifecycle or check management UIs.
+
+Functions hosts run separately using Core Tools 4. Lambda tests invoke handlers
+directly; shared setup supplies no Lambda runtime or event-source dispatcher.
+
+For the client, use Node 24 and
+run from `src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client`:
+
+```bash
+npm ci
+npm run verify
+npm run build:test
+npm run dev
+```
+
+`build:test` builds the deterministic public example catalog. Optional runtime
+settings are listed in the client's `.env.local.example`.
+
+## AI Toolkit and Automation
+
+`AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md` direct tools to
+`.ai/constitution.md`, matching `.ai/instructions/*.md`, and scoped instructions.
+Discover skills through `.ai/skills/INDEX.md`, `.agents/skills/`, and
+`.claude/skills/`. Repository-local Codex skills belong in `.agents/skills/`.
+
+The [GitHub platform guide](.github/readme.md) covers workflows,
+Dependabot, and Copilot configuration. Keep `.github/` documentation under
+non-README filenames so this root README remains the repository home page.
+
+Generated files carry `Generated by sync_ai_assets.ps1`. Edit canonical sources
+and regenerate adapters when those assets change:
+
+```powershell
+pwsh -NoProfile -File ./sync_ai_assets.ps1
+git diff --check
+```
+
+See [Scripts and Automation](https://github.com/AGameEmpowerment/Developer-Toolbox/wiki/Scripts-and-Automation)
+for the complete launcher and helper catalog. The active Resource Examples
+Validation workflow builds/tests each language independently and runs isolated
+resource checks. Other workflows validate AI adapters, bootstrap scripts and
+Copilot setup. Their YAML definitions do not establish their enabled state on
+GitHub. Azure DevOps pipelines remain disabled-trigger local examples.
+
+## Install Toolbox Support in Another Repository
+
+From the Toolbox checkout, supply the exact root of an existing non-bare Git
+worktree:
 
 ```powershell
 ./Install-ToolboxSetup.ps1 -TargetRepositoryPath C:\path\to\MyProject
 ```
 
-Linux, WSL, or macOS:
-
 ```bash
 ./install_toolbox_setup.sh /path/to/MyProject
 ```
 
-From the consuming repository, clone or update the shared public Toolbox
-without starting services:
+The installers add missing paths from `setup/toolbox-bootstrap-files.txt`,
+preserving existing files and links. They copy Dev Container support, editor settings, the bridge skill, and `setup_toolbox.*` wrappers.
+They keep application examples and Compose definitions in the separate Toolbox
+checkout.
 
-```powershell
-./setup_toolbox.ps1 -SkipSetup
-```
+From the consumer repository, `./setup_toolbox.ps1 -SkipSetup` or
+`./setup_toolbox.sh --skip-setup` obtains/updates that checkout without starting
+services. Omit the skip option to start resources. Use `DEVELOPER_TOOLBOX_ROOT` or
+the launcher's path option to select another checkout. Follow the
+[installation guide](https://github.com/AGameEmpowerment/Developer-Toolbox/wiki/Installing-Toolbox-Support)
+for safe refreshes and branch selection.
 
-```bash
-./setup_toolbox.sh --skip-setup
-```
+## Verification and Known Limits
 
-The launchers use `AGameEmpowerment/Developer-Toolbox` and honor
-`DEVELOPER_TOOLBOX_ROOT` or an explicit Toolbox path. Docker and Podman are
-supported; automatic selection chooses the first reachable engine with Compose
-support.
+Current validation is recorded in [the parity review](docs/parity/verification.md).
+The resource definitions include 13 long-running services and two one-shot jobs.
+Keycloak remains an independently built, project-owned identity resource.
 
-## Dev Container workload summary
+The resource images build locally. The .NET tests have 484 passed cases, zero
+failures and two optional database cases skipped. The NuGet scan reports no
+vulnerable packages across the 14 solution projects. Java verification passes 117
+JUnit cases, and the live OIDC startup suite passes all 25 checks with a 300-second
+readiness budget. Floating image tags, generated local trust material,
+emulator feature limits and sample configuration remain local-development constraints.
+No delivery template was deployed or published.
 
-The dev container is configured for the following workloads:
+## Architecture and Wiki
 
-- .NET SDK 8/9 and wasm-tools workload
-- Node.js 24 with npm, yarn, and pnpm
-- Azure CLI, Azure Developer CLI, and Bicep
-- Docker-in-Docker for container workflows
-- Terraform and TFLint
-- PowerShell, Python, Git, GitHub CLI
-- Java 21 (minimal install for tooling)
-
-If you remove any of these tools from your project, update .devcontainer/devcontainer.json accordingly.
-
-## Documentation map
-
-Use the links below to find focused documentation in this repository. Each link includes a one-sentence description of what the document is for.
-
-- [.ai/README.md](.ai/README.md) – Canonical, tool-neutral AI asset layout and synchronization rules.
-- [.github/readme.md](.github/readme.md) – Repository automation, Copilot configuration, and GitHub-specific guidance.
-- [containers/readme.md](containers/readme.md) – Docker Compose services and local dependency containers.
-- [containers/certs/readme.md](containers/certs/readme.md) – Certificate setup for HTTPS and WireMock scenarios.
-- [containers/extensions/readme.md](containers/extensions/readme.md) – VS Code extensions copied into container images.
-- [containers/mappings/readme.md](containers/mappings/readme.md) – Example mappings used by local container services.
-- [containers/\_\_files/readme.md](containers/__files/readme.md) – Example files used by local container services.
-- [devops/readme.md](devops/readme.md) – DevOps folder overview and how to use it in CI/CD.
-- [devops/manifest/readme.md](devops/manifest/readme.md) – Manifest templates and conventions for release artifacts.
-- [devops/pipelines/readme.md](devops/pipelines/readme.md) – CI/CD pipeline templates and conventions.
-- [devops/terraform/readme.md](devops/terraform/readme.md) – Terraform layout and infrastructure guidance.
-- [src/readme.md](src/readme.md) – Application source layout expectations and starter guidance.
-
-## Troubleshooting
-
-- Ensure Docker Desktop or Docker Engine is running before starting containers.
-- If SQL Server does not start, check container logs and confirm the environment variables in containers/.env.
-- If WireMock certificate generation fails, verify OpenJDK is installed and `keytool` is available on PATH.
-- For script execution issues on Windows, set PowerShell execution policy to allow local scripts.
-
-## AI asset synchronization
-
-Canonical policy, instructions, agents, prompts, and collections live under
-`.ai/`. Shared skill implementations live under `.agents/skills/`. GitHub
-Copilot adapters under `.github/instructions/`, Claude discovery files under
-`.claude/`, and selected Codex subagents under `.codex/agents/` are generated
-from those canonical sources.
-
-After changing a canonical AI asset, run:
-
-```powershell
-pwsh -NoProfile -File ./sync_ai_assets.ps1
-```
-
-The `AI Asset Synchronization` workflow verifies that generated adapters are
-current. The public Toolbox uses public package sources, container images, and
-repository resources throughout.
-
-## Additional resources
-
-- [AUTHORS.md](AUTHORS.md)
-- [CHANGELOG.md](CHANGELOG.md)
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [Dev Containers documentation](https://code.visualstudio.com/docs/devcontainers/containers)
-
-Built with accessibility in mind, but accessibility issues may still exist; please review and test with tools like Accessibility Insights.
-
-## Skills.sh Integration (Codex + Copilot)
-
-This repository uses the Skills CLI ecosystem at `https://skills.sh/` for skill discovery and installation.
-
-Common commands:
-
-```bash
-npx skills find <query>
-npx skills list -g
-npx skills add <owner/repo@skill> -g -y
-npx skills check
-```
-
-Reference:
-
-- `.ai/skills/INDEX.md` (canonical cross-tool skill discovery map)
-- `.agents/skills/` (public shared skill implementations)
-
-### Install Shared Skills Globally (Codex + Copilot)
-
-These skills are useful for both Codex and Copilot in this repository. You can
-paste the whole block into a PowerShell terminal to install them globally.
-
-```powershell
-npx skills add microsoft/github-copilot-for-azure@appinsights-instrumentation -g -y
-npx skills add microsoft/github-copilot-for-azure@azure-resource-lookup -g -y
-npx skills add microsoft/github-copilot-for-azure@azure-resource-visualizer -g -y
-npx skills add microsoft/github-copilot-for-azure@microsoft-code-reference -g -y
-npx skills add microsoft/github-copilot-for-azure@microsoft-docs -g -y
-npx skills add anthropics/skills@webapp-testing -g -y
-```
-
-### Install Codex Skills Globally (Skills.sh)
-
-The following commands install Codex-focused skills discussed for this
-repository (excluding the shared skills listed above). You can paste the whole
-block into a PowerShell terminal to install them globally.
-
-```powershell
-npx skills add microsoft/github-copilot-for-azure@azure-ai -g -y
-npx skills add microsoft/github-copilot-for-azure@azure-diagnostics -g -y
-npx skills add microsoft/github-copilot-for-azure@azure-observability -g -y
-npx skills add microsoft/github-copilot-for-azure@azure-rbac -g -y
-npx skills add vercel-labs/skills@find-skills -g -y
-npx skills add microsoft/github-copilot-for-azure@microsoft-foundry -g -y
-```
-
-### Install Copilot Skills Globally (Skills.sh)
-
-The following commands install the Copilot-focused skills discussed for this
-repository (excluding the shared skills listed above). You can paste the whole
-block into a PowerShell terminal to install them globally.
-
-```powershell
-npx skills add microsoft/github-copilot-for-azure@azure-role-selector -g -y
-npx skills add microsoft/github-copilot-for-azure@azure-static-web-apps -g -y
-npx skills add microsoft/github-copilot-for-azure@github-issues -g -y
-npx skills add microsoft/github-copilot-for-azure@make-skill-template -g -y
-npx skills add microsoft/github-copilot-for-azure@nuget-manager -g -y
-npx skills add microsoft/github-copilot-for-azure@vscode-ext-commands -g -y
-npx skills add microsoft/github-copilot-for-azure@vscode-ext-localization -g -y
-npx skills add microsoft/github-copilot-for-azure@web-design-reviewer -g -y
-```
-
-Optional verification:
-
-```powershell
-npx skills list -g
-npx skills check
-```
+See [architecture](docs/architecture.md), [current test inventory](docs/parity/test-inventory.md),
+[OneBox adoption](docs/guides/onebox-adoption.md), and the
+[wiki](https://github.com/AGameEmpowerment/Developer-Toolbox/wiki).
+The wiki draft records this working tree's base commit and source hashes;
+it does not claim these changes are already on the default branch.

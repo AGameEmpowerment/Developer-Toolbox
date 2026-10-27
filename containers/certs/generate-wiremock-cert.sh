@@ -5,14 +5,14 @@
 # This script creates a Java KeyStore (JKS) with a self-signed certificate for local
 # WireMock HTTPS development. It also exports the public certificate (.crt) for client trust.
 #
-# Prerequisites:
-#   - Free OpenJDK must be installed and keytool must be available in PATH
-#   - Alternatively, set JAVA_HOME environment variable
+# Uses host OpenJDK keytool when available, otherwise the existing WireMock image
+# with Docker or Podman. No host Java installation is required.
 #
 # Usage:
 #   ./generate-wiremock-cert.sh                    # Use default password "changeit"
 #   ./generate-wiremock-cert.sh -p mypassword      # Use custom password
 #   ./generate-wiremock-cert.sh -p mypassword -f   # Force overwrite existing files
+# Automation can set TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD instead of using -p.
 #
 # After generation, update your .env file with:
 #   WIREMOCK_KEYSTORE_PASSWORD=<your-password>
@@ -39,10 +39,11 @@ GRAY='\033[0;90m'
 NC='\033[0m' # No Color
 
 # Default values
-KEYSTORE_PASSWORD="changeit"
+KEYSTORE_PASSWORD="${TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD:-changeit}"
 VALIDITY_DAYS=3650
 FORCE=false
 VERBOSE=false
+CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-auto}"
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -63,6 +64,11 @@ while [[ $# -gt 0 ]]; do
             VERBOSE=true
             shift
             ;;
+        --runtime)
+            [[ $# -ge 2 ]] || { echo '--runtime requires auto, docker, or podman.' >&2; exit 1; }
+            CONTAINER_RUNTIME="$2"
+            shift 2
+            ;;
         -h|--help)
             echo "Usage: $0 [OPTIONS]"
             echo ""
@@ -71,6 +77,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -v, --validity DAYS      Certificate validity in days (default: 3650)"
             echo "  -f, --force              Overwrite existing files without prompting"
             echo "  --verbose                Print the keystore password to stdout (use with caution)"
+            echo "  --runtime ENGINE         Fallback container engine: auto, docker, or podman"
             echo "  -h, --help               Show this help message"
             exit 0
             ;;
@@ -81,6 +88,10 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+case "$CONTAINER_RUNTIME" in auto|docker|podman) ;; *) echo 'Invalid container runtime.' >&2; exit 1 ;; esac
+[[ ${#KEYSTORE_PASSWORD} -ge 6 ]] || { echo 'The WireMock keystore password must contain at least six characters.' >&2; exit 1; }
+[[ "$VALIDITY_DAYS" =~ ^[1-9][0-9]*$ ]] || { echo 'Certificate validity must be a positive number of days.' >&2; exit 1; }
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -108,7 +119,7 @@ if command -v keytool &> /dev/null; then
 fi
 
 # Check JAVA_HOME if not in PATH
-if [[ -z "$KEYTOOL" ]] && [[ -n "$JAVA_HOME" ]]; then
+if [[ -z "$KEYTOOL" ]] && [[ -n "${JAVA_HOME:-}" ]]; then
     if [[ -f "${JAVA_HOME}/bin/keytool" ]]; then
         KEYTOOL="${JAVA_HOME}/bin/keytool"
     fi
@@ -133,17 +144,61 @@ if [[ -z "$KEYTOOL" ]]; then
     done
 fi
 
-if [[ -z "$KEYTOOL" ]]; then
-    echo -e "${RED}Missing dependency: Java JDK keytool was not found.${NC}"
-    echo "Please ensure free OpenJDK is installed and one of the following:"
-    echo "  1. Add Java bin directory to PATH"
-    echo "  2. Set JAVA_HOME environment variable"
-    echo "  3. Install free OpenJDK on Debian/Ubuntu: sudo apt install default-jdk"
-    echo "     Fedora/RHEL alternative: sudo dnf install java-latest-openjdk-devel"
-    exit 1
+KEYTOOL_KEYSTORE_PATH="$KEYSTORE_PATH"
+KEYTOOL_CERT_PATH="$CERT_PATH"
+CONTAINER_ARGUMENTS=()
+if [[ -n "$KEYTOOL" ]]; then
+    echo -e "${CYAN}Using host keytool.${NC}"
+else
+    if [[ "$CONTAINER_RUNTIME" == auto ]]; then
+        for candidate in docker podman; do
+            if command -v "$candidate" >/dev/null 2>&1 && "$candidate" info >/dev/null 2>&1; then
+                CONTAINER_RUNTIME="$candidate"
+                break
+            fi
+        done
+    fi
+    if [[ "$CONTAINER_RUNTIME" == auto ]] || ! command -v "$CONTAINER_RUNTIME" >/dev/null 2>&1; then
+        echo 'Certificate generation requires host keytool or a reachable Docker/Podman engine.' >&2
+        exit 1
+    fi
+    source "${SCRIPT_DIR}/../../.devcontainer/ensure_image.sh"
+    ensure_toolbox_image "$CONTAINER_RUNTIME" wiremock/wiremock:latest || exit 1
+    KEYTOOL_KEYSTORE_PATH=/toolbox/certs/wiremock.jks
+    KEYTOOL_CERT_PATH=/toolbox/certs/wiremock.crt
+    bind_directory="$SCRIPT_DIR"
+    host_platform="$(uname -s)"
+    case "$host_platform" in
+        MINGW*|MSYS*|CYGWIN*) bind_directory="$(cygpath -m "$SCRIPT_DIR")" ;;
+    esac
+    mount_options=rw
+    [[ "$CONTAINER_RUNTIME" != podman ]] || mount_options=rw,z
+    CONTAINER_ARGUMENTS=(run --rm --network none --entrypoint keytool
+        --env TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD --volume "${bind_directory}:/toolbox/certs:${mount_options}")
+    if [[ "$CONTAINER_RUNTIME" == podman ]]; then
+        # Map the developer's identity without changing ownership of the host directory.
+        CONTAINER_ARGUMENTS+=(--userns keep-id)
+    else
+        case "$host_platform" in
+            MINGW*|MSYS*|CYGWIN*|Darwin*) ;;
+            *) CONTAINER_ARGUMENTS+=(--user "$(id -u):$(id -g)") ;;
+        esac
+    fi
+    CONTAINER_ARGUMENTS+=(wiremock/wiremock:latest)
+    echo -e "${CYAN}Using keytool from the WireMock image with ${CONTAINER_RUNTIME}.${NC}"
 fi
 
-echo -e "${CYAN}Using keytool: ${KEYTOOL}${NC}"
+invoke_keytool() {
+    if [[ -n "$KEYTOOL" ]]; then
+        if TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD="$KEYSTORE_PASSWORD" "$KEYTOOL" "$@" >/dev/null 2>&1; then return; fi
+    else
+        # Git Bash must not rewrite container paths passed to a native engine CLI.
+        if MSYS_NO_PATHCONV=1 TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD="$KEYSTORE_PASSWORD" \
+            "$CONTAINER_RUNTIME" "${CONTAINER_ARGUMENTS[@]}" "$@" >/dev/null 2>&1; then return; fi
+    fi
+    echo 'WireMock keytool failed. Check the selected engine and certificate-directory permissions.' >&2
+    return 1
+}
 
 # Remove existing files if present
 if [[ -f "$KEYSTORE_PATH" ]]; then
@@ -159,17 +214,18 @@ echo ""
 echo -e "${CYAN}Generating JKS keystore with self-signed certificate...${NC}"
 
 # Generate keystore with certificate including SANs for localhost
-"$KEYTOOL" -genkeypair \
+invoke_keytool -genkeypair \
     -alias wiremock \
     -keyalg RSA \
     -keysize 2048 \
     -validity "$VALIDITY_DAYS" \
-    -keystore "$KEYSTORE_PATH" \
+    -keystore "$KEYTOOL_KEYSTORE_PATH" \
     -storetype JKS \
-    -storepass "$KEYSTORE_PASSWORD" \
-    -keypass "$KEYSTORE_PASSWORD" \
+    -storepass:env TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD \
+    -keypass:env TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD \
     -dname "CN=localhost, OU=Development, O=Local, L=Local, ST=UT, C=US" \
     -ext "SAN=dns:localhost,dns:wiremock,dns:host.docker.internal,ip:127.0.0.1"
+[[ -f "$KEYSTORE_PATH" ]] || { echo 'WireMock keytool did not create the expected keystore.' >&2; exit 1; }
 
 echo -e "${GREEN}Keystore created: ${KEYSTORE_PATH}${NC}"
 
@@ -177,12 +233,13 @@ echo -e "${GREEN}Keystore created: ${KEYSTORE_PATH}${NC}"
 echo ""
 echo -e "${CYAN}Exporting public certificate...${NC}"
 
-"$KEYTOOL" -exportcert \
+invoke_keytool -exportcert \
     -alias wiremock \
-    -keystore "$KEYSTORE_PATH" \
-    -storepass "$KEYSTORE_PASSWORD" \
+    -keystore "$KEYTOOL_KEYSTORE_PATH" \
+    -storepass:env TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD \
     -rfc \
-    -file "$CERT_PATH"
+    -file "$KEYTOOL_CERT_PATH"
+[[ -f "$CERT_PATH" ]] || { echo 'WireMock keytool did not export the expected certificate.' >&2; exit 1; }
 
 echo -e "${GREEN}Certificate exported: ${CERT_PATH}${NC}"
 

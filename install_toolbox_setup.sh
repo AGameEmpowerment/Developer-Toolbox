@@ -134,6 +134,21 @@ prepare_source_file() {
     fi
 }
 
+has_linked_parent() {
+    local root_path="$1"
+    local target_path="$2"
+    local candidate_path=""
+
+    candidate_path="$(dirname "$target_path")"
+    while [[ "$candidate_path" != "$root_path" && "$candidate_path" == "$root_path/"* ]]; do
+        if [[ -L "$candidate_path" ]]; then
+            return 0
+        fi
+        candidate_path="$(dirname "$candidate_path")"
+    done
+    return 1
+}
+
 SOURCE_FILES=()
 TARGET_FILES=()
 while IFS= read -r manifest_entry || [[ -n "$manifest_entry" ]]; do
@@ -153,7 +168,7 @@ while IFS= read -r manifest_entry || [[ -n "$manifest_entry" ]]; do
         TARGET_FILES+=("${repository_root}/${manifest_entry}")
     elif [[ -d "$source_path" ]]; then
         target_entry_path="${repository_root}/${manifest_entry}"
-        if [[ -e "$target_entry_path" || -L "$target_entry_path" ]]; then
+        if [[ -L "$target_entry_path" || (-e "$target_entry_path" && ! -d "$target_entry_path") ]]; then
             continue
         fi
         while IFS= read -r -d '' source_file; do
@@ -171,6 +186,9 @@ done < "$MANIFEST_PATH"
 for index in "${!SOURCE_FILES[@]}"; do
     source_file="${SOURCE_FILES[$index]}"
     target_file="${TARGET_FILES[$index]}"
+    if has_linked_parent "$repository_root" "$target_file"; then
+        continue
+    fi
     if [[ -e "$target_file" || -L "$target_file" ]]; then
         continue
     fi
@@ -185,5 +203,3 @@ done
 echo "Toolbox bootstrap files are ready in '$repository_root'."
 echo "Primary AI skill: toolbox-repository-bridge"
 echo "Run './setup_toolbox.sh' or 'pwsh -File ./setup_toolbox.ps1' from the target repository."
-
-

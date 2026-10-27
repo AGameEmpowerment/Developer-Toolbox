@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { proxy } from "./proxy";
 
+vi.mock("./utils/auth", () => ({ createAuthClient: () => undefined }));
+
 vi.mock("next/server", () => ({
   NextResponse: {
     next: vi.fn(({ request } = {}) => ({
@@ -23,15 +25,15 @@ describe("proxy", () => {
     NextResponse.next.mockClear();
   });
 
-  it("forwards_theResolvedLocaleToServerComponents", () => {
-    const response = proxy(createRequest("fr-CA,fr;q=0.9,en;q=0.8"));
+  it("forwards_theResolvedLocaleToServerComponents", async () => {
+    const response = await proxy(createRequest("fr-CA,fr;q=0.9,en;q=0.8"));
 
     expect(response.forwardedRequest.headers.get("x-lang")).toBe("fr");
     expect(NextResponse.next).toHaveBeenCalledOnce();
   });
 
-  it("prevents_requestSpecificResponsesFromBeingCached", () => {
-    const response = proxy(createRequest("en"));
+  it("prevents_requestSpecificResponsesFromBeingCached", async () => {
+    const response = await proxy(createRequest("en"));
 
     expect(response.headers.get("Cache-Control")).toBe("no-store, private");
   });
