@@ -38,7 +38,12 @@ ports, environment, health checks, volumes and restart behavior. See
 | `localhost/toolbox-oidc-keycloak:latest` | Passed | `sha256:c8987ad08291db9716d4f1acce0b68e71be63ac1229d9b88496ee7e71a98be8a` |
 | `dev_aws_shared-aws-init:latest` | Passed | `sha256:5688ebec12b1a3903f11035c6f5203ba6b792e74229f293927e695d5eca14c5a` |
 
-The complete shared stack was not started during this review. Images were built with Docker; Podman behavior was checked with source/stub suites, not a live Podman build. Existing shared data and settings were preserved.
+The initial review built images without starting the complete shared stack.
+A subsequent [sequential container comparison](container-comparison.md) built,
+deployed, tested and tore down both projects on 2026-10-27, recording the shared
+Service Bus retained-data failure separately from passing fresh-volume checks.
+Podman behavior was checked with source/stub suites, not a live Podman build.
+Existing shared data and settings were preserved.
 
 ## Executed results by framework and area
 

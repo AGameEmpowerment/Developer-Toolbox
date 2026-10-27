@@ -1,0 +1,2262 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-27",
+  "recordedAtUtc": "2026-10-27T23:21:54.623100+00:00",
+  "kind": "sequential-local-container-comparison",
+  "scope": "Local developer resources; Docker Desktop linux/amd64 only",
+  "engine": {
+    "Version": "29.9.2",
+    "ApiVersion": "1.56",
+    "Os": "linux",
+    "Arch": "amd64",
+    "KernelVersion": "6.18.33.2-microsoft-standard-WSL2"
+  },
+  "tools": {
+    "powerShell": "7.6.5",
+    "dotnetSdk": "10.0.402",
+    "python": "Python 3.15.1"
+  },
+  "counting": {
+    "sharedSdk": "18 named resource commands from SampleApplication.ResourceNames; each executed once per project",
+    "web": "4 explicit HTTP probes per project, separate from SDK commands",
+    "freshServiceBus": "2 SDK resource commands repeated on new disposable SQL data per project",
+    "oidc": "Use receipt authoredDefinitions, discoveredExpandedCases and executed checks; keep parameter expansion separate",
+    "unitSuites": "Not rerun in this round; these checks are not NUnit, JUnit, pytest, Vitest or Pester test counts",
+    "browserExecutions": 0,
+    "snapshots": 0
+  },
+  "runtimeConfiguration": {
+    "sharedData": "Original named volumes retained across both default deployments",
+    "credentials": "Personal PostgreSQL/RabbitMQ process settings matched retained volume credentials; neither dotenv file was replaced",
+    "imagePolicy": "Existing latest images reused; missing-only preparation; BuildKit cache permitted; no pinned-image workaround",
+    "paths": "Absolute checkout/output paths replaced with role placeholders; no credentials, tokens or application payloads included"
+  },
+  "projects": {
+    "reference": {
+      "source": {
+        "commit": "618951fbd522f1a52ea68af130512cc5931a536a",
+        "trackedTreeClean": true,
+        "hashMethod": "SHA-256 of checkout bytes; excludes ignored settings, certificates and build outputs",
+        "inputs": [
+          {
+            "path": "Build-ToolboxImage.ps1",
+            "sha256": "2138ef49546a86d50cfa3b2faa4bcf744be73084963a7b23c64f67d4f1e3dcb9"
+          },
+          {
+            "path": "containers/.env.example",
+            "sha256": "804778a367aa7b3078fff4692259f0967d99564b90b85b80eece41b847d9d132"
+          },
+          {
+            "path": "containers/__files/example/lookups-countries-response.json",
+            "sha256": "e3aef871c137d56fc9db03a51dc163dd801b125f274b7e956c80ab29cb797a2d"
+          },
+          {
+            "path": "containers/__files/example/userpermission-1234567890123456-response.json",
+            "sha256": "91b17e58943d2eaef848248660c7196c844072bce4876d56584c300768b20981"
+          },
+          {
+            "path": "containers/__files/readme.md",
+            "sha256": "e16fdc4150aef3bce42832b6137dc6728c3ccccbaa5a030fdd7ee2fb8746bd71"
+          },
+          {
+            "path": "containers/aws/.dockerignore",
+            "sha256": "ac2de72f51a815d5d4c3b2c16f8aa800a4c817c4b4f5e054218e300c661b47fa"
+          },
+          {
+            "path": "containers/aws/Dockerfile",
+            "sha256": "3c335c675c05c2c3eef5ac53b5a377987716d12abdbdfc420312f9ac826e28ab"
+          },
+          {
+            "path": "containers/aws/README.md",
+            "sha256": "cb7126b002d92138584e57737ff93f65d827bb662b96e16a785c19af96ae00a7"
+          },
+          {
+            "path": "containers/aws/health.py",
+            "sha256": "93b6d32d1f65fb3e1a498ac86d0f22bcbb3c88d80bd799f12cf2a54cacf40274"
+          },
+          {
+            "path": "containers/aws/init.py",
+            "sha256": "fd17a3502a2ee71de427424201d015e5d78eccd98c74189a57c952f1155a5e0d"
+          },
+          {
+            "path": "containers/aws/local_session.py",
+            "sha256": "1ac9c5aec94c13874437765f25a4cbfaa653f04556cdd262d5f1678fb2936e08"
+          },
+          {
+            "path": "containers/aws/run_emulator.py",
+            "sha256": "de51fa5faf1f531430156ae1c3387bc3225ffd944ac6b9d2983d2b0dff8a1598"
+          },
+          {
+            "path": "containers/certs/Generate-WireMockCert.ps1",
+            "sha256": "ef97fb43a25cdb976ba4c01ff825dcc4e96333d840cff63cec6d667e228458cb"
+          },
+          {
+            "path": "containers/certs/generate-wiremock-cert.sh",
+            "sha256": "11ab1b216d309e47cda1c948b9b9088a741bae8698e102c99789bf723f353339"
+          },
+          {
+            "path": "containers/certs/readme.md",
+            "sha256": "ddb51f5218bce031f67b77881d32ce7959feeaa2e17d99d30be6a5f2742f541a"
+          },
+          {
+            "path": "containers/docker-compose-aws.yml",
+            "sha256": "1c83db228d7b5b032362f81d5f90905e9248d4fcf4c07da2d73146942ab0185e"
+          },
+          {
+            "path": "containers/docker-compose-azure.yml",
+            "sha256": "5b3bfb76834737e8f7f710fb573b42fdcb8a0e75634a6a191de6033dd3b5595d"
+          },
+          {
+            "path": "containers/docker-compose-common.yml",
+            "sha256": "5843bee6d3eec213da5a8d20b1abbe199c032d1413ba4c40faba9d7ee13b7bae"
+          },
+          {
+            "path": "containers/docker-compose.yml",
+            "sha256": "cfb94e35909ffaf92400f3a360e93225ba4817199bbe0e58f22baa2afc186fd9"
+          },
+          {
+            "path": "containers/environment.ps1",
+            "sha256": "2ee1710dc15e03f1dec09900e7c16a0eceaf969d79e7c24bb1419b4928e44ec6"
+          },
+          {
+            "path": "containers/environment.sh",
+            "sha256": "ef3ba1a752c8a7411ab598323801bdaafb393ef5a557ffcb11054c36a4a2e3cc"
+          },
+          {
+            "path": "containers/extensions/readme.md",
+            "sha256": "e16fdc4150aef3bce42832b6137dc6728c3ccccbaa5a030fdd7ee2fb8746bd71"
+          },
+          {
+            "path": "containers/mappings/default-mapping.json",
+            "sha256": "80d00749c043eaf1ae592c8fd3aad0c572f34801f590b931a71531ba27acc2c0"
+          },
+          {
+            "path": "containers/mappings/readme.md",
+            "sha256": "e16fdc4150aef3bce42832b6137dc6728c3ccccbaa5a030fdd7ee2fb8746bd71"
+          },
+          {
+            "path": "containers/mssql/Dockerfile",
+            "sha256": "8b267714512178532a424015b51d55877df44b6272620245e2746e3476be6cd2"
+          },
+          {
+            "path": "containers/mssql/db-init.sh",
+            "sha256": "e67b73bfd4ea20280df13c497595578cec0fde78d0b3811e7cc762dee09db262"
+          },
+          {
+            "path": "containers/mssql/db-init.sql",
+            "sha256": "eb71e2b3b9297f020227095230b88e2be41bf0f8d1d441f6d42ca5e046121c0a"
+          },
+          {
+            "path": "containers/mssql/entrypoint.sh",
+            "sha256": "d65cd1a790faf2dc387a0ab1355a3eb683a8549c38aec6ff4cdeff2105addcb9"
+          },
+          {
+            "path": "containers/oidc/contracts/consumer-matrix.md",
+            "sha256": "e85e1fb0b4e614cc0244ac6d8e3cada2662474f6365cfce3b7730b6cef6e2033"
+          },
+          {
+            "path": "containers/oidc/contracts/evidence-format.json",
+            "sha256": "4844f7fc61855a39e177501cf50ea5ffd70416adfe73f5a54c77dee848451ca7"
+          },
+          {
+            "path": "containers/oidc/contracts/protocol-profiles.json",
+            "sha256": "38a2a768b12d085ada26d6bf7c2c6fa17bdb43d8a114362448441e8ec95b00d7"
+          },
+          {
+            "path": "containers/oidc/examples/profile.json",
+            "sha256": "1cf940cbf60518c37d05c99cbc88228498cda5221d8799d9c319bed285c0dedb"
+          },
+          {
+            "path": "containers/oidc/examples/project.Dockerfile",
+            "sha256": "b926cdeca1044c8dbe3d3662a2f491cdabdf3bb9a5a2be88061138210d96b5f5"
+          },
+          {
+            "path": "containers/oidc/keycloak/Dockerfile",
+            "sha256": "c12d77150b08e52c516b2c081c8e772bcde4de8b1b70b80696cff8c98246d654"
+          },
+          {
+            "path": "containers/oidc/keycloak/README.md",
+            "sha256": "0cfea66d68f86c7b9b5aca194573a37be75b9695f5b19548f6bb551b81b33521"
+          },
+          {
+            "path": "containers/oidc/keycloak/contract.json",
+            "sha256": "cd43e5aebc55482957a35cb1c23c1ae09a0ee982fc3b3134eb328f0e8e3d79de"
+          },
+          {
+            "path": "containers/oidc/keycloak/default-realm.template.json",
+            "sha256": "cfe99284463e6a6b68beeeec05a989dbf4fa3e7be51b02c51131d89c8cb5c7e9"
+          },
+          {
+            "path": "containers/oidc/keycloak/startup.sh",
+            "sha256": "6c4e3ec674d2b82f3b3b38e57850d07115e2aa12322673d3e23031f484fa6178"
+          },
+          {
+            "path": "containers/readme.md",
+            "sha256": "049ea84e9f58220d68fde2374a0776e0f3dd433210bc85f3867f9359180309f1"
+          },
+          {
+            "path": "containers/service-bus/Config.json",
+            "sha256": "675d7b3f9c81a87531d5e632668312772ce7c67a6dd2129558102272d6d9afcb"
+          },
+          {
+            "path": "docker_down.ps1",
+            "sha256": "a8bf46e422092d329383211df1267231e2914d0478eece868963b64590a1c2c3"
+          },
+          {
+            "path": "docker_pull.ps1",
+            "sha256": "6ac8ff512c40b29e7c6f2cded74e1fe9b2891b401bf8243ce2c888c0b76b80e5"
+          },
+          {
+            "path": "docker_setup.ps1",
+            "sha256": "28033a89925fdef632d40aaa420224a026f2b345c68e7c05bd4c39756d7f08e7"
+          },
+          {
+            "path": "setup/configure_examples.py",
+            "sha256": "ea3d7739ffa516bf364d3fb17a527cebd82c844c29219e962f4b030ce90a285f"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.App/Edu.Si.Example.App.csproj",
+            "sha256": "3239df86bd94e0c08cd0c429f9e74a2367576e3efd54e9b3c680e28d37ad505b"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.App/LiveValidation.cs",
+            "sha256": "2b5712ec38aca09648262bef9bccbb36e70238255055aa5dce346e006784b5c8"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.App/Program.cs",
+            "sha256": "c6adb4edf407b2e01bda9c6e82a9518379a51cf0ae8ca022505a385f541f5c8b"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.App/SampleApplication.cs",
+            "sha256": "4d76d868eed701afb42a742f5452a7270a4d9528f4672b442ecb7ba0b73862be"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.App/ToolboxEnvironment.cs",
+            "sha256": "21389fdad46e502353dbb2904393138cffbb5a770e9f5345f613c1160923b1ea"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/DatabaseRegistration.cs",
+            "sha256": "87d381ef8b3f621ab9cab1f9e4770858bc6ab0fbec62a98157daf0b250909000"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/DatabaseSamples.cs",
+            "sha256": "bdf0f239b5e49c84d56057523a4d7b45e3da0158100e5e7d60209105d55e7e73"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/Edu.Si.Example.Data.csproj",
+            "sha256": "3bd8f93bc3325cd09db9a06cfb0b7d8412b4889eff5b6a734d6551b8c79887bd"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/IDatabaseSamples.cs",
+            "sha256": "d314bec0abc7806686ec15bd5973e3d73e5e22bab6bfac9263d5bc9a9ea35748"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/SampleContexts.cs",
+            "sha256": "a9cc84323440d97d78c612ea6470bca0cd0a6d9d2857f44a4c4dacb6f4d7309c"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/SampleMessage.cs",
+            "sha256": "37b3b5027373a5ba5cf52a3d8fa9a2ff9cb17a56a08728f10ba3d849aece8642"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Lib/Dependency.cs",
+            "sha256": "f65ec72ce97a02d09ff30d765a8ae7393733a8f13d5bf45253a2be94f2ee0340"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Lib/Edu.Si.Example.Lib.csproj",
+            "sha256": "61e3f2d043e37f0db4be1d8083dd31bebbfbb8fde2cf027327db2556c16bc385"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/Edu.Si.Example.Messaging.csproj",
+            "sha256": "b065bce38c968c59a1ea5246bfeba294914e1a9ade57741dab4461dc94f7892c"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/IMessagingSamples.cs",
+            "sha256": "387d5a08eed94d08b9057683bbefc0e2d99e768882ef8329ef638e5f0ea25261"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/LocalServiceBusConnection.cs",
+            "sha256": "0b82bbbe092439d3b438881fc8daf6bc31a1c3cb49b28d054e81e805c6f03212"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/MessagingSamples.cs",
+            "sha256": "115b13d86c7ac3fcefe05e9e126c81b86c75d26dce5f23c92723e439ce7c9893"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/ServiceBusValidationSamples.cs",
+            "sha256": "341dc5151bf287903a3c56124162fae76ebbfd77e210c33013d1ddbe1cff3e5c"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Resources/AssemblyInfo.cs",
+            "sha256": "8c1832c6fe44ddcddcc5d9ebee260848a8f2483d78af26214829ce209a957302"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Resources/Edu.Si.Example.Resources.csproj",
+            "sha256": "e9dda49f3f313f226395864b8130555d2d3b118b31ae5a6cbc7905d912c1ed79"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Resources/IResourceSamples.cs",
+            "sha256": "1d5784e983ed846618424272bb1d78f5bf65eaa7899af0be02acfc3b2623bd46"
+          },
+          {
+            "path": "src/Edu.Si.Example/Edu.Si.Example.Resources/ResourceSamples.cs",
+            "sha256": "399a3012c83ded87d398e7f08ed227c9f22da3c89be5c35452ff05a2c684a332"
+          },
+          {
+            "path": "tests/container_test_support.py",
+            "sha256": "7298f79a7222517ba7b27b12d283d303bf6f0ddf9e04c707d6a2b3436ec1d12e"
+          },
+          {
+            "path": "tests/test_host_examples.py",
+            "sha256": "3d7077fc08fb989d9fa49523f85416ce2098b793a48e4c5e4d2877907c921449"
+          },
+          {
+            "path": "tests/test_oidc_startup.ps1",
+            "sha256": "fa43ec77af0ba75dcd5963433a337fd196ec05e782ff2848bf9a1ada7b8a2d76"
+          },
+          {
+            "path": "tests/test_servicebus_containers.py",
+            "sha256": "0b8ec8b26fd52a0a7514dd148ec072bc1f5c1540be1a76124293046b2ec8ca8f"
+          }
+        ]
+      },
+      "powerShellSetup": {
+        "script": "docker_setup.ps1",
+        "runtime": "docker",
+        "exitCode": 0,
+        "startedAt": "2026-10-27T23:01:28.6355510+00:00",
+        "endedAt": "2026-10-27T23:02:29.0933195+00:00"
+      },
+      "validatorBuild": {
+        "configuration": "Release",
+        "status": "passed",
+        "restore": false,
+        "assembly": "src/Edu.Si.Example/Edu.Si.Example.App/bin/Release/net10.0/Edu.Si.Example.App.dll",
+        "sha256": "a528168b9b2a9c06034456c00fac2b6fa9832d2e8c112ee96277ae84c01a30c2"
+      },
+      "sharedChecks": {
+        "label": "reference",
+        "sourceCommit": "618951fbd522f1a52ea68af130512cc5931a536a",
+        "startedAt": "2026-10-27T23:04:09.783243+00:00",
+        "resources": [
+          {
+            "resource": "sqlserver",
+            "status": "passed",
+            "durationMilliseconds": 6340,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:18.834658+00:00",
+            "endedAt": "2026-10-27T23:04:25.653352+00:00"
+          },
+          {
+            "resource": "postgres",
+            "status": "passed",
+            "durationMilliseconds": 5108,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:25.656492+00:00",
+            "endedAt": "2026-10-27T23:04:31.141597+00:00"
+          },
+          {
+            "resource": "cosmos",
+            "status": "passed",
+            "durationMilliseconds": 3565,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:31.144650+00:00",
+            "endedAt": "2026-10-27T23:04:35.035994+00:00"
+          },
+          {
+            "resource": "dynamodb",
+            "status": "passed",
+            "durationMilliseconds": 3924,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:35.038738+00:00",
+            "endedAt": "2026-10-27T23:04:39.276113+00:00"
+          },
+          {
+            "resource": "redis",
+            "status": "passed",
+            "durationMilliseconds": 2614,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:39.278897+00:00",
+            "endedAt": "2026-10-27T23:04:42.234562+00:00"
+          },
+          {
+            "resource": "mail",
+            "status": "passed",
+            "durationMilliseconds": 3863,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:42.237739+00:00",
+            "endedAt": "2026-10-27T23:04:46.428764+00:00"
+          },
+          {
+            "resource": "seq",
+            "status": "passed",
+            "durationMilliseconds": 2578,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:46.431783+00:00",
+            "endedAt": "2026-10-27T23:04:49.301424+00:00"
+          },
+          {
+            "resource": "wiremock",
+            "status": "passed",
+            "durationMilliseconds": 2804,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:49.303999+00:00",
+            "endedAt": "2026-10-27T23:04:52.393547+00:00"
+          },
+          {
+            "resource": "blob",
+            "status": "passed",
+            "durationMilliseconds": 1054,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:52.396070+00:00",
+            "endedAt": "2026-10-27T23:04:53.850785+00:00"
+          },
+          {
+            "resource": "storage-queue",
+            "status": "passed",
+            "durationMilliseconds": 659,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:53.854015+00:00",
+            "endedAt": "2026-10-27T23:04:54.865478+00:00"
+          },
+          {
+            "resource": "table",
+            "status": "passed",
+            "durationMilliseconds": 909,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:54.868214+00:00",
+            "endedAt": "2026-10-27T23:04:56.117068+00:00"
+          },
+          {
+            "resource": "rabbitmq",
+            "status": "passed",
+            "durationMilliseconds": 2566,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:56.121154+00:00",
+            "endedAt": "2026-10-27T23:04:59.051695+00:00"
+          },
+          {
+            "resource": "sqs",
+            "status": "passed",
+            "durationMilliseconds": 10804,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:04:59.053631+00:00",
+            "endedAt": "2026-10-27T23:05:10.115671+00:00"
+          },
+          {
+            "resource": "sns",
+            "status": "passed",
+            "durationMilliseconds": 12575,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:05:10.120799+00:00",
+            "endedAt": "2026-10-27T23:05:23.147051+00:00"
+          },
+          {
+            "resource": "eventbridge",
+            "status": "passed",
+            "durationMilliseconds": 9243,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:05:23.149269+00:00",
+            "endedAt": "2026-10-27T23:05:32.748953+00:00"
+          },
+          {
+            "resource": "s3",
+            "status": "passed",
+            "durationMilliseconds": 7356,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:05:32.751628+00:00",
+            "endedAt": "2026-10-27T23:05:40.512135+00:00"
+          },
+          {
+            "resource": "servicebus",
+            "status": "failed",
+            "durationMilliseconds": 3195,
+            "error": "ServiceBusException",
+            "processExitCode": 1,
+            "startedAt": "2026-10-27T23:05:40.514882+00:00",
+            "endedAt": "2026-10-27T23:05:44.087120+00:00"
+          },
+          {
+            "resource": "servicebus-topic",
+            "status": "failed",
+            "durationMilliseconds": 4370,
+            "error": "ServiceBusException",
+            "processExitCode": 1,
+            "startedAt": "2026-10-27T23:05:44.090806+00:00",
+            "endedAt": "2026-10-27T23:05:48.891933+00:00"
+          }
+        ],
+        "webChecks": [
+          {
+            "name": "redisinsight",
+            "status": "passed",
+            "httpStatus": 200,
+            "endpoint": "http://127.0.0.1:10121/api/health"
+          },
+          {
+            "name": "smtp4dev-web",
+            "status": "passed",
+            "httpStatus": 200,
+            "endpoint": "http://127.0.0.1:10140/"
+          },
+          {
+            "name": "wiremock-admin",
+            "status": "passed",
+            "httpStatus": 200,
+            "endpoint": "http://127.0.0.1:10080/__admin/mappings"
+          },
+          {
+            "name": "servicebus-health",
+            "status": "failed",
+            "error": "HTTPError",
+            "endpoint": "http://127.0.0.1:10171/health"
+          }
+        ],
+        "containersBefore": [
+          {
+            "name": "RedisInsight",
+            "service": "redisinsight",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:b5e19ee240abef6edb435871b90ff8a210995422e8e018ab61c0339d318a1f84",
+            "startedAt": "2026-10-27T23:01:47.823181042Z"
+          },
+          {
+            "name": "RedisCache",
+            "service": "redis",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:97ec88159e6d7cfb5ddef9015386087d58a912de80112f06ebdfa78fa5989901",
+            "startedAt": "2026-10-27T23:01:42.36453806Z"
+          },
+          {
+            "name": "Wiremock",
+            "service": "wiremock",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:0d4ecb3e4dc8213fd7a4d37d6a78f6e6b553a6d2e15bd51b0999781282ac61b3",
+            "startedAt": "2026-10-27T23:01:41.825897613Z"
+          },
+          {
+            "name": "Smtp4Dev",
+            "service": "smtp4dev",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:25c434c1900a9c5b61e17ead0a774d9e81b80554d05cf64719d69e5ea8c66537",
+            "startedAt": "2026-10-27T23:01:40.88250263Z"
+          },
+          {
+            "name": "SeqOtlp",
+            "service": "otlp-seq",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:1e038adf49726f4a04d9c8f9c950457f4971dee4b8385adb927c8e993cb89b8d",
+            "startedAt": "2026-10-27T23:01:42.786424237Z"
+          },
+          {
+            "name": "ServiceBus",
+            "service": "service-bus",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:5a96d893b245031740f7d46e0fe5ff282d24b78c4b7d761dd57590f3f010a9b3",
+            "startedAt": "2026-10-27T23:01:55.890907096Z"
+          },
+          {
+            "name": "CosmoDb",
+            "service": "cosmosdb",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:db53613dae19d0a3d5ad50688d14aa6e957af082dafea56b52e1bd3a6b3f1406",
+            "startedAt": "2026-10-27T23:01:54.967925309Z"
+          },
+          {
+            "name": "Azurite",
+            "service": "azurite",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:830430c1da1a2d537e08f3e6764dd1f5ae00cf0346bcaf625b968ec3f0971fd5",
+            "startedAt": "2026-10-27T23:01:53.917218082Z"
+          },
+          {
+            "name": "SqlServer",
+            "service": "mssql",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:e0ae8b5dd9371c6dfac7e41e94ab15f900d49147ec027a891b8853e2e742e2f1",
+            "startedAt": "2026-10-27T23:01:54.462420105Z"
+          },
+          {
+            "name": "dev_aws_shared-aws-init-1",
+            "service": "aws-init",
+            "project": "dev_aws_shared",
+            "status": "exited",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:969904ee365d5fd069682ea6e2ce770f99c6b4dadcf4ddc11b589bd26c9aa8e6",
+            "startedAt": "2026-10-27T23:02:25.733670646Z"
+          },
+          {
+            "name": "DynamoDb",
+            "service": "dynamodb",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab",
+            "startedAt": "2026-10-27T23:02:09.963435886Z"
+          },
+          {
+            "name": "PostgreSql",
+            "service": "postgres",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336",
+            "startedAt": "2026-10-27T23:02:06.442469338Z"
+          },
+          {
+            "name": "RabbitMq",
+            "service": "rabbitmq",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:8dd6e3570ddaa2ef82a6c3a8950e79c1f73893adfbdddbc374fc1f1ac8a0f5dd",
+            "startedAt": "2026-10-27T23:02:08.203581099Z"
+          },
+          {
+            "name": "ToolboxAwsEmulator",
+            "service": "aws-emulator",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:e2c3f49964f13f67f835dc52743766c728c7040b43d64cec4cb22707c9360d6c",
+            "startedAt": "2026-10-27T23:02:09.157747208Z"
+          },
+          {
+            "name": "dev_aws_shared-dynamodb-volume-init-1",
+            "service": "dynamodb-volume-init",
+            "project": "dev_aws_shared",
+            "status": "exited",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab",
+            "startedAt": "2026-10-27T23:02:06.95402417Z"
+          }
+        ],
+        "containerReadinessPassed": true,
+        "containersAfter": [
+          {
+            "name": "RedisInsight",
+            "service": "redisinsight",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:b5e19ee240abef6edb435871b90ff8a210995422e8e018ab61c0339d318a1f84",
+            "startedAt": "2026-10-27T23:01:47.823181042Z"
+          },
+          {
+            "name": "RedisCache",
+            "service": "redis",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:97ec88159e6d7cfb5ddef9015386087d58a912de80112f06ebdfa78fa5989901",
+            "startedAt": "2026-10-27T23:01:42.36453806Z"
+          },
+          {
+            "name": "Wiremock",
+            "service": "wiremock",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:0d4ecb3e4dc8213fd7a4d37d6a78f6e6b553a6d2e15bd51b0999781282ac61b3",
+            "startedAt": "2026-10-27T23:01:41.825897613Z"
+          },
+          {
+            "name": "Smtp4Dev",
+            "service": "smtp4dev",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:25c434c1900a9c5b61e17ead0a774d9e81b80554d05cf64719d69e5ea8c66537",
+            "startedAt": "2026-10-27T23:01:40.88250263Z"
+          },
+          {
+            "name": "SeqOtlp",
+            "service": "otlp-seq",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:1e038adf49726f4a04d9c8f9c950457f4971dee4b8385adb927c8e993cb89b8d",
+            "startedAt": "2026-10-27T23:01:42.786424237Z"
+          },
+          {
+            "name": "ServiceBus",
+            "service": "service-bus",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 4,
+            "imageId": "sha256:5a96d893b245031740f7d46e0fe5ff282d24b78c4b7d761dd57590f3f010a9b3",
+            "startedAt": "2026-10-27T23:05:46.961282979Z"
+          },
+          {
+            "name": "CosmoDb",
+            "service": "cosmosdb",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:db53613dae19d0a3d5ad50688d14aa6e957af082dafea56b52e1bd3a6b3f1406",
+            "startedAt": "2026-10-27T23:01:54.967925309Z"
+          },
+          {
+            "name": "Azurite",
+            "service": "azurite",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:830430c1da1a2d537e08f3e6764dd1f5ae00cf0346bcaf625b968ec3f0971fd5",
+            "startedAt": "2026-10-27T23:01:53.917218082Z"
+          },
+          {
+            "name": "SqlServer",
+            "service": "mssql",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:e0ae8b5dd9371c6dfac7e41e94ab15f900d49147ec027a891b8853e2e742e2f1",
+            "startedAt": "2026-10-27T23:01:54.462420105Z"
+          },
+          {
+            "name": "dev_aws_shared-aws-init-1",
+            "service": "aws-init",
+            "project": "dev_aws_shared",
+            "status": "exited",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:969904ee365d5fd069682ea6e2ce770f99c6b4dadcf4ddc11b589bd26c9aa8e6",
+            "startedAt": "2026-10-27T23:02:25.733670646Z"
+          },
+          {
+            "name": "DynamoDb",
+            "service": "dynamodb",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab",
+            "startedAt": "2026-10-27T23:02:09.963435886Z"
+          },
+          {
+            "name": "PostgreSql",
+            "service": "postgres",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336",
+            "startedAt": "2026-10-27T23:02:06.442469338Z"
+          },
+          {
+            "name": "RabbitMq",
+            "service": "rabbitmq",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:8dd6e3570ddaa2ef82a6c3a8950e79c1f73893adfbdddbc374fc1f1ac8a0f5dd",
+            "startedAt": "2026-10-27T23:02:08.203581099Z"
+          },
+          {
+            "name": "ToolboxAwsEmulator",
+            "service": "aws-emulator",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:e2c3f49964f13f67f835dc52743766c728c7040b43d64cec4cb22707c9360d6c",
+            "startedAt": "2026-10-27T23:02:09.157747208Z"
+          },
+          {
+            "name": "dev_aws_shared-dynamodb-volume-init-1",
+            "service": "dynamodb-volume-init",
+            "project": "dev_aws_shared",
+            "status": "exited",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab",
+            "startedAt": "2026-10-27T23:02:06.95402417Z"
+          }
+        ],
+        "endedAt": "2026-10-27T23:05:52.155445+00:00",
+        "passed": 19,
+        "failed": 3,
+        "containerStabilityPassed": false,
+        "sdkCommandTemplate": "dotnet <Release App.dll> validate <resource> --json --timeout-seconds 45"
+      },
+      "powerShellTeardown": {
+        "script": "docker_down.ps1",
+        "runtime": "docker",
+        "exitCode": 0,
+        "cleanup": {
+          "label": "reference",
+          "baselineVolumesRetained": true,
+          "missingBaselineVolumeCount": 0,
+          "remainingSharedContainers": 0,
+          "remainingSharedNetworks": 0
+        }
+      },
+      "disposableServiceBus": {
+        "passed": 2,
+        "failed": 0,
+        "checks": [
+          {
+            "resource": "servicebus",
+            "status": "passed",
+            "durationMilliseconds": 3203
+          },
+          {
+            "resource": "servicebus-topic",
+            "status": "passed",
+            "durationMilliseconds": 786
+          }
+        ],
+        "exitCode": 0,
+        "cleanupPassed": true,
+        "command": "python tests/test_servicebus_containers.py --runtime docker --example-assembly <Release App.dll>",
+        "isolation": "Unique project, network, SQL volume and ports; down --volumes removes only those disposable resources"
+      },
+      "oidcBuild": {
+        "script": "Build-ToolboxImage.ps1",
+        "profile": "oidc",
+        "runtime": "docker",
+        "exitCode": 0
+      },
+      "oidc": {
+        "schemaVersion": 1,
+        "kind": "toolbox-oidc-startup",
+        "runId": "oidc-startup-38b9911b2ac745b683eef2214e1a5abe",
+        "timestampUtc": "2026-10-27T23:13:04.7206359+00:00",
+        "startedAtUtc": "2026-10-27T23:08:13.3468877+00:00",
+        "completedAtUtc": "2026-10-27T23:13:04.7249569+00:00",
+        "sources": [
+          {
+            "commit": "618951fbd522f1a52ea68af130512cc5931a536a",
+            "dirty": false,
+            "repository": "Edu-Developer-Toolbox",
+            "inputHashes": [
+              {
+                "path": "tests/test_oidc_startup.ps1",
+                "sha256": "fa43ec77af0ba75dcd5963433a337fd196ec05e782ff2848bf9a1ada7b8a2d76"
+              },
+              {
+                "path": "containers/oidc/keycloak/Dockerfile",
+                "sha256": "c12d77150b08e52c516b2c081c8e772bcde4de8b1b70b80696cff8c98246d654"
+              },
+              {
+                "path": "containers/oidc/keycloak/startup.sh",
+                "sha256": "6c4e3ec674d2b82f3b3b38e57850d07115e2aa12322673d3e23031f484fa6178"
+              },
+              {
+                "path": "containers/oidc/keycloak/default-realm.template.json",
+                "sha256": "cfe99284463e6a6b68beeeec05a989dbf4fa3e7be51b02c51131d89c8cb5c7e9"
+              },
+              {
+                "path": "containers/oidc/keycloak/contract.json",
+                "sha256": "cd43e5aebc55482957a35cb1c23c1ae09a0ee982fc3b3134eb328f0e8e3d79de"
+              },
+              {
+                "path": "containers/oidc/examples/project.Dockerfile",
+                "sha256": "b926cdeca1044c8dbe3d3662a2f491cdabdf3bb9a5a2be88061138210d96b5f5"
+              },
+              {
+                "path": "containers/oidc/examples/profile.json",
+                "sha256": "1cf940cbf60518c37d05c99cbc88228498cda5221d8799d9c319bed285c0dedb"
+              }
+            ]
+          }
+        ],
+        "engine": {
+          "hostOs": "Microsoft Windows 10.0.26200",
+          "measured": {
+            "name": "docker-desktop",
+            "os": "linux",
+            "architecture": "x86_64",
+            "version": "29.9.2"
+          },
+          "runtime": "docker",
+          "context": "desktop-linux"
+        },
+        "platform": "linux/amd64",
+        "images": {
+          "derivedId": null,
+          "derivedReference": "",
+          "addedBytes": 41984,
+          "upstreamId": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "derivedQualification": "not run: no DerivedImageName supplied",
+          "upstreamReference": "quay.io/keycloak/keycloak:latest",
+          "platform": "linux/amd64",
+          "baseId": "sha256:dd8a00f44b0a2c8058261b4b336cdd963b0cb51cb580c1406b38f6956f4863bc",
+          "addedLayers": 2,
+          "baseReference": "localhost/edu-oidc-keycloak:latest",
+          "sourceRevisionLabel": "618951fbd522f1a52ea68af130512cc5931a536a",
+          "contractVersion": "1"
+        },
+        "profile": {
+          "topology": "owned bridge, host loopback published ports",
+          "issuerReachability": "host PowerShell HTTP smoke",
+          "selections": [
+            "default",
+            "project",
+            "upstream-empty-import-comparison"
+          ]
+        },
+        "command": {
+          "readinessTimeoutSeconds": 180,
+          "outputPath": "<personal-root>\\artifacts\\container-comparison-2026-10-27\\reference-oidc",
+          "imageName": "localhost/edu-oidc-keycloak:latest",
+          "executable": "pwsh",
+          "upstreamImage": "quay.io/keycloak/keycloak:latest",
+          "derivedImageName": "",
+          "script": "tests/test_oidc_startup.ps1",
+          "containerRuntime": "docker",
+          "prerequisites": [
+            "PowerShell 7.3+",
+            "reachable selected engine",
+            "prebuilt base and upstream images in that engine store"
+          ]
+        },
+        "inventory": {
+          "executedHttpPersonaCases": 2,
+          "discoveredHttpPersonaCases": 2,
+          "browserExecutions": 0,
+          "parameterExpansion": "10 input rejections, 4 import rejections, 2 HTTP persona logins",
+          "authoredDefinitionMethod": "literal Invoke-Check call sites, excluding function declaration",
+          "area": "real-container startup",
+          "authoredDefinitions": 12,
+          "standaloneScripts": 1,
+          "framework": "standalone PowerShell",
+          "discoveredExpandedCases": 25,
+          "snapshots": 0
+        },
+        "checks": [
+          {
+            "name": "image-metadata-and-lean-layer-lineage",
+            "result": "passed"
+          },
+          {
+            "name": "native-version-without-startup-inputs",
+            "result": "passed"
+          },
+          {
+            "name": "image-files-match-current-source-hashes",
+            "result": "passed"
+          },
+          {
+            "name": "upstream-missing-import-starts-without-requested-realm",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-invalid-profile",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-missing-hostname",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-hostname-with-path",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-missing-secret",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-short-secret",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-unsafe-secret",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-wildcard-callback",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-conflicting-default-realm",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-invalid-project-realm",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-missing-project-import",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-directory-import",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-symlink-import",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-unreadable-import",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-extra-import",
+            "result": "passed"
+          },
+          {
+            "name": "default-readiness-discovery-and-signing-jwks",
+            "result": "passed"
+          },
+          {
+            "name": "effective-non-root-pid-one-and-private-import",
+            "result": "passed"
+          },
+          {
+            "name": "default-admin-code-login-and-management-denial",
+            "result": "passed"
+          },
+          {
+            "name": "default-user-code-login-and-management-denial",
+            "result": "passed"
+          },
+          {
+            "name": "native-sigterm-shutdown",
+            "result": "passed"
+          },
+          {
+            "name": "project-readiness-without-default-secrets",
+            "result": "passed"
+          },
+          {
+            "name": "project-replaces-default-users-and-realm",
+            "result": "passed"
+          }
+        ],
+        "results": {
+          "environmentFailures": 0,
+          "framework": "standalone PowerShell",
+          "failed": 0,
+          "skipped": 0,
+          "unexecutedAfterFailure": "none",
+          "passed": 25,
+          "notRun": 0,
+          "area": "real-container startup"
+        },
+        "coverage": "unavailable",
+        "cleanup": {
+          "passed": true,
+          "scope": "uniquely owned containers, network and non-secret fixture directory"
+        }
+      }
+    },
+    "personal": {
+      "source": {
+        "commit": "c7b0c8c0161edcc79cb9e29d0652dbcee6f1dabc",
+        "trackedTreeClean": true,
+        "hashMethod": "SHA-256 of checkout bytes; excludes ignored settings, certificates and build outputs",
+        "inputs": [
+          {
+            "path": "Build-ToolboxImage.ps1",
+            "sha256": "1bcc54042c6f116edff2c2b5ac804e225c1abb4a0f2028a9f84c1e9d82d99d43"
+          },
+          {
+            "path": "containers/.env.example",
+            "sha256": "42d36edda197df1d078679e2be8eb7c7d772718382087189d4bcdaccdfd3be76"
+          },
+          {
+            "path": "containers/__files/example/lookups-countries-response.json",
+            "sha256": "e3aef871c137d56fc9db03a51dc163dd801b125f274b7e956c80ab29cb797a2d"
+          },
+          {
+            "path": "containers/__files/example/userpermission-1234567890123456-response.json",
+            "sha256": "91b17e58943d2eaef848248660c7196c844072bce4876d56584c300768b20981"
+          },
+          {
+            "path": "containers/__files/readme.md",
+            "sha256": "e16fdc4150aef3bce42832b6137dc6728c3ccccbaa5a030fdd7ee2fb8746bd71"
+          },
+          {
+            "path": "containers/aws/.dockerignore",
+            "sha256": "ac2de72f51a815d5d4c3b2c16f8aa800a4c817c4b4f5e054218e300c661b47fa"
+          },
+          {
+            "path": "containers/aws/Dockerfile",
+            "sha256": "3c335c675c05c2c3eef5ac53b5a377987716d12abdbdfc420312f9ac826e28ab"
+          },
+          {
+            "path": "containers/aws/README.md",
+            "sha256": "98959bd4962fc2d5da817f6f531be6d9fd7f6598807f07f5486095a39e11f241"
+          },
+          {
+            "path": "containers/aws/health.py",
+            "sha256": "93b6d32d1f65fb3e1a498ac86d0f22bcbb3c88d80bd799f12cf2a54cacf40274"
+          },
+          {
+            "path": "containers/aws/init.py",
+            "sha256": "c6f1da900ec34aeb491d6484705e8da22323113800eb2c5d298d9a40092a6cd0"
+          },
+          {
+            "path": "containers/aws/local_session.py",
+            "sha256": "1ac9c5aec94c13874437765f25a4cbfaa653f04556cdd262d5f1678fb2936e08"
+          },
+          {
+            "path": "containers/aws/run_emulator.py",
+            "sha256": "de51fa5faf1f531430156ae1c3387bc3225ffd944ac6b9d2983d2b0dff8a1598"
+          },
+          {
+            "path": "containers/certs/Generate-WireMockCert.ps1",
+            "sha256": "dff14e42ffaed1199143b83b26d4afba7676306f64a0bd0e60ff995452259b3b"
+          },
+          {
+            "path": "containers/certs/generate-wiremock-cert.sh",
+            "sha256": "11ab1b216d309e47cda1c948b9b9088a741bae8698e102c99789bf723f353339"
+          },
+          {
+            "path": "containers/certs/readme.md",
+            "sha256": "ddb51f5218bce031f67b77881d32ce7959feeaa2e17d99d30be6a5f2742f541a"
+          },
+          {
+            "path": "containers/docker-compose-aws.yml",
+            "sha256": "8f3729786614c5b7360b1c102ace88b22a1b457b24d71f1cac079faed72ae70a"
+          },
+          {
+            "path": "containers/docker-compose-azure.yml",
+            "sha256": "af932abc8cc3eaa861111d7cc941daf9fb5dd21e470d041aa1cda7156f86448e"
+          },
+          {
+            "path": "containers/docker-compose-common.yml",
+            "sha256": "5843bee6d3eec213da5a8d20b1abbe199c032d1413ba4c40faba9d7ee13b7bae"
+          },
+          {
+            "path": "containers/docker-compose.yml",
+            "sha256": "cfb94e35909ffaf92400f3a360e93225ba4817199bbe0e58f22baa2afc186fd9"
+          },
+          {
+            "path": "containers/environment.ps1",
+            "sha256": "2ee1710dc15e03f1dec09900e7c16a0eceaf969d79e7c24bb1419b4928e44ec6"
+          },
+          {
+            "path": "containers/environment.sh",
+            "sha256": "ef3ba1a752c8a7411ab598323801bdaafb393ef5a557ffcb11054c36a4a2e3cc"
+          },
+          {
+            "path": "containers/extensions/readme.md",
+            "sha256": "e16fdc4150aef3bce42832b6137dc6728c3ccccbaa5a030fdd7ee2fb8746bd71"
+          },
+          {
+            "path": "containers/mappings/default-mapping.json",
+            "sha256": "80d00749c043eaf1ae592c8fd3aad0c572f34801f590b931a71531ba27acc2c0"
+          },
+          {
+            "path": "containers/mappings/readme.md",
+            "sha256": "e16fdc4150aef3bce42832b6137dc6728c3ccccbaa5a030fdd7ee2fb8746bd71"
+          },
+          {
+            "path": "containers/mssql/Dockerfile",
+            "sha256": "4d90b7cc7acf15380b4ec778707004180ad6b9f15fed535f7b9bf9c1423c9e97"
+          },
+          {
+            "path": "containers/mssql/db-init.sh",
+            "sha256": "e67b73bfd4ea20280df13c497595578cec0fde78d0b3811e7cc762dee09db262"
+          },
+          {
+            "path": "containers/mssql/db-init.sql",
+            "sha256": "eb71e2b3b9297f020227095230b88e2be41bf0f8d1d441f6d42ca5e046121c0a"
+          },
+          {
+            "path": "containers/mssql/entrypoint.sh",
+            "sha256": "d65cd1a790faf2dc387a0ab1355a3eb683a8549c38aec6ff4cdeff2105addcb9"
+          },
+          {
+            "path": "containers/oidc/contracts/consumer-matrix.md",
+            "sha256": "6fa4f69c5edbaa8ee3dafa864c23c03faac4ee50e5f06f89384af0eefb566809"
+          },
+          {
+            "path": "containers/oidc/contracts/evidence-format.json",
+            "sha256": "356fb7767852c47d06228695452e5e5fcdb9478646f6972652747c695af740f6"
+          },
+          {
+            "path": "containers/oidc/contracts/protocol-profiles.json",
+            "sha256": "1f4260237566fe7a31d45f8a5e1152ed0f5df56b510a5be581f248d5bbb70aa0"
+          },
+          {
+            "path": "containers/oidc/examples/profile.json",
+            "sha256": "e7fe9b862e0da2cd1ef32cc207b5c993c0958ce0f857d66e0d5236df54cf2812"
+          },
+          {
+            "path": "containers/oidc/examples/project.Dockerfile",
+            "sha256": "604c394abae49583a5d072f76334023432b6cb1804db6c50ecd5b224e81671f6"
+          },
+          {
+            "path": "containers/oidc/keycloak/Dockerfile",
+            "sha256": "38c21beab366dd0b7df832ed465924d90f745366fcf0d67135f0b577103adca6"
+          },
+          {
+            "path": "containers/oidc/keycloak/README.md",
+            "sha256": "6923ca31b8fbca43d5399dc252cd7e5b75eae32b593964922b02d6f00cd4a390"
+          },
+          {
+            "path": "containers/oidc/keycloak/contract.json",
+            "sha256": "766214e5d09131dca5010261abaf3fc5b72a65db6d19a651cfd3a7a9f7220824"
+          },
+          {
+            "path": "containers/oidc/keycloak/default-realm.template.json",
+            "sha256": "c91c4571b3d840e0c19c60cad200553e5b50cd268ced27930f0cb7aae50277c1"
+          },
+          {
+            "path": "containers/oidc/keycloak/startup.sh",
+            "sha256": "6c4e3ec674d2b82f3b3b38e57850d07115e2aa12322673d3e23031f484fa6178"
+          },
+          {
+            "path": "containers/readme.md",
+            "sha256": "c46f8585fee2e81e3171e516cda76ea4464a86a0a9ce5232c57d33b017c41f1c"
+          },
+          {
+            "path": "containers/service-bus/Config.json",
+            "sha256": "675d7b3f9c81a87531d5e632668312772ce7c67a6dd2129558102272d6d9afcb"
+          },
+          {
+            "path": "docker_down.ps1",
+            "sha256": "b578e3d4cf08165af9f7847193d5deb2ded832396a97b0cd2aebad454cd1a92c"
+          },
+          {
+            "path": "docker_pull.ps1",
+            "sha256": "6ac8ff512c40b29e7c6f2cded74e1fe9b2891b401bf8243ce2c888c0b76b80e5"
+          },
+          {
+            "path": "docker_setup.ps1",
+            "sha256": "a90801ea136c5cd98e5c7b30dd39e29b25e1630d83a9c1f88667c0b54600b90c"
+          },
+          {
+            "path": "setup/configure_examples.py",
+            "sha256": "8a1ef195ea0382f18ed8580fa53054cd643cf19e9bdcce8e1230b9383c32b9f1"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/DeveloperToolbox.Example.App.csproj",
+            "sha256": "05b023ca7b3738bea245e9111efcf48c43ecf54a096b1dc15b28e6453c664a7e"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/LiveValidation.cs",
+            "sha256": "baacfc452090b3594790b41bb347c41f9c5b37a1ee38e36e428560816d805602"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/Program.cs",
+            "sha256": "6daa4c80abdef03dd161d62836db66647b45b1fc169cec0b80e28b38d9f72f58"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/SampleApplication.cs",
+            "sha256": "056808d72ac58249cca7739a71edad1dba81c1939b01bb20ca527a25286bfffa"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/ToolboxEnvironment.cs",
+            "sha256": "805c5d454d6ce4a27e351be103addea059d9b99be8275c876808f2cc5220b93d"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/DatabaseRegistration.cs",
+            "sha256": "f61fb171f02ab1d582cadd76a33a15ee24445c6763f02c647b065be8ea9834f5"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/DatabaseSamples.cs",
+            "sha256": "a1311a28e2a68c3edee9b3673398ea0c5aac8ae4ffec6595f76ae80f64d6282c"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/DeveloperToolbox.Example.Data.csproj",
+            "sha256": "cb85f80709e6ab9276de3000ec4f5ae1cbde78687740023793b61d83759d017c"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/IDatabaseSamples.cs",
+            "sha256": "52ec8fff3b9a36a8af8296010423e50f247cc3ce5c6e236cd34e9d5b47b086f2"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/SampleContexts.cs",
+            "sha256": "c0545c1e8ee6018ef9f2dc326db8a50e8ad9d0f88c86cc5f0990bf01efa3ac4b"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Data/SampleMessage.cs",
+            "sha256": "32ad86a09bcab5009955dde5f5ea969e64d370f61d6056297a1c05c51f3ba941"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Lib/Dependency.cs",
+            "sha256": "fd15d519e9fcbc2fcee21bd5a7ec080c6f17fd7ac8ff84b80b1c85c69465edf8"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Lib/DeveloperToolbox.Example.Lib.csproj",
+            "sha256": "2c82dae7a6492e5dc0d99b6b5a5d1c89a4702b892f71757981e46302949d6115"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/DeveloperToolbox.Example.Messaging.csproj",
+            "sha256": "c4e57d41850d32d840369f0a408d1eaebbb2b9e7c5a3ca1d5b6d0230a6f058a9"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/IMessagingSamples.cs",
+            "sha256": "a9a66d49104b384c7c35f8fb2e30e1ccaa4201d4ce731ff89acfa6f2c9b1621a"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/LocalServiceBusConnection.cs",
+            "sha256": "faa5873c98d15eabb8a7525f149df403507fe0c3e7816986b5b871452e4e98ff"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/MessagingSamples.cs",
+            "sha256": "f7aa33f5602877544bdd328ef56dea52c3d80ab97afd1a14af89a3cf4238105b"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Messaging/ServiceBusValidationSamples.cs",
+            "sha256": "737d62f894642c0c3f3edd9593c450f50578fcad9adbb331b60660a993c2b0b0"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/AssemblyInfo.cs",
+            "sha256": "0e4aea3bd4257ebb2f606d39d040ae5345750d198f62e58ca8db73ee45410557"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/DeveloperToolbox.Example.Resources.csproj",
+            "sha256": "0ce530ea5036e276876842f0f8617e125cd220496004630f38de2f5b7dc2cacf"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/IResourceSamples.cs",
+            "sha256": "58b11984f54896de6a9cc14799040f4ef4af85d4eea92a27f7b06047d7c2bbda"
+          },
+          {
+            "path": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Resources/ResourceSamples.cs",
+            "sha256": "0d5352a55bd6f7c19585b7f96591d6941a203e55940c6c1804052029532ea08b"
+          },
+          {
+            "path": "tests/container_test_support.py",
+            "sha256": "7298f79a7222517ba7b27b12d283d303bf6f0ddf9e04c707d6a2b3436ec1d12e"
+          },
+          {
+            "path": "tests/test_host_examples.py",
+            "sha256": "55102a2eb8a968903ee02e9461213b94680ed44999d21812339fe6736a4269c6"
+          },
+          {
+            "path": "tests/test_oidc_startup.ps1",
+            "sha256": "8e10dc65a6d8d8eed3c0701b1197a702800ac25dc4d0a058ef4d062b9a307b62"
+          },
+          {
+            "path": "tests/test_servicebus_containers.py",
+            "sha256": "f6b37481c664b84b810a236f9ab506233858648d39181387da075b8670c49cef"
+          }
+        ]
+      },
+      "powerShellSetup": {
+        "script": "docker_setup.ps1",
+        "runtime": "docker",
+        "startedAt": "2026-10-27T23:13:13.738506+00:00",
+        "endedAt": "2026-10-27T23:14:00.182775+00:00",
+        "exitCode": 0,
+        "runtimeCredentials": "process-only values matching retained volumes"
+      },
+      "validatorBuild": {
+        "configuration": "Release",
+        "status": "passed",
+        "restore": false,
+        "assembly": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.App/bin/Release/net10.0/DeveloperToolbox.Example.App.dll",
+        "sha256": "33d2846a4b23f16becb446d70297ec1fa1ecd3e5e82f90519c1a5fcc656978c4"
+      },
+      "sharedChecks": {
+        "label": "personal",
+        "sourceCommit": "c7b0c8c0161edcc79cb9e29d0652dbcee6f1dabc",
+        "startedAt": "2026-10-27T23:14:34.845919+00:00",
+        "resources": [
+          {
+            "resource": "sqlserver",
+            "status": "passed",
+            "durationMilliseconds": 5607,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:14:36.798486+00:00",
+            "endedAt": "2026-10-27T23:14:42.865062+00:00"
+          },
+          {
+            "resource": "postgres",
+            "status": "passed",
+            "durationMilliseconds": 5401,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:14:42.870960+00:00",
+            "endedAt": "2026-10-27T23:14:48.774331+00:00"
+          },
+          {
+            "resource": "cosmos",
+            "status": "passed",
+            "durationMilliseconds": 3742,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:14:48.777697+00:00",
+            "endedAt": "2026-10-27T23:14:52.944213+00:00"
+          },
+          {
+            "resource": "dynamodb",
+            "status": "passed",
+            "durationMilliseconds": 3448,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:14:52.947815+00:00",
+            "endedAt": "2026-10-27T23:14:56.714763+00:00"
+          },
+          {
+            "resource": "redis",
+            "status": "passed",
+            "durationMilliseconds": 2725,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:14:56.718638+00:00",
+            "endedAt": "2026-10-27T23:14:59.824471+00:00"
+          },
+          {
+            "resource": "mail",
+            "status": "passed",
+            "durationMilliseconds": 3440,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:14:59.827876+00:00",
+            "endedAt": "2026-10-27T23:15:03.659591+00:00"
+          },
+          {
+            "resource": "seq",
+            "status": "passed",
+            "durationMilliseconds": 2641,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:03.662928+00:00",
+            "endedAt": "2026-10-27T23:15:06.599402+00:00"
+          },
+          {
+            "resource": "wiremock",
+            "status": "passed",
+            "durationMilliseconds": 2715,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:06.602876+00:00",
+            "endedAt": "2026-10-27T23:15:09.646036+00:00"
+          },
+          {
+            "resource": "blob",
+            "status": "passed",
+            "durationMilliseconds": 2795,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:09.648801+00:00",
+            "endedAt": "2026-10-27T23:15:12.884412+00:00"
+          },
+          {
+            "resource": "storage-queue",
+            "status": "passed",
+            "durationMilliseconds": 2567,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:12.887762+00:00",
+            "endedAt": "2026-10-27T23:15:15.712647+00:00"
+          },
+          {
+            "resource": "table",
+            "status": "passed",
+            "durationMilliseconds": 2556,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:15.715967+00:00",
+            "endedAt": "2026-10-27T23:15:18.546411+00:00"
+          },
+          {
+            "resource": "rabbitmq",
+            "status": "passed",
+            "durationMilliseconds": 2686,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:18.554153+00:00",
+            "endedAt": "2026-10-27T23:15:21.589726+00:00"
+          },
+          {
+            "resource": "sqs",
+            "status": "passed",
+            "durationMilliseconds": 10861,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:21.593336+00:00",
+            "endedAt": "2026-10-27T23:15:32.750134+00:00"
+          },
+          {
+            "resource": "sns",
+            "status": "passed",
+            "durationMilliseconds": 10900,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:32.752900+00:00",
+            "endedAt": "2026-10-27T23:15:43.936780+00:00"
+          },
+          {
+            "resource": "eventbridge",
+            "status": "passed",
+            "durationMilliseconds": 8717,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:43.939354+00:00",
+            "endedAt": "2026-10-27T23:15:52.886534+00:00"
+          },
+          {
+            "resource": "s3",
+            "status": "passed",
+            "durationMilliseconds": 7106,
+            "error": null,
+            "processExitCode": 0,
+            "startedAt": "2026-10-27T23:15:52.890532+00:00",
+            "endedAt": "2026-10-27T23:16:00.382941+00:00"
+          },
+          {
+            "resource": "servicebus",
+            "status": "failed",
+            "durationMilliseconds": 2471,
+            "error": "ServiceBusException",
+            "processExitCode": 1,
+            "startedAt": "2026-10-27T23:16:00.385586+00:00",
+            "endedAt": "2026-10-27T23:16:03.067558+00:00"
+          },
+          {
+            "resource": "servicebus-topic",
+            "status": "failed",
+            "durationMilliseconds": 2473,
+            "error": "ServiceBusException",
+            "processExitCode": 1,
+            "startedAt": "2026-10-27T23:16:03.070516+00:00",
+            "endedAt": "2026-10-27T23:16:05.802902+00:00"
+          }
+        ],
+        "webChecks": [
+          {
+            "name": "redisinsight",
+            "status": "passed",
+            "httpStatus": 200,
+            "endpoint": "http://127.0.0.1:10121/api/health"
+          },
+          {
+            "name": "smtp4dev-web",
+            "status": "passed",
+            "httpStatus": 200,
+            "endpoint": "http://127.0.0.1:10140/"
+          },
+          {
+            "name": "wiremock-admin",
+            "status": "passed",
+            "httpStatus": 200,
+            "endpoint": "http://127.0.0.1:10080/__admin/mappings"
+          },
+          {
+            "name": "servicebus-health",
+            "status": "failed",
+            "error": "HTTPError",
+            "endpoint": "http://127.0.0.1:10171/health"
+          }
+        ],
+        "containersBefore": [
+          {
+            "name": "RedisInsight",
+            "service": "redisinsight",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:b5e19ee240abef6edb435871b90ff8a210995422e8e018ab61c0339d318a1f84",
+            "startedAt": "2026-10-27T23:13:34.994913463Z"
+          },
+          {
+            "name": "RedisCache",
+            "service": "redis",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:97ec88159e6d7cfb5ddef9015386087d58a912de80112f06ebdfa78fa5989901",
+            "startedAt": "2026-10-27T23:13:29.631603975Z"
+          },
+          {
+            "name": "Wiremock",
+            "service": "wiremock",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:0d4ecb3e4dc8213fd7a4d37d6a78f6e6b553a6d2e15bd51b0999781282ac61b3",
+            "startedAt": "2026-10-27T23:13:30.173755567Z"
+          },
+          {
+            "name": "SeqOtlp",
+            "service": "otlp-seq",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:1e038adf49726f4a04d9c8f9c950457f4971dee4b8385adb927c8e993cb89b8d",
+            "startedAt": "2026-10-27T23:13:29.264753547Z"
+          },
+          {
+            "name": "Smtp4Dev",
+            "service": "smtp4dev",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:25c434c1900a9c5b61e17ead0a774d9e81b80554d05cf64719d69e5ea8c66537",
+            "startedAt": "2026-10-27T23:13:28.596226432Z"
+          },
+          {
+            "name": "ServiceBus",
+            "service": "service-bus",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 1,
+            "imageId": "sha256:5a96d893b245031740f7d46e0fe5ff282d24b78c4b7d761dd57590f3f010a9b3",
+            "startedAt": "2026-10-27T23:14:09.788234746Z"
+          },
+          {
+            "name": "CosmoDb",
+            "service": "cosmosdb",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:db53613dae19d0a3d5ad50688d14aa6e957af082dafea56b52e1bd3a6b3f1406",
+            "startedAt": "2026-10-27T23:13:41.956076022Z"
+          },
+          {
+            "name": "Azurite",
+            "service": "azurite",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:830430c1da1a2d537e08f3e6764dd1f5ae00cf0346bcaf625b968ec3f0971fd5",
+            "startedAt": "2026-10-27T23:13:42.566693247Z"
+          },
+          {
+            "name": "SqlServer",
+            "service": "mssql",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:9b6699cab8f53cf25634d34a7bceab4874560da5332dec8e3360998b384e460a",
+            "startedAt": "2026-10-27T23:13:40.60018585Z"
+          },
+          {
+            "name": "dev_aws_shared-aws-init-1",
+            "service": "aws-init",
+            "project": "dev_aws_shared",
+            "status": "exited",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:27ed3e2ba9d8d6c57a4b4e09ff328096779c8011793118b5f3dc7f106a9af921",
+            "startedAt": "2026-10-27T23:13:59.62130382Z"
+          },
+          {
+            "name": "DynamoDb",
+            "service": "dynamodb",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab",
+            "startedAt": "2026-10-27T23:13:54.497668751Z"
+          },
+          {
+            "name": "PostgreSql",
+            "service": "postgres",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336",
+            "startedAt": "2026-10-27T23:13:51.747785864Z"
+          },
+          {
+            "name": "RabbitMq",
+            "service": "rabbitmq",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:8dd6e3570ddaa2ef82a6c3a8950e79c1f73893adfbdddbc374fc1f1ac8a0f5dd",
+            "startedAt": "2026-10-27T23:13:50.708930614Z"
+          },
+          {
+            "name": "ToolboxAwsEmulator",
+            "service": "aws-emulator",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:987c446ed579d82e13385268d3939bcf2a147b78a15948cc68601f6ccda240e7",
+            "startedAt": "2026-10-27T23:13:52.326568388Z"
+          },
+          {
+            "name": "dev_aws_shared-dynamodb-volume-init-1",
+            "service": "dynamodb-volume-init",
+            "project": "dev_aws_shared",
+            "status": "exited",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab",
+            "startedAt": "2026-10-27T23:13:52.967327403Z"
+          }
+        ],
+        "containerReadinessPassed": true,
+        "runtimeCredentials": "process-only values matching retained volumes",
+        "containersAfter": [
+          {
+            "name": "RedisInsight",
+            "service": "redisinsight",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:b5e19ee240abef6edb435871b90ff8a210995422e8e018ab61c0339d318a1f84",
+            "startedAt": "2026-10-27T23:13:34.994913463Z"
+          },
+          {
+            "name": "RedisCache",
+            "service": "redis",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:97ec88159e6d7cfb5ddef9015386087d58a912de80112f06ebdfa78fa5989901",
+            "startedAt": "2026-10-27T23:13:29.631603975Z"
+          },
+          {
+            "name": "Wiremock",
+            "service": "wiremock",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:0d4ecb3e4dc8213fd7a4d37d6a78f6e6b553a6d2e15bd51b0999781282ac61b3",
+            "startedAt": "2026-10-27T23:13:30.173755567Z"
+          },
+          {
+            "name": "SeqOtlp",
+            "service": "otlp-seq",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:1e038adf49726f4a04d9c8f9c950457f4971dee4b8385adb927c8e993cb89b8d",
+            "startedAt": "2026-10-27T23:13:29.264753547Z"
+          },
+          {
+            "name": "Smtp4Dev",
+            "service": "smtp4dev",
+            "project": "dev_common_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:25c434c1900a9c5b61e17ead0a774d9e81b80554d05cf64719d69e5ea8c66537",
+            "startedAt": "2026-10-27T23:13:28.596226432Z"
+          },
+          {
+            "name": "ServiceBus",
+            "service": "service-bus",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 5,
+            "imageId": "sha256:5a96d893b245031740f7d46e0fe5ff282d24b78c4b7d761dd57590f3f010a9b3",
+            "startedAt": "2026-10-27T23:15:52.717120916Z"
+          },
+          {
+            "name": "CosmoDb",
+            "service": "cosmosdb",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:db53613dae19d0a3d5ad50688d14aa6e957af082dafea56b52e1bd3a6b3f1406",
+            "startedAt": "2026-10-27T23:13:41.956076022Z"
+          },
+          {
+            "name": "Azurite",
+            "service": "azurite",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:830430c1da1a2d537e08f3e6764dd1f5ae00cf0346bcaf625b968ec3f0971fd5",
+            "startedAt": "2026-10-27T23:13:42.566693247Z"
+          },
+          {
+            "name": "SqlServer",
+            "service": "mssql",
+            "project": "dev_azure_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:9b6699cab8f53cf25634d34a7bceab4874560da5332dec8e3360998b384e460a",
+            "startedAt": "2026-10-27T23:13:40.60018585Z"
+          },
+          {
+            "name": "dev_aws_shared-aws-init-1",
+            "service": "aws-init",
+            "project": "dev_aws_shared",
+            "status": "exited",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:27ed3e2ba9d8d6c57a4b4e09ff328096779c8011793118b5f3dc7f106a9af921",
+            "startedAt": "2026-10-27T23:13:59.62130382Z"
+          },
+          {
+            "name": "DynamoDb",
+            "service": "dynamodb",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab",
+            "startedAt": "2026-10-27T23:13:54.497668751Z"
+          },
+          {
+            "name": "PostgreSql",
+            "service": "postgres",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336",
+            "startedAt": "2026-10-27T23:13:51.747785864Z"
+          },
+          {
+            "name": "RabbitMq",
+            "service": "rabbitmq",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:8dd6e3570ddaa2ef82a6c3a8950e79c1f73893adfbdddbc374fc1f1ac8a0f5dd",
+            "startedAt": "2026-10-27T23:13:50.708930614Z"
+          },
+          {
+            "name": "ToolboxAwsEmulator",
+            "service": "aws-emulator",
+            "project": "dev_aws_shared",
+            "status": "running",
+            "health": "healthy",
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:987c446ed579d82e13385268d3939bcf2a147b78a15948cc68601f6ccda240e7",
+            "startedAt": "2026-10-27T23:13:52.326568388Z"
+          },
+          {
+            "name": "dev_aws_shared-dynamodb-volume-init-1",
+            "service": "dynamodb-volume-init",
+            "project": "dev_aws_shared",
+            "status": "exited",
+            "health": null,
+            "exitCode": 0,
+            "restartCount": 0,
+            "imageId": "sha256:ff89bd48ff32cd8d9be5fee8873b65b8854dc408f1afe881be6eb00247bc0dab",
+            "startedAt": "2026-10-27T23:13:52.967327403Z"
+          }
+        ],
+        "containerStabilityPassed": false,
+        "endedAt": "2026-10-27T23:16:07.030243+00:00",
+        "passed": 19,
+        "failed": 3,
+        "sdkCommandTemplate": "dotnet <Release App.dll> validate <resource> --json --timeout-seconds 45"
+      },
+      "powerShellTeardown": {
+        "script": "docker_down.ps1",
+        "runtime": "docker",
+        "startedAt": "2026-10-27T23:16:16.931643+00:00",
+        "endedAt": "2026-10-27T23:16:36.882064+00:00",
+        "exitCode": 0,
+        "runtimeCredentials": "repository local dotenv"
+      },
+      "disposableServiceBus": {
+        "passed": 2,
+        "failed": 0,
+        "checks": [
+          {
+            "resource": "servicebus",
+            "status": "passed",
+            "durationMilliseconds": 1468
+          },
+          {
+            "resource": "servicebus-topic",
+            "status": "passed",
+            "durationMilliseconds": 256
+          }
+        ],
+        "exitCode": 0,
+        "cleanupPassed": true,
+        "command": "python tests/test_servicebus_containers.py --runtime docker --example-assembly <Release App.dll>",
+        "isolation": "Unique project, network, SQL volume and ports; down --volumes removes only those disposable resources"
+      },
+      "oidcBuild": {
+        "script": "Build-ToolboxImage.ps1",
+        "profile": "oidc",
+        "runtime": "docker",
+        "exitCode": 0
+      },
+      "oidc": {
+        "schemaVersion": 1,
+        "kind": "toolbox-oidc-startup",
+        "runId": "oidc-startup-708feee304fd49fe884d457476fbb6e6",
+        "timestampUtc": "2026-10-27T23:21:02.2065298+00:00",
+        "startedAtUtc": "2026-10-27T23:18:05.0856075+00:00",
+        "completedAtUtc": "2026-10-27T23:21:02.2113639+00:00",
+        "sources": [
+          {
+            "repository": "Developer-Toolbox",
+            "commit": "c7b0c8c0161edcc79cb9e29d0652dbcee6f1dabc",
+            "inputHashes": [
+              {
+                "path": "tests/test_oidc_startup.ps1",
+                "sha256": "8e10dc65a6d8d8eed3c0701b1197a702800ac25dc4d0a058ef4d062b9a307b62"
+              },
+              {
+                "path": "containers/oidc/keycloak/Dockerfile",
+                "sha256": "38c21beab366dd0b7df832ed465924d90f745366fcf0d67135f0b577103adca6"
+              },
+              {
+                "path": "containers/oidc/keycloak/startup.sh",
+                "sha256": "6c4e3ec674d2b82f3b3b38e57850d07115e2aa12322673d3e23031f484fa6178"
+              },
+              {
+                "path": "containers/oidc/keycloak/default-realm.template.json",
+                "sha256": "c91c4571b3d840e0c19c60cad200553e5b50cd268ced27930f0cb7aae50277c1"
+              },
+              {
+                "path": "containers/oidc/keycloak/contract.json",
+                "sha256": "766214e5d09131dca5010261abaf3fc5b72a65db6d19a651cfd3a7a9f7220824"
+              },
+              {
+                "path": "containers/oidc/examples/project.Dockerfile",
+                "sha256": "604c394abae49583a5d072f76334023432b6cb1804db6c50ecd5b224e81671f6"
+              },
+              {
+                "path": "containers/oidc/examples/profile.json",
+                "sha256": "e7fe9b862e0da2cd1ef32cc207b5c993c0958ce0f857d66e0d5236df54cf2812"
+              }
+            ],
+            "dirty": false
+          }
+        ],
+        "engine": {
+          "hostOs": "Microsoft Windows 10.0.26200",
+          "measured": {
+            "name": "docker-desktop",
+            "os": "linux",
+            "architecture": "x86_64",
+            "version": "29.9.2"
+          },
+          "runtime": "docker",
+          "context": "desktop-linux"
+        },
+        "platform": "linux/amd64",
+        "images": {
+          "derivedId": null,
+          "baseReference": "localhost/toolbox-oidc-keycloak:latest",
+          "upstreamId": "sha256:a78d6b79572168cb25886b80a8b5b8d4ed4390743e3eecb810538683e209dd6b",
+          "addedBytes": 41991,
+          "addedLayers": 2,
+          "platform": "linux/amd64",
+          "derivedQualification": "not run: no DerivedImageName supplied",
+          "contractVersion": "1",
+          "sourceRevisionLabel": "c7b0c8c0161edcc79cb9e29d0652dbcee6f1dabc",
+          "baseId": "sha256:fb86ff066920a61b83d2b2325facfec2d38c4929f79a76f41f2dd7c6de7a723d",
+          "derivedReference": "",
+          "upstreamReference": "quay.io/keycloak/keycloak:latest"
+        },
+        "profile": {
+          "issuerReachability": "host PowerShell HTTP smoke",
+          "topology": "owned bridge, host loopback published ports",
+          "selections": [
+            "default",
+            "project",
+            "upstream-empty-import-comparison"
+          ]
+        },
+        "command": {
+          "readinessTimeoutSeconds": 300,
+          "prerequisites": [
+            "PowerShell 7.3+",
+            "reachable selected engine",
+            "prebuilt base and upstream images in that engine store"
+          ],
+          "script": "tests/test_oidc_startup.ps1",
+          "containerRuntime": "docker",
+          "imageName": "localhost/toolbox-oidc-keycloak:latest",
+          "executable": "pwsh",
+          "derivedImageName": "",
+          "upstreamImage": "quay.io/keycloak/keycloak:latest",
+          "outputPath": "<personal-root>\\artifacts\\container-comparison-2026-10-27\\personal-oidc"
+        },
+        "inventory": {
+          "authoredDefinitionMethod": "literal Invoke-Check call sites, excluding function declaration",
+          "discoveredExpandedCases": 25,
+          "snapshots": 0,
+          "parameterExpansion": "10 input rejections, 4 import rejections, 2 HTTP persona logins",
+          "standaloneScripts": 1,
+          "framework": "standalone PowerShell",
+          "executedHttpPersonaCases": 2,
+          "browserExecutions": 0,
+          "authoredDefinitions": 12,
+          "discoveredHttpPersonaCases": 2,
+          "area": "real-container startup"
+        },
+        "checks": [
+          {
+            "name": "image-metadata-and-lean-layer-lineage",
+            "result": "passed"
+          },
+          {
+            "name": "native-version-without-startup-inputs",
+            "result": "passed"
+          },
+          {
+            "name": "image-files-match-current-source-hashes",
+            "result": "passed"
+          },
+          {
+            "name": "upstream-missing-import-starts-without-requested-realm",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-invalid-profile",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-missing-hostname",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-hostname-with-path",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-missing-secret",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-short-secret",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-unsafe-secret",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-wildcard-callback",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-conflicting-default-realm",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-invalid-project-realm",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-missing-project-import",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-directory-import",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-symlink-import",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-unreadable-import",
+            "result": "passed"
+          },
+          {
+            "name": "preflight-extra-import",
+            "result": "passed"
+          },
+          {
+            "name": "default-readiness-discovery-and-signing-jwks",
+            "result": "passed"
+          },
+          {
+            "name": "effective-non-root-pid-one-and-private-import",
+            "result": "passed"
+          },
+          {
+            "name": "default-admin-code-login-and-management-denial",
+            "result": "passed"
+          },
+          {
+            "name": "default-user-code-login-and-management-denial",
+            "result": "passed"
+          },
+          {
+            "name": "native-sigterm-shutdown",
+            "result": "passed"
+          },
+          {
+            "name": "project-readiness-without-default-secrets",
+            "result": "passed"
+          },
+          {
+            "name": "project-replaces-default-users-and-realm",
+            "result": "passed"
+          }
+        ],
+        "results": {
+          "notRun": 0,
+          "failed": 0,
+          "area": "real-container startup",
+          "environmentFailures": 0,
+          "passed": 25,
+          "framework": "standalone PowerShell",
+          "unexecutedAfterFailure": "none",
+          "skipped": 0
+        },
+        "coverage": "unavailable",
+        "cleanup": {
+          "scope": "uniquely owned containers, network and non-secret fixture directory",
+          "passed": true
+        }
+      }
+    }
+  },
+  "diagnosis": {
+    "symptom": "retained SQL volume contains a conflicting Service Bus database file",
+    "sqlError5170": true,
+    "gatewayFileAlreadyExists": true
+  },
+  "coverage": "unavailable; no measured coverage report collected",
+  "finalCleanup": {
+    "containers": 0,
+    "networks": 0,
+    "isolatedContainers": 0,
+    "isolatedNetworks": 0,
+    "isolatedVolumes": 0,
+    "baselineVolumeCount": 13,
+    "baselineVolumesRetained": true,
+    "destructiveCleanupFlagsUsed": false,
+    "unrelatedContainersLeftRunning": [
+      "amazing_gould",
+      "nervous_carver",
+      "wizardly_stonebraker"
+    ]
+  },
+  "strictSequence": {
+    "referenceCompletedAtUtc": "2026-10-27T23:13:04.7249569+00:00",
+    "personalStartedAtUtc": "2026-10-27T23:13:13.738506+00:00",
+    "noOverlap": true
+  }
+}
