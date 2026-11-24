@@ -38,7 +38,7 @@ set -euo pipefail
 printf '%s %s\n' "$(basename "$0")" "$*" >> "$TOOLBOX_TEST_RUNTIME_LOG"
 for argument in "$@"; do
     case "$argument" in
-        up|start|restart|run|create) echo 'Pull must not start or create services.' >&2; exit 3 ;;
+        up|start|restart|run|create|build) echo 'Pull must not build or start services.' >&2; exit 3 ;;
     esac
 done
 if [[ "${1:-}" == compose && "${!#}" == pull ]]; then
@@ -71,20 +71,30 @@ if [[ "${1:-}" == compose && "${!#}" == pull ]]; then
     ' "${TOOLBOX_TEST_FIXTURE}/containers/.env.example" "$env_file"
     printf '%s\n' template-ready-before-pull >> "$TOOLBOX_TEST_RUNTIME_LOG"
 fi
+if [[ "$*" == "image inspect ${TOOLBOX_TEST_MISSING_IMAGE:-}" ]]; then
+    exit 1
+fi
 MOCK
 cp "${mock_bin}/runtime" "${mock_bin}/docker"
 cp "${mock_bin}/runtime" "${mock_bin}/podman"
 chmod +x "${mock_bin}/docker" "${mock_bin}/podman"
 
 run_pull() {
-    local fixture="$1" runtime="$2"
+    local fixture="$1" runtime="$2" missing_image="${3:-}" image expected_pull
     : > "${fixture}/runtime.log"
     (cd "$fixture" && TOOLBOX_TEST_FIXTURE="$fixture" TOOLBOX_TEST_RUNTIME_LOG="${fixture}/runtime.log" PATH="${mock_bin}:${PATH}" \
+        TOOLBOX_TEST_MISSING_IMAGE="$missing_image" \
         bash "${fixture}/docker_pull.sh" --runtime "$runtime") > "${fixture}/pull.log" 2>&1 || {
         cat "${fixture}/pull.log" >&2; fail "Pull failed its pre-pull configuration assertion."
     }
-    ! grep -q ' pull ' "${fixture}/runtime.log" || fail 'Cached images must never be pulled.'
-    grep -Fq "$runtime image inspect mcr.microsoft.com/mssql/server:latest" "${fixture}/runtime.log" || fail 'Missing SQL base cache check.'
+    expected_pull=""
+    if [[ -n "$missing_image" ]]; then expected_pull="$runtime pull $missing_image"; fi
+    [[ "$(grep -F ' pull ' "${fixture}/runtime.log" || true)" == "$expected_pull" ]] || fail 'Pull must fetch only the missing image.'
+    for image in mcr.microsoft.com/mssql/server:latest \
+        docker.io/library/node:lts-alpine3.23 docker.io/library/node:lts-alpine3.24 \
+        mcr.microsoft.com/azure-storage/azurite:latest docker.io/redis/redisinsight:latest; do
+        grep -Fxq "$runtime image inspect $image" "${fixture}/runtime.log" || fail "Missing cache check for $image."
+    done
     ! grep -Eq 'fixture-secret-never-log|custom-connection-never-log|custom-key-never-log' "${fixture}/pull.log" || fail "Pull printed developer values."
 }
 
@@ -92,6 +102,9 @@ for runtime in docker podman; do
     fresh="$(new_fixture "$runtime fresh with spaces")"
     run_pull "$fresh" "$runtime"
     cmp -s "${fresh}/containers/.env.example" "${fresh}/containers/.env" || fail "Fresh .env creation changed template contents."
+    run_pull "$fresh" "$runtime" docker.io/library/node:lts-alpine3.23
+    run_pull "$fresh" "$runtime" mcr.microsoft.com/azure-storage/azurite:latest
+    run_pull "$fresh" "$runtime" docker.io/redis/redisinsight:latest
 
     stale="$(new_fixture "$runtime stale without final newline")"
     cat > "${stale}/original-lines" <<'ENV'

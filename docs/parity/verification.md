@@ -13,8 +13,10 @@ post_date: 2026-10-27
 
 ## Source state
 
-Reviewed 2026-10-27. Code and test baseline: `46c7d9d500d15d9481762c181ea4336db0c6df24` on
-`codex/toolbox-resource-parity`. Reference source: `618951fbd522f1a52ea68af130512cc5931a536a`.
+The 2026-10-27 review used public commit
+`46c7d9d500d15d9481762c181ea4336db0c6df24` on
+`codex/toolbox-resource-parity` as the code and test baseline. The public
+receipt omits the reference project's revision.
 
 The [source inventory](test-inventory.json) counts exact Git blobs at that commit.
 Executions occurred before the commit; their receipts retain base commit

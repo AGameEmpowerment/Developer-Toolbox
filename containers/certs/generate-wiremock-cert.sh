@@ -44,6 +44,8 @@ VALIDITY_DAYS=3650
 FORCE=false
 VERBOSE=false
 CONTAINER_RUNTIME="${CONTAINER_RUNTIME:-auto}"
+USE_LOCAL_CA=false
+VALIDITY_EXPLICIT=false
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
@@ -53,8 +55,14 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         -v|--validity)
+            [[ $# -ge 2 ]] || { echo '--validity requires a number of days.' >&2; exit 1; }
             VALIDITY_DAYS="$2"
+            VALIDITY_EXPLICIT=true
             shift 2
+            ;;
+        --local-ca)
+            USE_LOCAL_CA=true
+            shift
             ;;
         -f|--force)
             FORCE=true
@@ -78,6 +86,7 @@ while [[ $# -gt 0 ]]; do
             echo "  -f, --force              Overwrite existing files without prompting"
             echo "  --verbose                Print the keystore password to stdout (use with caution)"
             echo "  --runtime ENGINE         Fallback container engine: auto, docker, or podman"
+            echo "  --local-ca               Sign with the shared local CA (365 days by default)"
             echo "  -h, --help               Show this help message"
             exit 0
             ;;
@@ -146,6 +155,7 @@ fi
 
 KEYTOOL_KEYSTORE_PATH="$KEYSTORE_PATH"
 KEYTOOL_CERT_PATH="$CERT_PATH"
+KEYTOOL_DIR="$SCRIPT_DIR"
 CONTAINER_ARGUMENTS=()
 if [[ -n "$KEYTOOL" ]]; then
     echo -e "${CYAN}Using host keytool.${NC}"
@@ -166,6 +176,7 @@ else
     ensure_toolbox_image "$CONTAINER_RUNTIME" wiremock/wiremock:latest || exit 1
     KEYTOOL_KEYSTORE_PATH=/toolbox/certs/wiremock.jks
     KEYTOOL_CERT_PATH=/toolbox/certs/wiremock.crt
+    KEYTOOL_DIR=/toolbox/certs
     bind_directory="$SCRIPT_DIR"
     host_platform="$(uname -s)"
     case "$host_platform" in
@@ -200,6 +211,33 @@ invoke_keytool() {
     return 1
 }
 
+if [[ "$USE_LOCAL_CA" == true ]]; then
+    [[ "$VALIDITY_EXPLICIT" == true ]] || VALIDITY_DAYS=365
+    ca_dir="${TOOLBOX_LOCAL_CA_DIR:-${SCRIPT_DIR}/../.local-ca}"
+    stage="$(mktemp -d "${SCRIPT_DIR}/.wiremock.XXXXXXXX")"
+    trap 'rm -f -- "$stage/wiremock.crt" "$stage/wiremock.key" "$stage/wiremock.pfx" "$stage/wiremock.jks" "$stage/root-ca.crt"; rmdir -- "$stage"' EXIT
+    stage_tool_path="$KEYTOOL_DIR/${stage##*/}"
+    TOOLBOX_LOCAL_HTTPS_PFX_PASSWORD="$KEYSTORE_PASSWORD" \
+        bash "$SCRIPT_DIR/local-https.sh" issue --ca-dir "$ca_dir" --output-dir "$stage" \
+        --name wiremock --host wiremock --host host.docker.internal --days "$VALIDITY_DAYS" \
+        --runtime "$CONTAINER_RUNTIME"
+    bash "$SCRIPT_DIR/local-https.sh" trust --ca-dir "$ca_dir" --output-dir "$stage"
+    invoke_keytool -importkeystore -noprompt -srcalias wiremock \
+        -srckeystore "$stage_tool_path/wiremock.pfx" -srcstoretype PKCS12 \
+        -srcstorepass:env TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD \
+        -destkeystore "$stage_tool_path/wiremock.jks" -deststoretype JKS \
+        -deststorepass:env TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD \
+        -destkeypass:env TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD
+    [[ -f "$stage/wiremock.jks" ]] || { echo 'WireMock keytool did not create the expected keystore.' >&2; exit 1; }
+    mv -f -- "$stage/wiremock.jks" "$KEYSTORE_PATH"
+    mv -f -- "$stage/wiremock.crt" "$CERT_PATH"
+    mv -f -- "$stage/root-ca.crt" "$SCRIPT_DIR/wiremock-ca.crt"
+    echo "WireMock HTTPS keystore: $KEYSTORE_PATH"
+    echo "WireMock HTTPS trust certificate: $SCRIPT_DIR/wiremock-ca.crt"
+    if [[ "$VERBOSE" == true ]]; then printf 'Keystore password: %s\n' "$KEYSTORE_PASSWORD"; fi
+    exit 0
+fi
+
 # Remove existing files if present
 if [[ -f "$KEYSTORE_PATH" ]]; then
     rm -f "$KEYSTORE_PATH"
@@ -223,7 +261,7 @@ invoke_keytool -genkeypair \
     -storetype JKS \
     -storepass:env TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD \
     -keypass:env TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD \
-    -dname "CN=localhost, OU=Development, O=Local, L=Local, ST=UT, C=US" \
+    -dname "CN=localhost" \
     -ext "SAN=dns:localhost,dns:wiremock,dns:host.docker.internal,ip:127.0.0.1"
 [[ -f "$KEYSTORE_PATH" ]] || { echo 'WireMock keytool did not create the expected keystore.' >&2; exit 1; }
 
@@ -240,6 +278,7 @@ invoke_keytool -exportcert \
     -rfc \
     -file "$KEYTOOL_CERT_PATH"
 [[ -f "$CERT_PATH" ]] || { echo 'WireMock keytool did not export the expected certificate.' >&2; exit 1; }
+rm -f -- "$SCRIPT_DIR/wiremock-ca.crt"
 
 echo -e "${GREEN}Certificate exported: ${CERT_PATH}${NC}"
 

@@ -38,12 +38,19 @@ def isolated_definition(rendered, project, sql_image):
         service["restart"] = "no"
         service.pop("build", None)
         service.pop("depends_on", None)
+        service.pop("cpus", None)
+        service.pop("mem_reservation", None)
         service["ports"] = []
     sql = services["mssql"]
     sql["image"] = sql_image
     sql["pull_policy"] = "never"
     sql["volumes"] = [{"type": "volume", "source": "mssql-data", "target": "/var/opt/mssql"}]
-    sql["environment"].update({"MSSQL_SA_PASSWORD": password, "SA_PASSWORD": password})
+    sql["environment"].update({
+        "MSSQL_SA_PASSWORD": password,
+        "SA_PASSWORD": password,
+        "MSSQL_MEMORY_LIMIT_MB": "2048",
+    })
+    sql["mem_limit"] = "3g"
     broker = services["service-bus"]
     broker["ports"] = ["127.0.0.1:0:5672", "127.0.0.1:0:5300"]
     # Both providers can render mounts differently; use the one canonical config path explicitly.

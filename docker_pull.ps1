@@ -1,9 +1,7 @@
 # Pull container images required by the shared development stack.
 #
-# Image-based services, including PostgreSQL and DynamoDB Local, are declared in
-# containers/docker-compose-{common,azure,aws}.yml, so the selected runtime pulls them
-# directly. The local SQL Server service is built from containers/mssql, so we
-# also pull its base image explicitly.
+# Read service images and Node wrapper build inputs from the Compose files.
+# Prepare the other Dockerfile inputs explicitly.
 
 [CmdletBinding()]
 param(
@@ -180,7 +178,8 @@ if ($missingAssignments.Count -gt 0) {
 
 . (Join-Path $PSScriptRoot '.devcontainer/ensure_image.ps1')
 $images = @($ComposeFiles | ForEach-Object {
-    Select-String -LiteralPath $_ -Pattern '^\s+image:\s*(\S+)' | ForEach-Object { $_.Matches[0].Groups[1].Value }
+    Select-String -LiteralPath $_ -Pattern '^\s+(?:image|UPSTREAM_IMAGE|NODE_RUNTIME_IMAGE):\s*(\S+)' |
+        ForEach-Object { $_.Matches[0].Groups[1].Value }
 }) + @('mcr.microsoft.com/mssql/server:latest', 'docker.io/library/python:latest')
 foreach ($image in @($images | Sort-Object -Unique)) {
     Ensure-ToolboxImage -Runtime $ContainerCli -Image $image

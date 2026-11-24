@@ -40,7 +40,7 @@ delivery templates, and a cross-tool AI engineering library.
 
 | Path | Contents |
 | --- | --- |
-| `.devcontainer/` | .NET 10 base, .NET 8/9/10, Java 25, Node 24, Python 3.14, Docker-in-Docker, editor tools, and launchers |
+| `.devcontainer/` | .NET 10 base with .NET 8/9/11 SDKs installed by the Dev Containers feature, Java 25, Node 26 LTS plus Node 24, Python 3.14, Docker-in-Docker, editor tools, and launchers |
 | `containers/` | Three Compose groups with 13 long-running resource services and two initialization jobs |
 | `src/` | Seven .NET application/library projects, three Java modules, Node.js/Python SDK and serverless examples, and a Next.js client |
 | `tests/` | Seven NUnit projects, Python helper regressions, shell setup/bootstrap suites, and opt-in disposable resource fixtures |
@@ -187,7 +187,7 @@ with their volumes. Volume deletion requires explicit cleanup and force flags.
 
 Most local images intentionally follow floating current tags. Cosmos follows
 `vnext-latest`; SQL Server and Full-Text Search are coupled to matching builds;
-the client runtime uses `node:24-slim`. This policy accepts upstream changes for
+the client runtime uses `node:26-bookworm-slim`. This policy accepts upstream changes for
 developer tooling. Production adopters must use tested immutable tags or digests.
 
 ## Sample Applications
@@ -196,9 +196,9 @@ developer tooling. Production adopters must use tested immutable tags or digests
 | --- | --- | --- |
 | C# | .NET 10; EF Core SQL Server/PostgreSQL, 18 SDK/resource commands, Functions, and Lambda handlers | [C# examples](src/DeveloperToolbox.Example/README.md) |
 | Java | JDK 25 and Maven; Hibernate transactions, SDK checks, Functions, and Lambda handlers | [Java examples](src/DeveloperToolbox.Java.Example/README.md) |
-| Node.js | Node 24; 15 SDK checks, native Functions queues, Blob/S3 receipts, and Lambda handlers | [Node.js examples](src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/README.md) |
+| Node.js | Node 24 or 26 locally and Node 24 for serverless hosts. Includes 15 SDK checks, Functions queues, Blob/S3 receipts, and Lambda handlers | [Node.js examples](src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/README.md) |
 | Python | Python 3.14; 15 SDK checks, native Functions queues, Blob/S3 receipts, and Lambda handlers | [Python examples](src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/README.md) |
-| Next.js client | Node 24, Next.js 16.4, React 19.3, public semantic UI, four locales, and example routes | [Client guide](src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/README.md) |
+| Next.js client | Node 26, Next.js 16.4, React 19.3, public semantic UI, four locales, and example routes | [Client guide](src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/README.md) |
 
 The C# console and Java CLI can read `containers/.env` directly via
 `TOOLBOX_ENV_FILE`. The optional settings generator writes ignored C# application,
@@ -226,7 +226,7 @@ and Seq events. It does not change container lifecycle or check management UIs.
 Functions hosts run separately using Core Tools 4. Lambda tests invoke handlers
 directly; shared setup supplies no Lambda runtime or event-source dispatcher.
 
-For the client, use Node 24 and
+For the client, use Node 26 and
 run from `src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client`:
 
 ```bash

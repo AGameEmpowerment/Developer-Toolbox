@@ -365,124 +365,55 @@ done
 echo -e "\n${CYAN}=== WireMock Certificate Setup ===${NC}"
 
 WIREMOCK_KEYSTORE="${CERTS_DIR}/wiremock.jks"
+WIREMOCK_ROOT="${TOOLBOX_LOCAL_CA_DIR:-${CONTAINERS_DIR}/.local-ca}/root-ca.crt"
+WIREMOCK_ISSUER="${CERTS_DIR}/wiremock-ca.crt"
 GENERATE_CERT_SCRIPT="${CERTS_DIR}/generate-wiremock-cert.sh"
 
-if [[ ! -f "$WIREMOCK_KEYSTORE" || "$ENV_FILE_JUST_CREATED" == true || "${TOOLBOX_GENERATED_WIREMOCK_PASSWORD:-false}" == true ]]; then
-    if [[ -f "$GENERATE_CERT_SCRIPT" ]]; then
-        echo -e "${YELLOW}Generating WireMock TLS certificate...${NC}"
-        if ! ENV_PASSWORD="$(resolve_wiremock_password "$ENV_FILE" "$CONTAINER_CLI" && printf '.')"; then
-            exit 1
-        fi
-        ENV_PASSWORD="${ENV_PASSWORD%.}"
-        if [[ -z "$ENV_PASSWORD" ]]; then
-            echo 'Configure WIREMOCK_KEYSTORE_PASSWORD in containers/.env before generating certificates.' >&2
-            exit 1
-        fi
-        # Keep the password out of native process arguments and preserve the raw dotenv assignment.
-        TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD="$ENV_PASSWORD" \
-            bash "$GENERATE_CERT_SCRIPT" --runtime "$CONTAINER_CLI" -f
-        echo -e "${GREEN}WireMock certificate generated using the configured keystore password.${NC}"
-    else
-        echo -e "${YELLOW}Warning: WireMock certificate script not found at: ${GENERATE_CERT_SCRIPT}${NC}"
+if [[ ! -f "$WIREMOCK_KEYSTORE" || "$ENV_FILE_JUST_CREATED" == true ||
+    "${TOOLBOX_GENERATED_WIREMOCK_PASSWORD:-false}" == true ]] ||
+    ! cmp -s "$WIREMOCK_ROOT" "$WIREMOCK_ISSUER"; then
+    if [[ ! -f "$GENERATE_CERT_SCRIPT" ]]; then
+        echo "WireMock certificate script not found at: $GENERATE_CERT_SCRIPT" >&2
+        exit 1
     fi
+    echo "Generating WireMock TLS certificate..."
+    if ! ENV_PASSWORD="$(resolve_wiremock_password "$ENV_FILE" "$CONTAINER_CLI" && printf '.')"; then
+        exit 1
+    fi
+    ENV_PASSWORD="${ENV_PASSWORD%.}"
+    if [[ -z "$ENV_PASSWORD" ]]; then
+        echo 'Configure WIREMOCK_KEYSTORE_PASSWORD in containers/.env before generating certificates.' >&2
+        exit 1
+    fi
+    # Preserve the dotenv value without passing it in process arguments.
+    TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD="$ENV_PASSWORD" \
+        bash "$GENERATE_CERT_SCRIPT" --runtime "$CONTAINER_CLI" --local-ca -f
+    echo "WireMock certificate generated using the configured keystore password."
 else
-    echo -e "${GRAY}WireMock keystore already exists. Skipping certificate generation.${NC}"
+    echo "WireMock keystore already uses the local development CA."
 fi
 
-# Import certificate to system trust store
-WIREMOCK_CERT="${CERTS_DIR}/wiremock.crt"
-if [[ -f "$WIREMOCK_CERT" ]]; then
-    echo -e "${YELLOW}Importing WireMock certificate to system trust store...${NC}"
-
-    # Detect OS and import certificate accordingly
-    if [[ -d "/usr/local/share/ca-certificates" ]]; then
-        # Debian/Ubuntu
-        CERT_DEST="/usr/local/share/ca-certificates/wiremock.crt"
-        if [[ -f "$CERT_DEST" ]]; then
-            echo -e "${GRAY}Certificate already installed in system trust store.${NC}"
-        else
-            if [[ $EUID -eq 0 ]]; then
-                cp "$WIREMOCK_CERT" "$CERT_DEST"
-                update-ca-certificates
-                echo -e "${GREEN}Certificate imported to system trust store.${NC}"
-            else
-                # Try with sudo
-                if command -v sudo &> /dev/null; then
-                    sudo cp "$WIREMOCK_CERT" "$CERT_DEST"
-                    sudo update-ca-certificates
-                    echo -e "${GREEN}Certificate imported to system trust store.${NC}"
-                else
-                    echo -e "${YELLOW}Warning: Cannot import certificate without root privileges.${NC}"
-                    echo -e "${GRAY}Manual import: sudo cp '$WIREMOCK_CERT' /usr/local/share/ca-certificates/ && sudo update-ca-certificates${NC}"
-                fi
-            fi
-        fi
-    elif [[ -d "/etc/pki/ca-trust/source/anchors" ]]; then
-        # RHEL/CentOS/Fedora
-        CERT_DEST="/etc/pki/ca-trust/source/anchors/wiremock.crt"
-        if [[ -f "$CERT_DEST" ]]; then
-            echo -e "${GRAY}Certificate already installed in system trust store.${NC}"
-        else
-            if [[ $EUID -eq 0 ]]; then
-                cp "$WIREMOCK_CERT" "$CERT_DEST"
-                update-ca-trust
-                echo -e "${GREEN}Certificate imported to system trust store.${NC}"
-            else
-                if command -v sudo &> /dev/null; then
-                    sudo cp "$WIREMOCK_CERT" "$CERT_DEST"
-                    sudo update-ca-trust
-                    echo -e "${GREEN}Certificate imported to system trust store.${NC}"
-                else
-                    echo -e "${YELLOW}Warning: Cannot import certificate without root privileges.${NC}"
-                    echo -e "${GRAY}Manual import: sudo cp '$WIREMOCK_CERT' /etc/pki/ca-trust/source/anchors/ && sudo update-ca-trust${NC}"
-                fi
-            fi
-        fi
-    elif [[ -d "/etc/ssl/certs" ]] && [[ -f "/etc/alpine-release" ]]; then
-        # Alpine Linux
-        CERT_DEST="/usr/local/share/ca-certificates/wiremock.crt"
-        if [[ -f "$CERT_DEST" ]]; then
-            echo -e "${GRAY}Certificate already installed in system trust store.${NC}"
-        else
-            if [[ $EUID -eq 0 ]]; then
-                mkdir -p /usr/local/share/ca-certificates
-                cp "$WIREMOCK_CERT" "$CERT_DEST"
-                update-ca-certificates
-                echo -e "${GREEN}Certificate imported to system trust store.${NC}"
-            else
-                if command -v sudo &> /dev/null; then
-                    sudo mkdir -p /usr/local/share/ca-certificates
-                    sudo cp "$WIREMOCK_CERT" "$CERT_DEST"
-                    sudo update-ca-certificates
-                    echo -e "${GREEN}Certificate imported to system trust store.${NC}"
-                else
-                    echo -e "${YELLOW}Warning: Cannot import certificate without root privileges.${NC}"
-                fi
-            fi
-        fi
-    else
-        echo -e "${YELLOW}Warning: Unknown Linux distribution. Cannot auto-import certificate.${NC}"
-        echo -e "${GRAY}You may need to manually add '$WIREMOCK_CERT' to your system's CA trust store.${NC}"
+WIREMOCK_ROOT="$(cd -- "$(dirname -- "$WIREMOCK_ROOT")" && pwd -P)/root-ca.crt"
+node_ca_path="$(read_env_scalar NODE_EXTRA_CA_CERTS)"
+if [[ -z "$node_ca_path" || "$node_ca_path" == "${CERTS_DIR}/wiremock.crt" ]]; then
+    # Preserve a developer's explicit CA bundle and migrate the old generated default.
+    env_without_node_cert="$(umask 077; mktemp "${ENV_FILE}.tmp.XXXXXX")"
+    grep -Ev '^[[:space:]]*(export[[:space:]]+)?NODE_EXTRA_CA_CERTS[[:space:]]*=' "$ENV_FILE" > "$env_without_node_cert" || true
+    node_certificate_path="$WIREMOCK_ROOT"
+    case "$(uname -s)" in
+        MINGW*|MSYS*|CYGWIN*) node_certificate_path="$(cygpath -m "$node_certificate_path")" ;;
+    esac
+    node_certificate_path="${node_certificate_path//\\/\\\\}"
+    node_certificate_path="${node_certificate_path//\"/\\\"}"
+    node_certificate_path="${node_certificate_path//\$/\\\$}"
+    printf '\nNODE_EXTRA_CA_CERTS="%s"\n' "$node_certificate_path" >> "$env_without_node_cert"
+    if ! mv "$env_without_node_cert" "$ENV_FILE"; then
+        rm -f "$env_without_node_cert"
+        exit 1
     fi
-
-    # Also set NODE_EXTRA_CA_CERTS for Node.js applications
-    if [[ -z "$(read_env_scalar NODE_EXTRA_CA_CERTS)" ]]; then
-        # Update the empty template value without overwriting a developer's certificate path.
-        env_without_node_cert="$(umask 077; mktemp "${ENV_FILE}.tmp.XXXXXX")"
-        grep -Ev '^[[:space:]]*(export[[:space:]]+)?NODE_EXTRA_CA_CERTS[[:space:]]*=' "$ENV_FILE" > "$env_without_node_cert" || true
-        node_certificate_path="${WIREMOCK_CERT//\\/\\\\}"
-        node_certificate_path="${node_certificate_path//\"/\\\"}"
-        node_certificate_path="${node_certificate_path//\$/\\\$}"
-        printf '\nNODE_EXTRA_CA_CERTS="%s"\n' "$node_certificate_path" >> "$env_without_node_cert"
-        if ! mv "$env_without_node_cert" "$ENV_FILE"; then
-            rm -f "$env_without_node_cert"
-            exit 1
-        fi
-        echo -e "${GREEN}NODE_EXTRA_CA_CERTS configured for Node.js applications.${NC}"
-    fi
-else
-    echo -e "${YELLOW}Warning: WireMock certificate not found. HTTPS clients may not trust the server.${NC}"
 fi
+
+echo "Use this CA file in local HTTPS clients: $WIREMOCK_ROOT"
 #endregion
 
 #region Container Services

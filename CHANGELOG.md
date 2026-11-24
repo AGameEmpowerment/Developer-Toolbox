@@ -1,6 +1,12 @@
 
 ## Unreleased
 
+- Add a shared development CA for local HTTPS, with per-client trust and WireMock
+  certificate generation in both setup scripts.
+- Update the shared devcontainer to the .NET 11 SDK and use Node 26 LTS for the
+  web client. Keep Node 24 for the serverless examples.
+- Add resource settings and a memory monitor for shared containers. Isolated
+  fixtures use their own resource settings.
 - Allow 300 seconds for cold OIDC startup qualification and verify the current
   image with all 25 live checks; update MailKit and the SQL cryptography dependency
   to patched packages, and record Java 25/Maven build and test evidence.

@@ -37,7 +37,8 @@ def shared_definition(runtime):
 
 
 def built_image(runtime, service, name, explicit):
-    project = {"mssql": "dev_azure_shared", "aws-emulator": "dev_aws_shared"}.get(name, "dev_common_shared")
+    project = {"mssql": "dev_azure_shared", "azurite": "dev_azure_shared",
+               "aws-emulator": "dev_aws_shared"}.get(name, "dev_common_shared")
     candidates = [explicit] if explicit else [service.get("image"),
         project + "-" + name, project + "_" + name]
     for candidate in filter(None, candidates):

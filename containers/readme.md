@@ -272,6 +272,20 @@ Moto uses normal container networking and does not mount the Docker/Podman
 engine socket. Repository bind mounts retain
 shared SELinux labels for portable Podman access.
 
+### Check shared container resource usage
+
+Run the monitor from the repository root with PowerShell. It samples running
+services in the three shared Compose projects.
+
+```powershell
+./containers/Watch-ContainerMemory.ps1 -Samples 3
+./containers/Watch-ContainerMemory.ps1 -ContainerRuntime podman
+```
+
+The shared Compose files set CPU limits and soft memory reservations for local
+services. Set a service's `TOOLBOX_*_CPUS` variable from its Compose file to a
+lower value if the container engine has fewer CPUs allocated.
+
 ### Stop and restart an individual service
 
 Long-running services use `restart: unless-stopped`. A manual stop persists

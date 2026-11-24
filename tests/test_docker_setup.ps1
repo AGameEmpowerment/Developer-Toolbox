@@ -30,8 +30,20 @@ function New-SetupFixture {
     foreach ($group in @("common", "azure", "aws")) {
         Copy-Item -LiteralPath (Join-Path $repoRoot "containers/docker-compose-$group.yml") -Destination $containers
     }
-    # No certificate or generator exists, so tests never touch the user's trust store or JDK.
+    # Use fixture certificates and a stub generator to keep setup offline.
+    $ca = Join-Path $containers '.local-ca'
+    New-Item -ItemType Directory -Path $ca -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $ca 'root-ca.crt') -Value 'fixture root'
+    Copy-Item -LiteralPath (Join-Path $ca 'root-ca.crt') -Destination (Join-Path $certs 'wiremock-ca.crt')
     Set-Content -LiteralPath (Join-Path $certs "wiremock.jks") -Value "fake-keystore"
+    Set-Content -LiteralPath (Join-Path $certs 'Generate-WireMockCert.ps1') -Value @'
+param([string]$ContainerRuntime, [switch]$UseLocalCa, [switch]$Force)
+if (!$UseLocalCa -or !$Force -or !$env:TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD) {
+    throw 'Fixture generation must use the local CA and the configured password.'
+}
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot '../.local-ca/root-ca.crt') -Destination (Join-Path $PSScriptRoot 'wiremock-ca.crt') -Force
+Set-Content -LiteralPath (Join-Path $PSScriptRoot 'wiremock.jks') -Value 'generated-keystore'
+'@
     Add-Content -LiteralPath (Join-Path $containers ".env.example") -Value 'TOOLBOX_FUTURE_SETTING="${RABBITMQ_DEFAULT_USER}/literal#value"'
     return $fixture
 }
@@ -72,6 +84,12 @@ try {
     $global:toolboxTestFailedVolume = $null
     function global:docker {
         Add-Content -LiteralPath $env:TOOLBOX_TEST_RUNTIME_LOG -Value ($args -join " ")
+        if ($args[-1] -eq 'password') {
+            $composePath = $args[([array]::IndexOf($args, '-f') + 1)]
+            Set-Content -LiteralPath (Join-Path (Split-Path -Parent $composePath) 'value') -Value 'fixture-password' -NoNewline
+            $global:LASTEXITCODE = 0
+            return
+        }
         if ($args[0] -eq 'image' -and $args -contains '--format') { Write-Output '17.0.5035.5'; $global:LASTEXITCODE = 0; return }
         if ($args[0] -eq 'volume') {
             $global:LASTEXITCODE = 0
@@ -93,6 +111,11 @@ try {
     function global:podman {
         Add-Content -LiteralPath $env:TOOLBOX_TEST_RUNTIME_LOG -Value ($args -join " ")
         $global:LASTEXITCODE = 0
+        if ($args[-1] -eq 'password') {
+            $composePath = $args[([array]::IndexOf($args, '-f') + 1)]
+            Set-Content -LiteralPath (Join-Path (Split-Path -Parent $composePath) 'value') -Value 'fixture-password' -NoNewline
+            return
+        }
         if ($args[0] -eq 'image' -and $args -contains '--format') { Write-Output '17.0.5035.5'; $global:LASTEXITCODE = 0; return }
         if ($args[0] -eq 'volume') {
             if ($args[1] -eq 'inspect' -and -not $global:toolboxTestVolumesExist) { $global:LASTEXITCODE = 1 }

@@ -15,13 +15,16 @@ images=(
     docker.io/library/redis:latest
     docker.io/rnwood/smtp4dev:latest
     docker.io/datalust/seq:latest
-    mcr.microsoft.com/azure-storage/azurite:latest
     mcr.microsoft.com/azure-messaging/servicebus-emulator:latest
     # The floating management variant provides the broker UI exercised by these tests.
     docker.io/library/rabbitmq:management
     docker.io/amazon/dynamodb-local:latest
     docker.io/library/postgres:latest
 )
+while IFS= read -r image; do
+    images+=("$image")
+done < <(sed -nE 's/^[[:space:]]+(UPSTREAM_IMAGE|NODE_RUNTIME_IMAGE):[[:space:]]*([^[:space:]]+).*/\2/p' \
+    containers/docker-compose-azure.yml)
 for image in "${images[@]}"; do ensure_toolbox_image "$runtime" "$image"; done
 
 # FTS must match the engine in the locally selected SQL base.
@@ -31,5 +34,5 @@ TOOLBOX_MSSQL_ENGINE_VERSION="$("$runtime" image inspect --format '{{ index .Con
     exit 1
 }
 export TOOLBOX_MSSQL_ENGINE_VERSION
-"$runtime" compose --env-file containers/.env.example -f containers/docker-compose-azure.yml -p dev_azure_shared build mssql
+"$runtime" compose --env-file containers/.env.example -f containers/docker-compose-azure.yml -p dev_azure_shared build mssql azurite
 "$runtime" compose --env-file containers/.env.example -f containers/docker-compose-aws.yml -p dev_aws_shared build aws-emulator

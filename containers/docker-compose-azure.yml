@@ -44,6 +44,8 @@ services:
                     - mssql
         restart: unless-stopped
         container_name: SqlServer
+        cpus: '${TOOLBOX_SQL_SERVER_CPUS:-2}'
+        mem_reservation: 4g
         hostname: mssql
 
     # CosmoDb Server Instance
@@ -68,13 +70,19 @@ services:
             retries: 15
             start_period: 60s
         container_name: CosmoDb
+        cpus: '${TOOLBOX_COSMO_DB_CPUS:-2}'
+        mem_reservation: 2g
         restart: unless-stopped
         hostname: cosmosdb
 
     # Local Azure Blob Storage
     azurite:
-        image: mcr.microsoft.com/azure-storage/azurite:latest
-        pull_policy: never
+        build:
+            context: ./node-runtime
+            args:
+                UPSTREAM_IMAGE: mcr.microsoft.com/azure-storage/azurite:latest
+                # Match the upstream Alpine minor release for musl compatibility.
+                NODE_RUNTIME_IMAGE: docker.io/library/node:lts-alpine3.23
         ports:
             - "127.0.0.1:10000:10000" # Blob service
             - "127.0.0.1:10001:10001" # Queue service
@@ -83,6 +91,8 @@ services:
             - azurite-data:/data
         restart: unless-stopped
         container_name: Azurite
+        cpus: '${TOOLBOX_AZURITE_CPUS:-1}'
+        mem_reservation: 512m
 
     # Service Bus Emulator using the shared SQL Server Linux instance.
     service-bus:
@@ -108,6 +118,8 @@ services:
                     - sb-emulator
         restart: unless-stopped
         container_name: ServiceBus
+        cpus: '${TOOLBOX_SERVICE_BUS_CPUS:-2}'
+        mem_reservation: 1g
 
 networks:
     default:

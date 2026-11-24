@@ -32,6 +32,8 @@ services:
             - postgres-data:/var/lib/postgresql
         restart: unless-stopped
         container_name: PostgreSql
+        cpus: '${TOOLBOX_POSTGRE_SQL_CPUS:-2}'
+        mem_reservation: 2g
         hostname: postgres
 
     # Named volumes start owned by root; the official emulator runs as dynamodblocal.
@@ -61,6 +63,8 @@ services:
                 condition: service_completed_successfully
         restart: unless-stopped
         container_name: DynamoDb
+        cpus: '${TOOLBOX_DYNAMO_DB_CPUS:-1}'
+        mem_reservation: 2g
         hostname: dynamodb
 
     # Local messaging broker. These resources are development-only.
@@ -84,6 +88,8 @@ services:
             start_period: 30s
         restart: unless-stopped
         container_name: RabbitMq
+        cpus: '${TOOLBOX_RABBIT_MQ_CPUS:-2}'
+        mem_reservation: 1g
         hostname: rabbitmq
 
     # Free Apache-2.0 Moto, built from official Python and the official PyPI package.
@@ -102,6 +108,8 @@ services:
             start_period: 30s
         restart: unless-stopped
         container_name: ToolboxAwsEmulator
+        cpus: '${TOOLBOX_TOOLBOX_AWS_EMULATOR_CPUS:-1}'
+        mem_reservation: 512m
 
     # Explicit Python invocation remains portable across Windows and Podman.
     aws-init:

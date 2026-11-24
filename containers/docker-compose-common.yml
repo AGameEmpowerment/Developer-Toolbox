@@ -35,11 +35,17 @@ services:
             - redis-data:/data
         restart: unless-stopped
         container_name: RedisCache
+        cpus: '${TOOLBOX_REDIS_CACHE_CPUS:-0.5}'
+        mem_reservation: 256m
 
     # Local RedisInsight UI for Redis Cache
     redisinsight:
-        image: docker.io/redis/redisinsight:latest
-        pull_policy: never
+        build:
+            context: ./node-runtime
+            args:
+                UPSTREAM_IMAGE: docker.io/redis/redisinsight:latest
+                # Match the upstream Alpine minor release for musl compatibility.
+                NODE_RUNTIME_IMAGE: docker.io/library/node:lts-alpine3.24
         ports:
             - "127.0.0.1:10121:5540" # RedisInsight Web UI
         environment:
@@ -60,6 +66,8 @@ services:
             - redisinsight-data:/data
         restart: unless-stopped
         container_name: RedisInsight
+        cpus: '${TOOLBOX_REDIS_INSIGHT_CPUS:-0.5}'
+        mem_reservation: 512m
 
     # Local Mail Trap
     smtp4dev:
@@ -78,6 +86,8 @@ services:
             - ServerOptions__HostName=smtp4dev
         restart: unless-stopped
         container_name: Smtp4Dev
+        cpus: '${TOOLBOX_SMTP4DEV_CPUS:-0.5}'
+        mem_reservation: 512m
 
     # Local Seq observability service with OTLP ingestion and durable storage
     otlp-seq:
@@ -91,6 +101,8 @@ services:
             - "127.0.0.1:10150:80" # Web UI and API port
         restart: unless-stopped
         container_name: SeqOtlp
+        cpus: '${TOOLBOX_SEQ_OTLP_CPUS:-2}'
+        mem_reservation: 2g
         volumes:
             - seq-data:/data
 
@@ -129,6 +141,8 @@ services:
             - "--verbose"
         restart: unless-stopped
         container_name: Wiremock
+        cpus: '${TOOLBOX_WIREMOCK_CPUS:-2}'
+        mem_reservation: 1g
 
 networks:
     default:

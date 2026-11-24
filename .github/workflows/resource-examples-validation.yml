@@ -1,4 +1,4 @@
-# Validate local developer examples with isolated containers and the existing private npm registry.
+# Validate local developer examples with isolated containers and public package sources.
 name: Resource Examples Validation
 
 on:
@@ -41,7 +41,7 @@ jobs:
             - uses: actions/checkout@v6
             - uses: actions/setup-node@v7
               with:
-                  node-version: '24'
+                  node-version: '26'
             - name: Install public client dependencies and apply the reviewed mitigation
               run: npm ci --registry=https://registry.npmjs.org
             - name: Verify frontend and dependency-security regression tests
@@ -91,6 +91,7 @@ jobs:
                   bash tests/test_docker_pull.sh
                   bash tests/test_ensure_image.sh
                   bash tests/test_wiremock_certificates.sh
+                  bash tests/test_local_https.sh
             - name: Validate PowerShell startup and image-pull scripts without services
               shell: pwsh
               run: |

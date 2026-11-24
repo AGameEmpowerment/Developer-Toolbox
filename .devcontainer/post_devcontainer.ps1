@@ -7,7 +7,7 @@ Write-Host "Post Create Commands for Environment..."
 # Skip apt update/upgrade here. The base image is current, third-party repositories can have
 # expired signing keys, and package upgrades make container creation significantly slower.
 if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
-    Write-Error ".NET SDK is not installed or accessible. The base image should provide .NET 10."
+    Write-Error ".NET SDK is not installed or accessible. Check the devcontainer's .NET SDK feature."
     Write-Host "Visit https://dotnet.microsoft.com/download to download the .NET SDK."
     exit 1
 }

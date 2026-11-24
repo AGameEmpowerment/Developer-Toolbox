@@ -9,6 +9,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) "toolbox-docker-pull-$([guid]::NewGuid().ToString('N'))"
 $previousLog = $env:TOOLBOX_TEST_RUNTIME_LOG
 $previousFixture = $env:TOOLBOX_TEST_FIXTURE
+$previousMissingImage = $env:TOOLBOX_TEST_MISSING_IMAGE
 
 function Assert-Condition {
     param([bool]$Condition, [string]$Message)
@@ -48,7 +49,7 @@ function Assert-TemplateSettings {
 function Invoke-MockRuntime {
     param([string]$Runtime, [string[]]$Arguments)
     Add-Content -LiteralPath $env:TOOLBOX_TEST_RUNTIME_LOG -Value ("$Runtime " + ($Arguments -join " "))
-    Assert-Condition (-not (@($Arguments | Where-Object { $_ -in @("up", "start", "restart", "run", "create") }).Count)) "Pull unexpectedly started or created services."
+    Assert-Condition (-not (@($Arguments | Where-Object { $_ -in @("up", "start", "restart", "run", "create", "build") }).Count)) "Pull unexpectedly built or started services."
     if ($Arguments[0] -eq "compose" -and $Arguments[-1] -eq "pull") {
         $envIndex = [array]::IndexOf($Arguments, "--env-file")
         Assert-Condition ($envIndex -ge 0 -and $envIndex + 1 -lt $Arguments.Count) "Compose pull omitted --env-file."
@@ -58,11 +59,15 @@ function Invoke-MockRuntime {
         Add-Content -LiteralPath $env:TOOLBOX_TEST_RUNTIME_LOG -Value "template-ready-before-pull"
     }
     $global:LASTEXITCODE = 0
+    if (($Arguments -join ' ') -ceq "image inspect $env:TOOLBOX_TEST_MISSING_IMAGE") {
+        $global:LASTEXITCODE = 1
+    }
 }
 
 function Invoke-PullFixture {
-    param([string]$Fixture, [string]$Runtime)
+    param([string]$Fixture, [string]$Runtime, [string]$MissingImage)
     $env:TOOLBOX_TEST_FIXTURE = $Fixture
+    $env:TOOLBOX_TEST_MISSING_IMAGE = $MissingImage
     $env:TOOLBOX_TEST_RUNTIME_LOG = Join-Path $Fixture "runtime.log"
     Set-Content -LiteralPath $env:TOOLBOX_TEST_RUNTIME_LOG -Value "" -NoNewline
     $outputFile = Join-Path $Fixture "pull.log"
@@ -74,9 +79,16 @@ function Invoke-PullFixture {
     }
     Assert-Condition ($LASTEXITCODE -eq 0) "Pull returned a failure."
     $calls = @(Get-Content -LiteralPath $env:TOOLBOX_TEST_RUNTIME_LOG)
-    Assert-Condition (@($calls | Where-Object { $_ -match ' pull ' }).Count -eq 0) 'Cached images must never be pulled.'
-    foreach ($image in @('mcr.microsoft.com/mssql/server:latest', 'docker.io/library/python:latest')) {
-        Assert-Condition ($calls -contains "$Runtime image inspect $image") 'Missing base-image cache inspection.'
+    $pulls = @($calls | Where-Object { $_ -match ' pull ' })
+    if ($MissingImage) {
+        Assert-Condition ($pulls.Count -eq 1 -and $pulls[0] -ceq "$Runtime pull $MissingImage") 'Pull must fetch only the missing image.'
+    } else {
+        Assert-Condition ($pulls.Count -eq 0) 'Cached images must never be pulled.'
+    }
+    foreach ($image in @('mcr.microsoft.com/mssql/server:latest', 'docker.io/library/python:latest',
+            'docker.io/library/node:lts-alpine3.23', 'docker.io/library/node:lts-alpine3.24',
+            'mcr.microsoft.com/azure-storage/azurite:latest', 'docker.io/redis/redisinsight:latest')) {
+        Assert-Condition ($calls -contains "$Runtime image inspect $image") "Missing cache check for $image."
     }
     $output = Get-Content -LiteralPath $outputFile -Raw
     foreach ($secret in @("fixture-secret-never-log", "custom-connection-never-log", "custom-key-never-log")) {
@@ -95,6 +107,9 @@ try {
         $expected = [System.IO.File]::ReadAllText((Join-Path $fresh "containers/.env.example"))
         $created = [System.IO.File]::ReadAllText((Join-Path $fresh "containers/.env"))
         Assert-Condition ($created -ceq $expected) "Fresh .env creation changed template contents."
+        Invoke-PullFixture $fresh $runtime 'docker.io/library/node:lts-alpine3.23'
+        Invoke-PullFixture $fresh $runtime 'mcr.microsoft.com/azure-storage/azurite:latest'
+        Invoke-PullFixture $fresh $runtime 'docker.io/redis/redisinsight:latest'
 
         $stale = New-PullFixture "$runtime stale without final newline"
         $localLines = @(
@@ -128,6 +143,7 @@ try {
     Remove-Item Function:\podman -ErrorAction SilentlyContinue
     $env:TOOLBOX_TEST_RUNTIME_LOG = $previousLog
     $env:TOOLBOX_TEST_FIXTURE = $previousFixture
+    $env:TOOLBOX_TEST_MISSING_IMAGE = $previousMissingImage
     $resolved = [System.IO.Path]::GetFullPath($testRoot)
     $temporaryRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath())
     if ($resolved.StartsWith($temporaryRoot, [System.StringComparison]::OrdinalIgnoreCase) -and

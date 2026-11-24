@@ -55,7 +55,7 @@ and instantiated by the consuming project.
 | Root | Projects |
 | --- | --- |
 | `src/DeveloperToolbox.Java.Example` | Maven core, Functions and Lambda modules; Java 25 |
-| `src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node` | Independent Node 24 SDK, Functions and Lambda package |
+| `src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node` | Independent Node 24/26 SDK checks and Node 24 Functions and Lambda handlers |
 | `src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python` | Independent Python SDK, Functions and Lambda package |
 | `src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client` | Public Next.js 16.4 / React 19.3 example client |
 

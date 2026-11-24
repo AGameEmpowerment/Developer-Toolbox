@@ -25,6 +25,9 @@
 .PARAMETER ContainerRuntime
     Container engine used when host keytool is unavailable. Setup passes its selected engine.
 
+.PARAMETER UseLocalCa
+    Sign the WireMock certificate with the shared local CA. Default validity is 365 days.
+
 .EXAMPLE
     .\Generate-WireMockCert.ps1
     Creates keystore with default password "changeit"
@@ -61,7 +64,10 @@ param(
 
     [Parameter()]
     [ValidateSet("auto", "docker", "podman")]
-    [string]$ContainerRuntime = $(if ($env:CONTAINER_RUNTIME) { $env:CONTAINER_RUNTIME } else { "auto" })
+    [string]$ContainerRuntime = $(if ($env:CONTAINER_RUNTIME) { $env:CONTAINER_RUNTIME } else { "auto" }),
+
+    [Parameter()]
+    [switch]$UseLocalCa
 )
 
 if ($PSVersionTable.PSVersion -lt [version]"5.1") {
@@ -135,6 +141,7 @@ if (-not $keytool) {
 
 $KeyToolKeystorePath = $KeystorePath
 $KeyToolCertPath = $CertPath
+$KeyToolDirectory = $ScriptDir
 $ContainerArguments = @()
 if ($keytool) {
     Write-Host "Using host keytool." -ForegroundColor Cyan
@@ -157,6 +164,7 @@ if ($keytool) {
     Ensure-ToolboxImage -Runtime $ContainerRuntime -Image 'wiremock/wiremock:latest'
     $KeyToolKeystorePath = "/toolbox/certs/wiremock.jks"
     $KeyToolCertPath = "/toolbox/certs/wiremock.crt"
+    $KeyToolDirectory = "/toolbox/certs"
     $mountOptions = if ($ContainerRuntime -eq "podman") { "rw,z" } else { "rw" }
     $ContainerArguments = @("run", "--rm", "--network", "none",
         "--entrypoint", "keytool", "--env", "TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD",
@@ -192,6 +200,49 @@ function Invoke-WireMockKeyTool {
     }
 }
 
+if ($UseLocalCa) {
+    if (-not $PSBoundParameters.ContainsKey('ValidityDays')) { $ValidityDays = 365 }
+    $temporaryName = '.wiremock.' + [Guid]::NewGuid().ToString('N')
+    $temporaryPath = Join-Path $ScriptDir $temporaryName
+    $toolTemporaryPath = "$KeyToolDirectory/$temporaryName"
+    [System.IO.Directory]::CreateDirectory($temporaryPath) | Out-Null
+    $previousPfxPassword = [Environment]::GetEnvironmentVariable('TOOLBOX_LOCAL_HTTPS_PFX_PASSWORD', 'Process')
+    try {
+        $env:TOOLBOX_LOCAL_HTTPS_PFX_PASSWORD = $KeystorePassword
+        $certificateScript = Join-Path $ScriptDir 'New-LocalHttpsCertificate.ps1'
+        & $certificateScript -Action Issue -OutputDirectory $temporaryPath -Name wiremock `
+            -DnsName wiremock,host.docker.internal -ValidityDays $ValidityDays -ContainerRuntime $ContainerRuntime | Out-Null
+        & $certificateScript -Action Trust -OutputDirectory $temporaryPath | Out-Null
+        Invoke-WireMockKeyTool -Arguments @(
+            '-importkeystore', '-noprompt', '-srcalias', 'wiremock',
+            '-srckeystore', "$toolTemporaryPath/wiremock.pfx", '-srcstoretype', 'PKCS12',
+            '-srcstorepass:env', 'TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD',
+            '-destkeystore', "$toolTemporaryPath/wiremock.jks", '-deststoretype', 'JKS',
+            '-deststorepass:env', 'TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD',
+            '-destkeypass:env', 'TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD'
+        )
+        $generatedKeystore = Join-Path $temporaryPath 'wiremock.jks'
+        if (-not (Test-Path -LiteralPath $generatedKeystore -PathType Leaf)) {
+            throw 'WireMock keytool did not create the expected keystore.'
+        }
+        $issuerPath = Join-Path $ScriptDir 'wiremock-ca.crt'
+        Move-Item -LiteralPath $generatedKeystore -Destination $KeystorePath -Force
+        Move-Item -LiteralPath (Join-Path $temporaryPath 'wiremock.crt') -Destination $CertPath -Force
+        Move-Item -LiteralPath (Join-Path $temporaryPath 'root-ca.crt') -Destination $issuerPath -Force
+        Write-Host "WireMock HTTPS keystore: $KeystorePath"
+        Write-Host "WireMock HTTPS trust certificate: $issuerPath"
+        if ($ShowPassword) { Write-Host "Keystore password: $KeystorePassword" }
+    } finally {
+        [Environment]::SetEnvironmentVariable('TOOLBOX_LOCAL_HTTPS_PFX_PASSWORD', $previousPfxPassword, 'Process')
+        foreach ($name in @('wiremock.crt', 'wiremock.key', 'wiremock.pfx', 'wiremock.jks', 'root-ca.crt')) {
+            $path = Join-Path $temporaryPath $name
+            if (Test-Path -LiteralPath $path -PathType Leaf) { Remove-Item -LiteralPath $path -Force }
+        }
+        [System.IO.Directory]::Delete($temporaryPath)
+    }
+    return
+}
+
 # Remove existing files if present
 if (Test-Path $KeystorePath) {
     Remove-Item $KeystorePath -Force
@@ -216,7 +267,7 @@ $genArgs = @(
     "-storetype", "JKS",
     "-storepass:env", "TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD",
     "-keypass:env", "TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD",
-    "-dname", "CN=localhost, OU=Development, O=Local, L=Local, ST=UT, C=US",
+    "-dname", "CN=localhost",
     "-ext", "SAN=dns:localhost,dns:wiremock,dns:host.docker.internal,ip:127.0.0.1"
 )
 
@@ -240,6 +291,10 @@ $exportArgs = @(
 
 Invoke-WireMockKeyTool -Arguments $exportArgs
 if (-not (Test-Path -LiteralPath $CertPath)) { throw "WireMock keytool did not export the expected certificate." }
+$legacyIssuerPath = Join-Path $ScriptDir 'wiremock-ca.crt'
+if (Test-Path -LiteralPath $legacyIssuerPath -PathType Leaf) {
+    Remove-Item -LiteralPath $legacyIssuerPath -Force
+}
 
 Write-Host "Certificate exported: $CertPath" -ForegroundColor Green
 

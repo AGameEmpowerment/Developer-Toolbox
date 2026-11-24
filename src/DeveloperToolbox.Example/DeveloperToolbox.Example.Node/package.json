@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/functions/*.mjs",
   "engines": {
-    "node": "24.x"
+    "node": "24.x || 26.x"
   },
   "scripts": {
     "test": "vitest run --testTimeout=60000",
@@ -13,22 +13,22 @@
     "verify": "vitest run"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "3.1149.0",
-    "@aws-sdk/client-eventbridge": "3.1149.0",
-    "@aws-sdk/client-s3": "3.1149.0",
-    "@aws-sdk/client-sns": "3.1149.0",
-    "@aws-sdk/client-sqs": "3.1149.0",
+    "@aws-sdk/client-dynamodb": "3.1161.0",
+    "@aws-sdk/client-eventbridge": "3.1161.0",
+    "@aws-sdk/client-s3": "3.1161.0",
+    "@aws-sdk/client-sns": "3.1161.0",
+    "@aws-sdk/client-sqs": "3.1161.0",
     "@azure/cosmos": "4.10.1",
     "@azure/data-tables": "13.3.2",
-    "@azure/functions": "4.16.5",
+    "@azure/functions": "4.17.0",
     "@azure/service-bus": "7.10.0",
     "@azure/storage-blob": "12.34.0",
     "@azure/storage-queue": "12.32.0",
     "amqplib": "2.2.0",
-    "nodemailer": "10.1.0",
-    "redis": "6.3.0"
+    "nodemailer": "10.3.1",
+    "redis": "6.3.1"
   },
   "devDependencies": {
-    "vitest": "5.0.3"
+    "vitest": "5.0.5"
   }
 }

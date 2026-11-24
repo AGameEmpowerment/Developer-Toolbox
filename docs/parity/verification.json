@@ -1,7 +1,7 @@
 {
   "date": "2026-10-27",
   "baseCommit": "66f452566f589a05c520d2679b320d020284d5f5",
-  "referenceCommit": "618951fbd522f1a52ea68af130512cc5931a536a",
+  "referenceCommit": null,
   "sourceState": "Committed code/test baseline on codex/toolbox-resource-parity; execution receipts retain their original pre-commit source provenance.",
   "coverage": "unavailable; no measured coverage report collected",
   "images": [

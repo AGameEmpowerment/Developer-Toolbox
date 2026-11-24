@@ -49,15 +49,17 @@ Executed on **2026-10-27** with clean tracked source trees:
 
 | Project | Exact tested source commit |
 | --- | --- |
-| Reference | `618951fbd522f1a52ea68af130512cc5931a536a` |
+| Reference | Omitted from the public receipt |
 | Personal | `c7b0c8c0161edcc79cb9e29d0652dbcee6f1dabc` |
 
 The [machine-readable evidence](container-comparison.json) includes SHA-256
 hashes for 70 source inputs per project, built validator assembly hashes,
 container image IDs, states, health, job exit codes, restart counts, per-check
-results, OIDC receipts and cleanup checks. Hashes describe checkout bytes at
-those commits; ignored credentials, certificates and generated settings are
-excluded. Absolute checkout and output paths use role placeholders.
+results, OIDC receipts and cleanup checks. The reference repository and commit
+identifiers are omitted. Absolute checkout and output paths, identifying
+reference project path components and the reference OIDC local image name use
+placeholders. Source hashes describe the original checkout bytes, excluding
+ignored credentials, certificates and generated settings.
 
 Host tools were Docker Engine **29.9.2** on Linux/AMD64, PowerShell **7.6.5**,
 .NET SDK **10.0.402**, and Python **3.15.1**. BuildKit reused cached layers and

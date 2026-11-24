@@ -29,12 +29,13 @@
     "sharedData": "Original named volumes retained across both default deployments",
     "credentials": "Personal PostgreSQL/RabbitMQ process settings matched retained volume credentials; neither dotenv file was replaced",
     "imagePolicy": "Existing latest images reused; missing-only preparation; BuildKit cache permitted; no pinned-image workaround",
-    "paths": "Absolute checkout/output paths replaced with role placeholders; no credentials, tokens or application payloads included"
+    "paths": "Absolute checkout and output paths and identifying reference project path components use placeholders. The reference OIDC image tag uses a placeholder for its local image name.",
+    "redactions": "Reference repository and commit identifiers are omitted. Hashes describe the original bytes. The receipt excludes credentials, tokens and application payloads."
   },
   "projects": {
     "reference": {
       "source": {
-        "commit": "618951fbd522f1a52ea68af130512cc5931a536a",
+        "commit": null,
         "trackedTreeClean": true,
         "hashMethod": "SHA-256 of checkout bytes; excludes ignored settings, certificates and build outputs",
         "inputs": [
@@ -215,91 +216,91 @@
             "sha256": "ea3d7739ffa516bf364d3fb17a527cebd82c844c29219e962f4b030ce90a285f"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.App/Edu.Si.Example.App.csproj",
+            "path": "src/<reference-example>/<app-project>/<app-project>.csproj",
             "sha256": "3239df86bd94e0c08cd0c429f9e74a2367576e3efd54e9b3c680e28d37ad505b"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.App/LiveValidation.cs",
+            "path": "src/<reference-example>/<app-project>/LiveValidation.cs",
             "sha256": "2b5712ec38aca09648262bef9bccbb36e70238255055aa5dce346e006784b5c8"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.App/Program.cs",
+            "path": "src/<reference-example>/<app-project>/Program.cs",
             "sha256": "c6adb4edf407b2e01bda9c6e82a9518379a51cf0ae8ca022505a385f541f5c8b"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.App/SampleApplication.cs",
+            "path": "src/<reference-example>/<app-project>/SampleApplication.cs",
             "sha256": "4d76d868eed701afb42a742f5452a7270a4d9528f4672b442ecb7ba0b73862be"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.App/ToolboxEnvironment.cs",
+            "path": "src/<reference-example>/<app-project>/ToolboxEnvironment.cs",
             "sha256": "21389fdad46e502353dbb2904393138cffbb5a770e9f5345f613c1160923b1ea"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/DatabaseRegistration.cs",
+            "path": "src/<reference-example>/<data-project>/DatabaseRegistration.cs",
             "sha256": "87d381ef8b3f621ab9cab1f9e4770858bc6ab0fbec62a98157daf0b250909000"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/DatabaseSamples.cs",
+            "path": "src/<reference-example>/<data-project>/DatabaseSamples.cs",
             "sha256": "bdf0f239b5e49c84d56057523a4d7b45e3da0158100e5e7d60209105d55e7e73"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/Edu.Si.Example.Data.csproj",
+            "path": "src/<reference-example>/<data-project>/<data-project>.csproj",
             "sha256": "3bd8f93bc3325cd09db9a06cfb0b7d8412b4889eff5b6a734d6551b8c79887bd"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/IDatabaseSamples.cs",
+            "path": "src/<reference-example>/<data-project>/IDatabaseSamples.cs",
             "sha256": "d314bec0abc7806686ec15bd5973e3d73e5e22bab6bfac9263d5bc9a9ea35748"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/SampleContexts.cs",
+            "path": "src/<reference-example>/<data-project>/SampleContexts.cs",
             "sha256": "a9cc84323440d97d78c612ea6470bca0cd0a6d9d2857f44a4c4dacb6f4d7309c"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Data/SampleMessage.cs",
+            "path": "src/<reference-example>/<data-project>/SampleMessage.cs",
             "sha256": "37b3b5027373a5ba5cf52a3d8fa9a2ff9cb17a56a08728f10ba3d849aece8642"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Lib/Dependency.cs",
+            "path": "src/<reference-example>/<lib-project>/Dependency.cs",
             "sha256": "f65ec72ce97a02d09ff30d765a8ae7393733a8f13d5bf45253a2be94f2ee0340"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Lib/Edu.Si.Example.Lib.csproj",
+            "path": "src/<reference-example>/<lib-project>/<lib-project>.csproj",
             "sha256": "61e3f2d043e37f0db4be1d8083dd31bebbfbb8fde2cf027327db2556c16bc385"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/Edu.Si.Example.Messaging.csproj",
+            "path": "src/<reference-example>/<messaging-project>/<messaging-project>.csproj",
             "sha256": "b065bce38c968c59a1ea5246bfeba294914e1a9ade57741dab4461dc94f7892c"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/IMessagingSamples.cs",
+            "path": "src/<reference-example>/<messaging-project>/IMessagingSamples.cs",
             "sha256": "387d5a08eed94d08b9057683bbefc0e2d99e768882ef8329ef638e5f0ea25261"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/LocalServiceBusConnection.cs",
+            "path": "src/<reference-example>/<messaging-project>/LocalServiceBusConnection.cs",
             "sha256": "0b82bbbe092439d3b438881fc8daf6bc31a1c3cb49b28d054e81e805c6f03212"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/MessagingSamples.cs",
+            "path": "src/<reference-example>/<messaging-project>/MessagingSamples.cs",
             "sha256": "115b13d86c7ac3fcefe05e9e126c81b86c75d26dce5f23c92723e439ce7c9893"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Messaging/ServiceBusValidationSamples.cs",
+            "path": "src/<reference-example>/<messaging-project>/ServiceBusValidationSamples.cs",
             "sha256": "341dc5151bf287903a3c56124162fae76ebbfd77e210c33013d1ddbe1cff3e5c"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Resources/AssemblyInfo.cs",
+            "path": "src/<reference-example>/<resources-project>/AssemblyInfo.cs",
             "sha256": "8c1832c6fe44ddcddcc5d9ebee260848a8f2483d78af26214829ce209a957302"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Resources/Edu.Si.Example.Resources.csproj",
+            "path": "src/<reference-example>/<resources-project>/<resources-project>.csproj",
             "sha256": "e9dda49f3f313f226395864b8130555d2d3b118b31ae5a6cbc7905d912c1ed79"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Resources/IResourceSamples.cs",
+            "path": "src/<reference-example>/<resources-project>/IResourceSamples.cs",
             "sha256": "1d5784e983ed846618424272bb1d78f5bf65eaa7899af0be02acfc3b2623bd46"
           },
           {
-            "path": "src/Edu.Si.Example/Edu.Si.Example.Resources/ResourceSamples.cs",
+            "path": "src/<reference-example>/<resources-project>/ResourceSamples.cs",
             "sha256": "399a3012c83ded87d398e7f08ed227c9f22da3c89be5c35452ff05a2c684a332"
           },
           {
@@ -331,12 +332,12 @@
         "configuration": "Release",
         "status": "passed",
         "restore": false,
-        "assembly": "src/Edu.Si.Example/Edu.Si.Example.App/bin/Release/net10.0/Edu.Si.Example.App.dll",
+        "assembly": "src/<reference-example>/<app-project>/bin/Release/net10.0/<app-project>.dll",
         "sha256": "a528168b9b2a9c06034456c00fac2b6fa9832d2e8c112ee96277ae84c01a30c2"
       },
       "sharedChecks": {
         "label": "reference",
-        "sourceCommit": "618951fbd522f1a52ea68af130512cc5931a536a",
+        "sourceCommit": null,
         "startedAt": "2026-10-27T23:04:09.783243+00:00",
         "resources": [
           {
@@ -916,9 +917,9 @@
         "completedAtUtc": "2026-10-27T23:13:04.7249569+00:00",
         "sources": [
           {
-            "commit": "618951fbd522f1a52ea68af130512cc5931a536a",
+            "commit": null,
             "dirty": false,
-            "repository": "Edu-Developer-Toolbox",
+            "repository": "reference",
             "inputHashes": [
               {
                 "path": "tests/test_oidc_startup.ps1",
@@ -973,8 +974,8 @@
           "platform": "linux/amd64",
           "baseId": "sha256:dd8a00f44b0a2c8058261b4b336cdd963b0cb51cb580c1406b38f6956f4863bc",
           "addedLayers": 2,
-          "baseReference": "localhost/edu-oidc-keycloak:latest",
-          "sourceRevisionLabel": "618951fbd522f1a52ea68af130512cc5931a536a",
+          "baseReference": "<reference-oidc-image>:latest",
+          "sourceRevisionLabel": null,
           "contractVersion": "1"
         },
         "profile": {
@@ -989,7 +990,7 @@
         "command": {
           "readinessTimeoutSeconds": 180,
           "outputPath": "<personal-root>\\artifacts\\container-comparison-2026-10-27\\reference-oidc",
-          "imageName": "localhost/edu-oidc-keycloak:latest",
+          "imageName": "<reference-oidc-image>:latest",
           "executable": "pwsh",
           "upstreamImage": "quay.io/keycloak/keycloak:latest",
           "derivedImageName": "",

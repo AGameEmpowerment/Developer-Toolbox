@@ -14,9 +14,10 @@ post_date: 2026-10-12
 ## Run the SDK examples
 
 These are local developer support examples, not production deployment templates.
-Node.js 24 matches the supported
+Run local SDK checks and handler tests with Node.js 24 or 26. Use Node.js 24 for the
 [Azure Functions runtime](https://learn.microsoft.com/azure/azure-functions/functions-versions)
 and [AWS Lambda runtime](https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html).
+In a Bash terminal in the Toolbox devcontainer, run `nvm use 24` to switch to that version.
 The SDKs are installed from the public npm registry; this project needs no private
 registry credentials.
 

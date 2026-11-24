@@ -301,87 +301,39 @@ foreach ($group in $SharedGroups) {
 Write-Host "`n=== WireMock Certificate Setup ===" -ForegroundColor Cyan
 
 $WireMockKeystore = Join-Path $CertsDir "wiremock.jks"
+$localCaDir = if ($env:TOOLBOX_LOCAL_CA_DIR) {
+    $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($env:TOOLBOX_LOCAL_CA_DIR)
+} else {
+    Join-Path $ContainersDir '.local-ca'
+}
+$WireMockRoot = Join-Path $localCaDir 'root-ca.crt'
+$WireMockIssuer = Join-Path $CertsDir "wiremock-ca.crt"
 $GenerateCertScript = Join-Path $CertsDir "Generate-WireMockCert.ps1"
+$wireMockUsesLocalCa = (Test-Path -LiteralPath $WireMockRoot -PathType Leaf) -and
+    (Test-Path -LiteralPath $WireMockIssuer -PathType Leaf) -and
+    ((Get-FileHash -LiteralPath $WireMockRoot).Hash -eq (Get-FileHash -LiteralPath $WireMockIssuer).Hash)
 
-if (-not (Test-Path $WireMockKeystore) -or $EnvFileJustCreated -or $script:ToolboxGeneratedWireMockPassword) {
-    if (Test-Path $GenerateCertScript) {
-        Write-Host "Generating WireMock TLS certificate..." -ForegroundColor Yellow
-        $EnvPassword = Get-ToolboxWireMockPassword -EnvFile $EnvFile -ContainerRuntime $ContainerCli
-        if (-not $EnvPassword) { throw "Configure WIREMOCK_KEYSTORE_PASSWORD in containers/.env before generating certificates." }
-        $previousKeystorePassword = [Environment]::GetEnvironmentVariable("TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD", "Process")
-        try {
-            $env:TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD = $EnvPassword
-            & $GenerateCertScript -ContainerRuntime $ContainerCli -Force
-        } finally {
-            [Environment]::SetEnvironmentVariable("TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD", $previousKeystorePassword, "Process")
-        }
-        Write-Host "WireMock certificate generated using the configured keystore password." -ForegroundColor Green
-    } else {
-        Write-Warning "WireMock certificate script not found at: $GenerateCertScript"
+if (-not (Test-Path -LiteralPath $WireMockKeystore -PathType Leaf) -or -not $wireMockUsesLocalCa -or
+    $EnvFileJustCreated -or $script:ToolboxGeneratedWireMockPassword) {
+    if (-not (Test-Path -LiteralPath $GenerateCertScript -PathType Leaf)) {
+        throw "WireMock certificate script not found at: $GenerateCertScript"
     }
+    Write-Host "Generating WireMock TLS certificate..." -ForegroundColor Yellow
+    $EnvPassword = Get-ToolboxWireMockPassword -EnvFile $EnvFile -ContainerRuntime $ContainerCli
+    if (-not $EnvPassword) { throw "Configure WIREMOCK_KEYSTORE_PASSWORD in containers/.env before generating certificates." }
+    $previousKeystorePassword = [Environment]::GetEnvironmentVariable("TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD", "Process")
+    try {
+        $env:TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD = $EnvPassword
+        & $GenerateCertScript -ContainerRuntime $ContainerCli -UseLocalCa -Force
+    } finally {
+        [Environment]::SetEnvironmentVariable("TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD", $previousKeystorePassword, "Process")
+    }
+    Write-Host "WireMock certificate generated using the configured keystore password." -ForegroundColor Green
 } else {
-    Write-Host "WireMock keystore already exists. Skipping certificate generation." -ForegroundColor Gray
+    Write-Host "WireMock keystore already uses the local development CA." -ForegroundColor Gray
 }
 
-# Import certificate to Windows trusted root store for automatic trust (Windows only)
-$WireMockCert = Join-Path $CertsDir "wiremock.crt"
-if (Test-Path $WireMockCert) {
-    # Always attempt to import to Windows certificate store on Windows
-    if ($isWindowsPlatform) {
-        Write-Host "Importing WireMock certificate to Windows trusted root store..." -ForegroundColor Yellow
-
-        try {
-            # Load the certificate file so we can compare its thumbprint with any existing trusted certs
-            $fileCert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 $WireMockCert
-        } catch {
-            Write-Warning "Failed to load WireMock certificate from '$WireMockCert': $_"
-            Write-Warning "Skipping trusted root import check. You may need to manually trust the certificate."
-            $fileCert = $null
-        }
-
-        # Find any existing WireMock certificates in the CurrentUser\Root store by subject
-        $existingCerts = Get-ChildItem -Path Cert:\CurrentUser\Root | Where-Object { $_.Subject -like "*CN=localhost*OU=Development*" }
-
-        if ($fileCert -and $existingCerts) {
-            # Check if any existing certificate has the same thumbprint as the file
-            $matchingCert = $existingCerts | Where-Object { $_.Thumbprint -eq $fileCert.Thumbprint }
-        } else {
-            $matchingCert = $null
-        }
-
-        if ($matchingCert) {
-            Write-Host "WireMock certificate already trusted in CurrentUser\Root store." -ForegroundColor Gray
-            Write-Host "  Thumbprint: $($fileCert.Thumbprint)" -ForegroundColor Gray
-        } else {
-            if ($existingCerts) {
-                Write-Host "Existing WireMock certificate(s) with subject 'CN=localhost, OU=Development' found with different thumbprint. Removing stale certificate(s)..." -ForegroundColor Yellow
-                foreach ($old in $existingCerts) {
-                    try {
-                        Remove-Item -Path "Cert:\CurrentUser\Root\$($old.Thumbprint)" -Force
-                        Write-Host "  Removed old WireMock certificate with thumbprint $($old.Thumbprint)" -ForegroundColor Gray
-                    } catch {
-                        Write-Warning "  Failed to remove old WireMock certificate with thumbprint $($old.Thumbprint): $_"
-                    }
-                }
-            }
-
-            try {
-                $cert = Import-Certificate -FilePath $WireMockCert -CertStoreLocation Cert:\CurrentUser\Root
-                Write-Host "Certificate imported to CurrentUser\Root store." -ForegroundColor Green
-                Write-Host "  Thumbprint: $($cert.Thumbprint)" -ForegroundColor Gray
-            } catch {
-                Write-Warning "Failed to import certificate to trusted store: $_"
-                Write-Warning "You may need to run as Administrator or manually trust the certificate."
-                Write-Host "  Manual import: Import-Certificate -FilePath '$WireMockCert' -CertStoreLocation Cert:\CurrentUser\Root" -ForegroundColor Gray
-            }
-        }
-    } else {
-        Write-Host "WireMock certificate generated at: $WireMockCert" -ForegroundColor Gray
-        Write-Host "To trust the certificate on Linux/macOS, you may need to add it to your system's CA trust store." -ForegroundColor Yellow
-    }
-} else {
-    Write-Warning "WireMock certificate not found. HTTPS clients may not trust the server."
-}
+Write-Host "Use this CA file in local HTTPS clients: $WireMockRoot" -ForegroundColor Gray
 #endregion
 
 #region Container Services

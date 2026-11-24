@@ -115,6 +115,8 @@ def isolated_definition(rendered, project, images, resources):
         service.pop("build", None)
         service.pop("depends_on", None)
         service.pop("links", None)
+        service.pop("cpus", None)
+        service.pop("mem_reservation", None)
         if name in images:
             service["image"] = images[name]
             service["pull_policy"] = "never"

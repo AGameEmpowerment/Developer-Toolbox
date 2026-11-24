@@ -42,6 +42,8 @@ class SharedDefinitionTests(unittest.TestCase):
 class BuiltImageTests(unittest.TestCase):
     def test_uses_owning_cloud_project_for_docker_and_podman_image_names(self):
         for service, project in (("mssql", "dev_azure_shared"),
+                                 ("azurite", "dev_azure_shared"),
+                                 ("redisinsight", "dev_common_shared"),
                                  ("aws-emulator", "dev_aws_shared")):
             for separator in ("-", "_"):
                 expected = project + separator + service

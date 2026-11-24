@@ -38,6 +38,9 @@ class SourcePortTests(unittest.TestCase):
             "fest" + "ack",
             "ic" + "s-eng",
             "ch" + "urchofjesuschrist",
+            "edu" + "-developer-toolbox",
+            "edu" + "-oidc-keycloak",
+            "edu" + ".si.example",
             "art" + "ifactory",
             "sonar" + "qube",
         )
@@ -47,6 +50,7 @@ class SourcePortTests(unittest.TestCase):
             REPOSITORY_ROOT / "containers",
             REPOSITORY_ROOT / ".devcontainer",
             REPOSITORY_ROOT / "setup",
+            REPOSITORY_ROOT / "docs" / "parity",
         )
         text_extensions = {
             ".css",

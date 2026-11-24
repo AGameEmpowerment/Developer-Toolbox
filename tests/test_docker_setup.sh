@@ -20,7 +20,7 @@ new_fixture() {
     local fixture="${TEST_ROOT}/$1"
     mkdir -p "${fixture}/.devcontainer"
     cp "${REPO_ROOT}/.devcontainer/ensure_image.sh" "${fixture}/.devcontainer/"
-    mkdir -p "${fixture}/containers/certs"
+    mkdir -p "${fixture}/containers/certs" "${fixture}/containers/.local-ca"
     cp "${REPO_ROOT}/docker_setup.sh" "$fixture/"
     cp "${REPO_ROOT}/docker_pull.sh" "$fixture/"
     cp "${REPO_ROOT}/docker_down.sh" "$fixture/"
@@ -29,8 +29,18 @@ new_fixture() {
     for group in common azure aws; do
         cp "${REPO_ROOT}/containers/docker-compose-${group}.yml" "${fixture}/containers/"
     done
-    # Deliberately omit the CRT/generator to keep certificate stores and keytool untouched.
+    # Use fixture certificates and a stub generator to keep setup offline.
+    printf 'fixture root\n' > "${fixture}/containers/.local-ca/root-ca.crt"
+    cp "${fixture}/containers/.local-ca/root-ca.crt" "${fixture}/containers/certs/wiremock-ca.crt"
     printf 'fake-keystore\n' > "${fixture}/containers/certs/wiremock.jks"
+    cat > "${fixture}/containers/certs/generate-wiremock-cert.sh" <<'MOCK'
+#!/usr/bin/env bash
+set -euo pipefail
+[[ " $* " == *" --local-ca "* && -n "${TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD:-}" ]]
+certs="$(dirname "$0")"
+cp "$certs/../.local-ca/root-ca.crt" "$certs/wiremock-ca.crt"
+printf 'generated-keystore\n' > "$certs/wiremock.jks"
+MOCK
     printf '%s\n' 'TOOLBOX_FUTURE_SETTING="${RABBITMQ_DEFAULT_USER}/literal#value"' >> "${fixture}/containers/.env.example"
     printf '%s' "$fixture"
 }
@@ -53,6 +63,11 @@ cat > "${mock_bin}/docker" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
 printf '%s\n' "$*" >> "$TOOLBOX_TEST_RUNTIME_LOG"
+if [[ "${!#}" == password ]]; then
+    until [[ "$1" == -f ]]; do shift; done
+    printf 'fixture-password' > "$(dirname "$2")/value"
+    exit 0
+fi
 if [[ "${1:-}" == image && "$*" == *--format* ]]; then echo 17.0.5035.5; exit 0; fi
 if [[ "$1" == volume && "$2" == inspect && "${TOOLBOX_TEST_VOLUMES_EXIST:-false}" != true ]]; then exit 1; fi
 if [[ "$1" == volume && "$2" == create && "${!#}" == "${TOOLBOX_TEST_FAILED_VOLUME:-}" ]]; then exit 23; fi
@@ -65,6 +80,11 @@ cat > "${mock_bin}/podman" <<'MOCK'
 #!/usr/bin/env bash
 set -euo pipefail
 printf '%s\n' "$*" >> "$TOOLBOX_TEST_RUNTIME_LOG"
+if [[ "${!#}" == password ]]; then
+    until [[ "$1" == -f ]]; do shift; done
+    printf 'fixture-password' > "$(dirname "$2")/value"
+    exit 0
+fi
 if [[ "${1:-}" == image && "$*" == *--format* ]]; then echo 17.0.5035.5; exit 0; fi
 if [[ "$1" == volume && "$2" == inspect && "${TOOLBOX_TEST_VOLUMES_EXIST:-false}" != true ]]; then exit 1; fi
 if [[ "$1" == volume && "$2" == create && "${!#}" == "${TOOLBOX_TEST_FAILED_VOLUME:-}" ]]; then exit 23; fi
@@ -87,12 +107,25 @@ run_setup() {
         bash "${fixture}/docker_setup.sh" --runtime "$runtime" > "${fixture}/setup.log" 2>&1
 }
 
+expected_node_ca_path() {
+    local path
+    path="$(cd -- "$1/containers/.local-ca" && pwd -P)/root-ca.crt"
+    case "$(uname -s)" in
+        MINGW*|MSYS*|CYGWIN*) cygpath -m "$path" ;;
+        *) printf '%s\n' "$path" ;;
+    esac
+}
+
 create="$(new_fixture 'create with spaces')"
 run_setup "$create" || fail "Creating .env failed."
 assert_template_settings "$create"
-grep -Ev '^(MSSQL_SA_PASSWORD|POSTGRES_PASSWORD|RABBITMQ_DEFAULT_PASS|SEQ_STORAGE_SECRETKEY|WIREMOCK_KEYSTORE_PASSWORD)=' "${create}/containers/.env.example" > "${create}/expected-settings"
-grep -Ev '^(MSSQL_SA_PASSWORD|POSTGRES_PASSWORD|RABBITMQ_DEFAULT_PASS|SEQ_STORAGE_SECRETKEY|WIREMOCK_KEYSTORE_PASSWORD)=' "${create}/containers/.env" > "${create}/actual-settings"
+generated_settings='^(MSSQL_SA_PASSWORD|POSTGRES_PASSWORD|RABBITMQ_DEFAULT_PASS|SEQ_STORAGE_SECRETKEY|WIREMOCK_KEYSTORE_PASSWORD|NODE_EXTRA_CA_CERTS)='
+grep -Ev "$generated_settings|^$" "${create}/containers/.env.example" > "${create}/expected-settings"
+grep -Ev "$generated_settings|^$" "${create}/containers/.env" > "${create}/actual-settings"
 cmp -s "${create}/expected-settings" "${create}/actual-settings" || fail "Creating .env changed template assignments."
+created_ca_path="$(expected_node_ca_path "$create")"
+grep -Fxq "NODE_EXTRA_CA_CERTS=\"$created_ca_path\"" "$create/containers/.env" || \
+    fail 'Initial setup did not configure Node to use the local CA.'
 for key in MSSQL_SA_PASSWORD POSTGRES_PASSWORD RABBITMQ_DEFAULT_PASS SEQ_STORAGE_SECRETKEY WIREMOCK_KEYSTORE_PASSWORD; do
     value="$(sed -n "s/^${key}=\"\([^\"]*\)\"\r\{0,1\}$/\1/p" "${create}/containers/.env")"
     [[ -n "$value" && "$value" != auto ]] || fail "A managed local credential remained blank or auto."
@@ -162,16 +195,9 @@ run_setup "$migrate" || fail "Repeating setup failed."
 cmp -s "${migrate}/first-migration.env" "${migrate}/containers/.env" || fail "A second setup changed migrated .env."
 
 node_certificate="$(new_fixture 'custom Node certificate')"
-mkdir -p "${node_certificate}/trusted-certs"
-printf 'fixture certificate\n' > "${node_certificate}/trusted-certs/wiremock.crt"
-printf 'fixture certificate\n' > "${node_certificate}/containers/certs/wiremock.crt"
-# Redirect the operating-system trust directory into the disposable fixture.
-sed "s|/usr/local/share/ca-certificates|${node_certificate}/trusted-certs|g" \
-    "${node_certificate}/docker_setup.sh" > "${node_certificate}/setup-with-fixture-trust.sh"
 printf '%s\n' 'WIREMOCK_KEYSTORE_PASSWORD="local-keystore-password"' \
     'NODE_EXTRA_CA_CERTS=""' 'export NODE_EXTRA_CA_CERTS = '\''/developer/custom-ca.crt'\''' \
     > "${node_certificate}/containers/.env"
-mv "${node_certificate}/setup-with-fixture-trust.sh" "${node_certificate}/docker_setup.sh"
 run_setup "$node_certificate" || fail 'Custom Node certificate setup failed.'
 [[ "$(grep -E '^[[:space:]]*(export[[:space:]]+)?NODE_EXTRA_CA_CERTS[[:space:]]*=' \
     "${node_certificate}/containers/.env" | tail -1)" == "export NODE_EXTRA_CA_CERTS = '/developer/custom-ca.crt'" ]] || \
@@ -183,6 +209,16 @@ printf '%s\n' 'WIREMOCK_KEYSTORE_PASSWORD="local-keystore-password"' \
 run_setup "$node_certificate" || fail 'Leading-hash Node certificate setup failed.'
 grep -Fxq 'NODE_EXTRA_CA_CERTS=#developer-ca.crt' "${node_certificate}/containers/.env" || \
     fail 'Setup replaced a leading-hash custom Node certificate path.'
+
+printf 'WIREMOCK_KEYSTORE_PASSWORD="local-keystore-password"\nNODE_EXTRA_CA_CERTS="%s"\n' \
+    "$node_certificate/containers/certs/wiremock.crt" > "$node_certificate/containers/.env"
+printf 'previous CA\n' > "$node_certificate/containers/certs/wiremock-ca.crt"
+run_setup "$node_certificate" || fail 'Local CA migration failed.'
+node_ca_root="$(expected_node_ca_path "$node_certificate")"
+grep -Fxq "NODE_EXTRA_CA_CERTS=\"$node_ca_root\"" \
+    "$node_certificate/containers/.env" || fail 'Setup did not update the old generated trust path.'
+grep -Fxq 'generated-keystore' "$node_certificate/containers/certs/wiremock.jks" || \
+    fail 'Setup did not reissue the WireMock certificate after the CA changed.'
 
 legacy_endpoint="$(new_fixture 'legacy AWS default endpoint')"
 printf '%s\n' 'export TOOLBOX_CONTAINER_AWS_ENDPOINT="http://localstack:4566"' > "${legacy_endpoint}/containers/.env"

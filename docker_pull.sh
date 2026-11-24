@@ -1,10 +1,8 @@
 #!/bin/bash
 # Pull container images required by the shared development stack.
 #
-# Image-based services, including PostgreSQL and DynamoDB Local, are declared in
-# containers/docker-compose-{common,azure,aws}.yml, so the selected runtime pulls them
-# directly. The local SQL Server service is built from containers/mssql, so we
-# also pull its base image explicitly.
+# Read service images and Node wrapper build inputs from the Compose files.
+# Prepare the other Dockerfile inputs explicitly.
 
 if [ -z "${BASH_VERSION:-}" ]; then
     echo "Missing dependency: Bash 3.2 or later is required. Run this script with bash, not sh." >&2
@@ -187,7 +185,10 @@ fi
 source "${SCRIPT_DIR}/.devcontainer/ensure_image.sh"
 images=()
 for group in common azure aws; do
-    while IFS= read -r image; do images+=("$image"); done < <(sed -nE 's/^[[:space:]]+image:[[:space:]]*([^[:space:]]+).*/\1/p' "${SCRIPT_DIR}/containers/docker-compose-${group}.yml")
+    while IFS= read -r image; do
+        images+=("$image")
+    done < <(sed -nE 's/^[[:space:]]+(image|UPSTREAM_IMAGE|NODE_RUNTIME_IMAGE):[[:space:]]*([^[:space:]]+).*/\2/p' \
+        "${SCRIPT_DIR}/containers/docker-compose-${group}.yml")
 done
 images+=(mcr.microsoft.com/mssql/server:latest docker.io/library/python:latest)
 while IFS= read -r image; do ensure_toolbox_image "$CONTAINER_CLI" "$image" || exit 1; done < <(printf '%s\n' "${images[@]}" | sort -u)
