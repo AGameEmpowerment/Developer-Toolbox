@@ -58,7 +58,7 @@ jobs:
 
             - name: Run Bash bootstrap tests
               shell: bash
-              run: ./tests/test_toolbox_bootstrap.sh
+              run: bash ./tests/test_toolbox_bootstrap.sh
 
     powershell-bootstrap:
         name: PowerShell bootstrap tests (${{ matrix.os }})

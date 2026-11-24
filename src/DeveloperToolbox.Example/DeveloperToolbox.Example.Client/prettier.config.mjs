@@ -5,6 +5,12 @@ const prettierConfig = {
   semi: true,
   singleQuote: false,
   endOfLine: "crlf",
+  overrides: [
+    {
+      files: "package.json",
+      options: { endOfLine: "lf" },
+    },
+  ],
 };
 
 export default prettierConfig;

@@ -60,18 +60,20 @@ exit /b 1
 '@
         Set-Content -LiteralPath (Join-Path $mockBin "devcontainer.cmd") -Value '@echo %*'
     } else {
-        Set-Content -LiteralPath (Join-Path $mockBin "docker") -Value @'
-#!/usr/bin/env bash
-exit 1
-'@
-        Set-Content -LiteralPath (Join-Path $mockBin "podman") -Value @'
-#!/usr/bin/env bash
-[[ "$1" == "info" || "$1" == "image" ]]
-'@
-        Set-Content -LiteralPath (Join-Path $mockBin "devcontainer") -Value @'
-#!/usr/bin/env bash
-printf '%s\n' "$*"
-'@
+        # Write individual lines so Linux uses LF even when Git checks out this test with CRLF.
+        $shebang = '#!/usr/bin/env bash'
+        Set-Content -LiteralPath (Join-Path $mockBin "docker") -Encoding ascii -Value @(
+            $shebang
+            'exit 1'
+        )
+        Set-Content -LiteralPath (Join-Path $mockBin "podman") -Encoding ascii -Value @(
+            $shebang
+            '[[ "$1" == "info" || "$1" == "image" ]]'
+        )
+        Set-Content -LiteralPath (Join-Path $mockBin "devcontainer") -Encoding ascii -Value @(
+            $shebang
+            'printf ''%s\n'' "$*"'
+        )
         foreach ($commandName in @("docker", "podman", "devcontainer")) {
             & chmod u+x -- (Join-Path $mockBin $commandName)
             if ($LASTEXITCODE -ne 0) {

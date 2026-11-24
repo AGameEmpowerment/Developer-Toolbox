@@ -60,6 +60,8 @@ def rendered(short=False):
     services["mssql"]["build"] = {"context": "shared-mssql"}
     services["aws-emulator"]["build"] = {"context": "shared-aws"}
     services["aws-init"]["build"] = {"context": "shared-aws"}
+    services["azurite"].pop("image")
+    services["azurite"]["build"] = {"context": "shared-node-runtime"}
     services["function-app"] = {"image": "sample-application", "container_name": "SharedSample"}
     return {"services": services,
             "volumes": {source: {"name": "dev_common_shared_" + source, "external": True} for source, _ in MOUNTS.values()},
@@ -69,7 +71,8 @@ def rendered(short=False):
 def definition(short=False, include_cosmos=False):
     resources = host.select_resources("csharp", include_cosmos=include_cosmos)
     return host.isolated_definition(rendered(short), PROJECT,
-                                    {"mssql": "built-mssql", "aws-emulator": "built-moto"}, resources)
+                                    {"mssql": "built-mssql", "aws-emulator": "built-moto",
+                                     "azurite": "built-azurite"}, resources)
 
 
 class IsolationTests(unittest.TestCase):
@@ -269,6 +272,41 @@ class IsolationTests(unittest.TestCase):
 
 
 class HostRunnerTests(unittest.TestCase):
+    def test_host_fixture_starts_azurite_from_its_local_compose_image(self):
+        source = rendered()
+        image = "dev_azure_shared-azurite"
+
+        def engine(_runtime, *arguments, **_kwargs):
+            if "up" in arguments:
+                path = Path(arguments[arguments.index("-f") + 1])
+                service = json.loads(path.read_text(encoding="utf-8"))["services"]["azurite"]
+                self.assertEqual(service["image"], image)
+                self.assertEqual(service["pull_policy"], "never")
+                self.assertNotIn("build", service)
+
+        completed = subprocess.CompletedProcess([], 0, json.dumps({"resource": "blob", "success": True}), "")
+        with patch.object(host, "shared_definition", return_value=source), \
+             patch.object(host, "built_image", return_value=image) as resolve, patch.object(host, "run", side_effect=engine) as execute, \
+             patch.object(host, "bound_port", return_value=23456), patch.object(host, "await_resource"), \
+             patch.object(host, "public_defaults", return_value=DEFAULTS), patch.object(host.subprocess, "run", return_value=completed), \
+             contextlib.redirect_stdout(io.StringIO()):
+            host.verify("docker", "node", ["blob"])
+        resolve.assert_called_once_with("docker", source["services"]["azurite"], "azurite", None)
+        self.assertEqual(execute.call_args_list[0].args[-3:], ("up", "-d", "azurite"))
+
+    def test_compose_errors_identify_the_phase_and_withhold_engine_output(self):
+        secret = "must-not-appear-in-output"
+        timeout = subprocess.TimeoutExpired([secret], 240, output=secret, stderr=secret)
+        output = io.StringIO()
+        with patch.object(host, "shared_definition", return_value=rendered()), \
+             patch.object(host, "run", side_effect=[timeout, RuntimeError(secret)]) as engine, \
+             contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(output):
+            self.assertEqual(host.main(["--runtime", "docker", "--language", "node", "--resources", "redis"]), 1)
+        self.assertEqual(engine.call_args.args[-2:], ("down", "--volumes"))
+        self.assertIn("startup (redis) timed out after 240 seconds", output.getvalue())
+        self.assertIn("infrastructure cleanup failed", output.getvalue())
+        self.assertNotIn(secret, output.getvalue())
+
     def test_csharp_failure_diagnostics_accept_only_bounded_exception_class_names(self):
         for error in ('AmazonDynamoDBException', 'TimeoutException', 'Exception',
                       'must-not-appear/SecretException', 'SecretException\ncredential',

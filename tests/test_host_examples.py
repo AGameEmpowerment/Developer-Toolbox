@@ -449,6 +449,19 @@ def await_resource(runtime, container, service, ports, timeout=240):
                          f"(http={last_http_status}, sqlcmd_exit={last_sql_exit}, probe={last_probe}; {readiness_state_summary(state)}).")
 
 
+class FixtureCommandError(RuntimeError):
+    """Report a fixture phase without exposing engine output or arguments."""
+
+
+def run_fixture_command(runtime, compose, phase, *arguments, timeout):
+    try:
+        run(runtime, *compose, *arguments, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        raise FixtureCommandError(f"Isolated infrastructure {phase} timed out after {timeout} seconds.") from None
+    except (OSError, RuntimeError):
+        raise FixtureCommandError(f"Isolated infrastructure {phase} failed.") from None
+
+
 def verify(runtime, language, requested=None, include_cosmos=False, *, assembly=CSHARP_ASSEMBLY,
            java_jar=JAVA_JAR, python_executable=sys.executable):
     resources = select_resources(language, requested, include_cosmos)
@@ -458,8 +471,9 @@ def verify(runtime, language, requested=None, include_cosmos=False, *, assembly=
         raise ValueError("Package the Java host CLI first.")
     rendered = shared_definition(runtime)
     names = service_names(resources)
+    # The AWS initialization job reuses the AWS emulator image in the fixture.
     images = {name: built_image(runtime, rendered["services"][name], name, None)
-              for name in ("mssql", "aws-emulator") if name in names}
+              for name in names if name != "aws-init" and "build" in rendered["services"][name]}
     project = "toolbox-host-" + uuid.uuid4().hex
     definition = isolated_definition(rendered, project, images, resources)
     with tempfile.TemporaryDirectory(prefix=project + "-") as temporary:
@@ -472,17 +486,18 @@ def verify(runtime, language, requested=None, include_cosmos=False, *, assembly=
         try:
             print(f"Starting disposable infrastructure for the {language} host examples.", flush=True)
             if "dynamodb-volume-init" in names:
-                run(runtime, *compose, "run", "--rm", "dynamodb-volume-init", timeout=120)
+                run_fixture_command(runtime, compose, "DynamoDB volume initialization",
+                                    "run", "--rm", "dynamodb-volume-init", timeout=120)
             initial = tuple(name for name in names if name not in {"aws-init", "dynamodb-volume-init", "service-bus"})
-            run(runtime, *compose, "up", "-d", *initial, timeout=240)
+            run_fixture_command(runtime, compose, f"startup ({', '.join(initial)})", "up", "-d", *initial, timeout=240)
             ports = {(name, target): bound_port(runtime, project + "-" + name, target)
                      for name in initial for target in target_ports(definition["services"][name])}
             for name in initial:
                 await_resource(runtime, project + "-" + name, name, ports)
             if "aws-init" in names:
-                run(runtime, *compose, "run", "--rm", "aws-init", timeout=60)
+                run_fixture_command(runtime, compose, "AWS initialization", "run", "--rm", "aws-init", timeout=60)
             if "service-bus" in names:
-                run(runtime, *compose, "up", "-d", "service-bus", timeout=120)
+                run_fixture_command(runtime, compose, "Service Bus startup", "up", "-d", "service-bus", timeout=120)
                 for target in target_ports(definition["services"]["service-bus"]):
                     ports[("service-bus", target)] = bound_port(runtime, project + "-service-bus", target)
                 await_resource(runtime, project + "-service-bus", "service-bus", ports)
@@ -515,11 +530,11 @@ def verify(runtime, language, requested=None, include_cosmos=False, *, assembly=
         finally:
             failed = sys.exc_info()[0] is not None
             try:
-                run(runtime, *compose, "down", "--volumes", timeout=90)
-            except (RuntimeError, subprocess.TimeoutExpired):
+                run_fixture_command(runtime, compose, "cleanup", "down", "--volumes", timeout=90)
+            except FixtureCommandError as error:
                 if not failed:
                     raise
-                print("Isolated infrastructure cleanup also failed.", file=sys.stderr)
+                print(str(error), file=sys.stderr)
 
 
 def main(argv=None):
@@ -548,8 +563,8 @@ def main(argv=None):
         return 0
     except KeyboardInterrupt:
         print("Interrupted; only isolated infrastructure cleanup was requested.", file=sys.stderr)
-    except AssertionError as error:
-        # Only this harness constructs assertion messages; SDK output stays captured.
+    except (AssertionError, FixtureCommandError) as error:
+        # The harness constructs these messages; provider output stays captured.
         print(str(error), file=sys.stderr)
     except ValueError:
         print("Invalid host validation arguments or fixture configuration. Check --help and selected build prerequisites.", file=sys.stderr)
