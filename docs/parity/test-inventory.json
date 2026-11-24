@@ -1,0 +1,1623 @@
+{
+  "date": "2026-10-27",
+  "sourceCommit": "46c7d9d500d15d9481762c181ea4336db0c6df24",
+  "repository": "AGameEmpowerment/Developer-Toolbox",
+  "method": "Selected-commit Git-blob lexical declaration inventory; Python functions use AST. SHA-256 hashes use exact Git blob bytes, independent of checkout line endings. Counts are source markers, not adapter-discovered cases. See inventory-source.py for exact expressions. Comments/generated strings can require review; no parameter/source/fixture/browser/role expansion.",
+  "executed": "Not collected by this source-only inventory; execution evidence is reported separately",
+  "coverage": "Unavailable: no measured coverage report generated or imported",
+  "files": [
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/scripts/tests/braces-depth-guard.test.mjs",
+      "sha256": "6da855eadef88593835344aa833390e3de6e993f34457f8918295688f385f425",
+      "framework": "Node test",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 18,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/proxy.test.js",
+      "sha256": "9750c7eaf543a1c93e36938bf6f107798e09cdcabc758ca8dd7c04dc6af91b7e",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 2,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/examples.test.js",
+      "sha256": "9fefa36e45237453f71468fec7f5f610261c1e55de3442e220683b210dd25b61",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 3,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/i18n.test.js",
+      "sha256": "e91ef8fdd6fc9b1f63ea0d61605740eaa2f52c5fe6245d4b91724024209eb7a0",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 4,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/src/utils/testHelpers.jsx",
+      "sha256": "dd71832ddb8b71242be929f0417fa70eff92e082b5c3e6e65ee4c24b555cb8d6",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 2,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/vitest.setup.test.mjs",
+      "sha256": "3e40da375b5d672157df757f2740f4b9c3b44616ee57998d9c1912be7b378ac3",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client",
+      "counts": {
+        "authoredCallSites": 2,
+        "parameterizedCallSites": 0
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/tests/cli.test.mjs",
+      "sha256": "70783e51ce35da433c7fe14b9a2e745dd404a850b1ae7a93b4149ba4748a7a9c",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node",
+      "counts": {
+        "authoredCallSites": 3,
+        "parameterizedCallSites": 3
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node/tests/samples.test.mjs",
+      "sha256": "78ebd31a039c1dd11a48cc8e01428cb7ef5f82a7dbf9e478cbaf8872bc85641c",
+      "framework": "Vitest",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Node",
+      "counts": {
+        "authoredCallSites": 33,
+        "parameterizedCallSites": 9
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python/tests/test_samples.py",
+      "sha256": "e35af15813fa03740724150cd097c0da2a4967ee39386f45a8bc5a5904a62a2b",
+      "framework": "Python test functions",
+      "area": "src/DeveloperToolbox.Example/DeveloperToolbox.Example.Python",
+      "counts": {
+        "authoredFunctions": 31
+      },
+      "definitions": []
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/ContractsTests.java",
+      "sha256": "b7a1fe29c195c1798fa10efd2ed2baf6988d4cb6f2c4c3a61657698617a14ade",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/core",
+      "counts": {
+        "testAnnotations": 16,
+        "authoredAttributedMethodDeclarations": 16
+      },
+      "definitions": [
+        {
+          "method": "localHostAllowsOnlyKnownHosts",
+          "line": 14
+        },
+        {
+          "method": "localHostRejectsRemoteAndAmbiguousNames",
+          "line": 16
+        },
+        {
+          "method": "endpointGuardRejectsUnsafeUris",
+          "line": 18
+        },
+        {
+          "method": "endpointGuardAcceptsComposeAws",
+          "line": 19
+        },
+        {
+          "method": "credentialsMustBeConfigured",
+          "line": 20
+        },
+        {
+          "method": "certificateImportRejectsCloudBeforeFilesystemOrNetwork",
+          "line": 21
+        },
+        {
+          "method": "certificateImportPreservesExistingStore",
+          "line": 26
+        },
+        {
+          "method": "dotenvIsDataOnlyAndExpandsPriorAssignments",
+          "line": 31
+        },
+        {
+          "method": "dotenvDecodesQuotedCredentialsAndPreservesLiteralDollars",
+          "line": 36
+        },
+        {
+          "method": "dotenvSupportsBomFinalAssignmentsAndEscapedWhitespace",
+          "line": 50
+        },
+        {
+          "method": "dotenvMalformedValuesFailWithoutExposingCredentials",
+          "line": 61
+        },
+        {
+          "method": "workEnvelopeRejectsMalformedInput",
+          "line": 67
+        },
+        {
+          "method": "workEnvelopeRoundtripAndBounds",
+          "line": 68
+        },
+        {
+          "method": "lambdaEnvelopeRejectsMalformedInput",
+          "line": 74
+        },
+        {
+          "method": "lambdaContractPreservesUnicodeAndBounds",
+          "line": 75
+        },
+        {
+          "method": "envelopesRejectTrailingJsonAndGarbage",
+          "line": 80
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/CosmosCertificateTlsTests.java",
+      "sha256": "790fc9a05354cdbec999a2a397be56e548fbff35935534156a01b90253ad4db6",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/core",
+      "counts": {
+        "testAnnotations": 2,
+        "authoredAttributedMethodDeclarations": 2
+      },
+      "definitions": [
+        {
+          "method": "importsSelfSignedLocalCertificateWithMatchingSubjectAlternativeName",
+          "line": 69
+        },
+        {
+          "method": "rejectsLocalServerCertificateForAnotherHostnameWithoutWritingTrustStore",
+          "line": 85
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/DatabaseSamplesTests.java",
+      "sha256": "39967e2fd3de05a33423d406495bbcf47ece0dc72cdb15089e01f214c9f74d1f",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/core",
+      "counts": {
+        "testAnnotations": 7,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "sqlServerPreservesUnicodeIdentifiersAndMessages",
+          "line": 11
+        },
+        {
+          "method": "postgresUsesItsUnicodeCapableCharacterType",
+          "line": 14
+        },
+        {
+          "method": "committedMessagesAreIdempotentAndRetainOriginalText",
+          "line": 47
+        },
+        {
+          "method": "schemaDemoExercisesCommittedInsertParameterizedQueryAndRollback",
+          "line": 55
+        },
+        {
+          "method": "failedWriteRollsBackAndPropagates",
+          "line": 58
+        },
+        {
+          "method": "concurrentDuplicateDeliveryCommitsExactlyOnce",
+          "line": 68
+        },
+        {
+          "method": "invalidSourceHasNoDatabaseSideEffects",
+          "line": 76
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/core/src/test/java/developertoolbox/core/SdkGuardsTests.java",
+      "sha256": "4ca8d0b6008d785adcdbfb4301949920686664038513d03dc8dd64f9777a157d",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/core",
+      "counts": {
+        "testAnnotations": 7,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "wireMockCleanupFailureCannotReportSuccess",
+          "line": 11
+        },
+        {
+          "method": "azureTransportCanInitializeWithoutMixedNettyMajors",
+          "line": 34
+        },
+        {
+          "method": "awsExamplesRejectCloudBeforeCreatingClients",
+          "line": 41
+        },
+        {
+          "method": "azureStorageRejectsCloudAccounts",
+          "line": 47
+        },
+        {
+          "method": "azureStorageRejectsProxyAndDuplicateSettings",
+          "line": 53
+        },
+        {
+          "method": "serviceBusRejectsCloudAndAmbiguousConfig",
+          "line": 59
+        },
+        {
+          "method": "unknownResourceHasNoSideEffects",
+          "line": 64
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/functions/src/test/java/developertoolbox/functions/ToolboxFunctionsTests.java",
+      "sha256": "2df86e350644a49c85b6a28ca37aec8558b7c4ed4e60f3bee856af9223e8cfea",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/functions",
+      "counts": {
+        "testAnnotations": 6,
+        "authoredAttributedMethodDeclarations": 6
+      },
+      "definitions": [
+        {
+          "method": "dispatchesAllSdkAndNativeQueuePublisherSamples",
+          "line": 20
+        },
+        {
+          "method": "unknownResourceReturns404WithoutDispatch",
+          "line": 28
+        },
+        {
+          "method": "providerFailuresReturnSanitized500",
+          "line": 32
+        },
+        {
+          "method": "nativeBindingsPersistValidatedWorkToExpectedDatabase",
+          "line": 38
+        },
+        {
+          "method": "failedCommitPropagatesForNativeTriggerRetry",
+          "line": 45
+        },
+        {
+          "method": "malformedQueueWorkDoesNotTouchDatabase",
+          "line": 51
+        }
+      ]
+    },
+    {
+      "source": "src/DeveloperToolbox.Java.Example/lambda/src/test/java/developertoolbox/lambda/LambdaTests.java",
+      "sha256": "0d701939cefea03a05b3802228bba6a46cdbcc9b29b99527a1bb9f36c80e74ee",
+      "framework": "JUnit",
+      "area": "src/DeveloperToolbox.Java.Example/lambda",
+      "counts": {
+        "testAnnotations": 11,
+        "authoredAttributedMethodDeclarations": 11
+      },
+      "definitions": [
+        {
+          "method": "httpReturnsJsonSharedContract",
+          "line": 13
+        },
+        {
+          "method": "httpDecodesValidBase64Unicode",
+          "line": 18
+        },
+        {
+          "method": "httpRejectsInvalidUtf8RatherThanReplacementDecoding",
+          "line": 22
+        },
+        {
+          "method": "httpReturns400ForMalformedAndInvalidMessages",
+          "line": 27
+        },
+        {
+          "method": "eventBridgeReadsDetail",
+          "line": 28
+        },
+        {
+          "method": "eventBridgeRejectsMissingDetail",
+          "line": 29
+        },
+        {
+          "method": "sqsCommitsValidRecordsAndReturnsOnlyIndividualFailures",
+          "line": 30
+        },
+        {
+          "method": "sqsReturnsFailureWhenCommitLeavesInsufficientResponseBudget",
+          "line": 41
+        },
+        {
+          "method": "exhaustedBudgetReturnsFailuresWithoutSideEffects",
+          "line": 49
+        },
+        {
+          "method": "sqsMissingIdsFailBatchBecausePartialFailureCannotIdentifyRecord",
+          "line": 55
+        },
+        {
+          "method": "sqsNullInputFails",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.App.Tests/LiveValidationTests.cs",
+      "sha256": "c0cd8f1c618b16180ab49fd0c90c117d32ffce593788d698b216f8dd6e21b628",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.App.Tests",
+      "counts": {
+        "Test": 7,
+        "TestCase": 13,
+        "authoredAttributedMethodDeclarations": 10
+      },
+      "definitions": [
+        {
+          "method": "TryParse_NoResources_SelectsOnlyInfrastructureResources",
+          "line": 10
+        },
+        {
+          "method": "TryParse_SelectedResources_NormalizesAndDeduplicatesInRequestedOrder",
+          "line": 23
+        },
+        {
+          "method": "TryParse_InvalidTimeout_ReturnsSafeUsageError",
+          "line": 37
+        },
+        {
+          "method": "RunAsync_InvalidValidationArguments_DoesNotConstructClients",
+          "line": 50
+        },
+        {
+          "method": "RunAsync_AllChecksPass_ReturnsSuccessWithoutPrintingProviderResults",
+          "line": 63
+        },
+        {
+          "method": "RunAsync_OneFailure_ContinuesAndKeepsDiagnosticsSecretSafe",
+          "line": 82
+        },
+        {
+          "method": "RunAsync_CheckTimeout_AwaitsCleanupBeforeNextCheck",
+          "line": 107
+        },
+        {
+          "method": "RunAsync_CallerAlreadyCanceled_ReportsUnexecutedChecks",
+          "line": 129
+        },
+        {
+          "method": "RunAsync_ProviderReturnsAfterCallerCancellation_DoesNotReportSuccess",
+          "line": 143
+        },
+        {
+          "method": "RunAsync_ProviderCancelsWithoutBudgetExpiration_ReportsFailure",
+          "line": 165
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.App.Tests/SampleApplicationTests.cs",
+      "sha256": "94b8f72a1fc46206b919f0864bba39376e435d1544fa742a02b2f0637bc467fa",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.App.Tests",
+      "counts": {
+        "Test": 6,
+        "TestCase": 5,
+        "TestCaseSource": 1,
+        "authoredAttributedMethodDeclarations": 9
+      },
+      "definitions": [
+        {
+          "method": "RunAsync_NoArguments_PrintsGreetingWithoutStartingClients",
+          "line": 14
+        },
+        {
+          "method": "RunAsync_Help_PrintsAllResourcesWithoutStartingClients",
+          "line": 29
+        },
+        {
+          "method": "RunAsync_UnknownResource_ReturnsUsageErrorWithoutStartingClients",
+          "line": 44
+        },
+        {
+          "method": "RunAsync_SupportedResource_CallsOnlySelectedExampleWithCallerToken",
+          "line": 58
+        },
+        {
+          "method": "RunAsync_ProviderFails_ReturnsFailureWithoutPrintingSecrets",
+          "line": 84
+        },
+        {
+          "method": "RunAsync_HostConfigurationFails_ReturnsSafeFailure",
+          "line": 98
+        },
+        {
+          "method": "RunAsync_ProviderCanceled_ReturnsFailureAndForwardsCancellation",
+          "line": 111
+        },
+        {
+          "method": "RunAsync_ValidateSelectedResources_ReusesRunnerAndCallsOnlyRequestedChecks",
+          "line": 130
+        },
+        {
+          "method": "RunAsync_ValidateServiceBusWithoutRoundTripValidator_DoesNotFallBackToSendOnlySamples",
+          "line": 149
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.App.Tests/ToolboxEnvironmentTests.cs",
+      "sha256": "57b17b0e4b776420f071aded69d6241602be416c4d9f15255999f5bc69baa754",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.App.Tests",
+      "counts": {
+        "Test": 3,
+        "TestCase": 8,
+        "authoredAttributedMethodDeclarations": 4
+      },
+      "definitions": [
+        {
+          "method": "Parse_CanonicalReferences_ProtectConnectionComponentsAndKeepEnvironmentSecretsLiteral",
+          "line": 12
+        },
+        {
+          "method": "Parse_QuotedAndUnquotedAssignments_PreserveDataWithoutExecutingCommands",
+          "line": 42
+        },
+        {
+          "method": "Parse_InvalidSettings_RejectWithoutIncludingSecretValues",
+          "line": 66
+        },
+        {
+          "method": "Read_DotenvWithoutJson_AllowsIndependentHostConfigurationAndLaterOverrides",
+          "line": 73
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Data.Tests/DatabaseConfigurationTests.cs",
+      "sha256": "37dc80474dc725793f0ab7ddd7f92b5ff724af2ff57c59b111aa738dda454d1f",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Data.Tests",
+      "counts": {
+        "TestCase": 32,
+        "Test": 1,
+        "authoredAttributedMethodDeclarations": 10
+      },
+      "definitions": [
+        {
+          "method": "TransactionSample_InvalidText_RejectsBeforeRequiringConfiguration",
+          "line": 15
+        },
+        {
+          "method": "TransactionSample_OversizedText_RejectsBeforeRequiringConfiguration",
+          "line": 24
+        },
+        {
+          "method": "DatabaseOperation_MissingConnection_ReportsOnlyRequiredSetting",
+          "line": 36
+        },
+        {
+          "method": "DatabaseOperation_PreCanceled_StopsBeforeConnecting",
+          "line": 47
+        },
+        {
+          "method": "SaveMessage_MaximumBounds_AcceptsValidationBeforeRequiringDatabase",
+          "line": 64
+        },
+        {
+          "method": "AddToolboxDatabases_MissingProviderSettings_ResolvesOneLazySingleton",
+          "line": 73
+        },
+        {
+          "method": "DatabaseOperation_MissingContainerComponent_ReportsSettingWithoutCredentials",
+          "line": 90
+        },
+        {
+          "method": "DatabaseOperation_ContainerCredentialsWithDelimiters_PreservesLocalDatabase",
+          "line": 103
+        },
+        {
+          "method": "DatabaseOperation_ExplicitConnection_TakesPrecedenceOverContainerComponents",
+          "line": 118
+        },
+        {
+          "method": "DatabaseOperation_UnsafeContainerDestination_RejectsBeforeConnecting",
+          "line": 134
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Data.Tests/DatabaseIntegrationTests.cs",
+      "sha256": "f0dbf9f48892655e140254591e3ccaf76522ba9904f95b707d567043452152f4",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Data.Tests",
+      "counts": {
+        "TestCase": 2,
+        "authoredAttributedMethodDeclarations": 1
+      },
+      "definitions": [
+        {
+          "method": "SaveMessageAsync_ConcurrentRedelivery_InsertsOneRow",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Data.Tests/DatabaseSamplesTests.cs",
+      "sha256": "88135d9e6a61f072e21f0f8e376c47f54b63e1529fdc2441618ccd43685b835a",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Data.Tests",
+      "counts": {
+        "TestCase": 6,
+        "Test": 5,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "SaveSqlServerMessageAsync_EmptyFields_RejectsBeforeConnecting",
+          "line": 12
+        },
+        {
+          "method": "SavePostgresMessageAsync_OversizedFields_RejectsBeforeConnecting",
+          "line": 21
+        },
+        {
+          "method": "SqlServerAsync_RemoteDatabase_RejectsBeforeConnecting",
+          "line": 29
+        },
+        {
+          "method": "SqlServerAsync_FailoverPartner_RejectsBeforeConnecting",
+          "line": 36
+        },
+        {
+          "method": "PostgresAsync_DifferentDatabase_RejectsBeforeConnecting",
+          "line": 46
+        },
+        {
+          "method": "PostgresAsync_MissingPassword_RejectsBeforeConnecting",
+          "line": 53
+        },
+        {
+          "method": "Contexts_SameModel_EnforceStableMessageKeyAndPayloadBounds",
+          "line": 60
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Functions.Tests/FunctionRegistrationTests.cs",
+      "sha256": "9abf90bdf10a808610b8c3601dba16f7ee69e07966dec334973261ec1e2e4f97",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Functions.Tests",
+      "counts": {
+        "Test": 2,
+        "authoredAttributedMethodDeclarations": 2
+      },
+      "definitions": [
+        {
+          "method": "AddToolboxFunctionSamples_ResourceHttpHandler_DisablesRedirectsAndProxies",
+          "line": 12
+        },
+        {
+          "method": "AddToolboxFunctionSamples_WithoutCredentials_ResolvesBothFunctionsWithoutNetworkCalls",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Functions.Tests/QueueFunctionsTests.cs",
+      "sha256": "4c9da4ada52791d2088e21139d703534dc626dc0adb97c2f9fcf818089d49536",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Functions.Tests",
+      "counts": {
+        "TestCase": 21,
+        "TestCaseSource": 1,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "Trigger_ValidOrRepeatedMessage_PersistsAndLogsOutcome",
+          "line": 15
+        },
+        {
+          "method": "Trigger_InvalidEnvelope_RejectsBeforeDatabaseWrite",
+          "line": 44
+        },
+        {
+          "method": "Trigger_MalformedJson_PropagatesParsingFailure",
+          "line": 56
+        },
+        {
+          "method": "Trigger_BoundaryPayload_IsAccepted",
+          "line": 66
+        },
+        {
+          "method": "Trigger_DatabaseFailure_PropagatesWithoutSuccessLog",
+          "line": 78
+        },
+        {
+          "method": "Trigger_CanceledInvocation_ForwardsCancellationAndDoesNotLogSuccess",
+          "line": 91
+        },
+        {
+          "method": "Trigger_NullMessage_RejectsBeforeDatabaseWrite",
+          "line": 106
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Functions.Tests/QueuePublishersTests.cs",
+      "sha256": "69d0aa746641fc24c8c5a11baf6a4b5b07db8024220d21024377e5b2f204a33e",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Functions.Tests",
+      "counts": {
+        "TestCase": 45,
+        "Test": 5,
+        "authoredAttributedMethodDeclarations": 16
+      },
+      "definitions": [
+        {
+          "method": "ServiceBusAsync_ValidWork_PublishesStableEnvelopeToDedicatedEntity",
+          "line": 17
+        },
+        {
+          "method": "ServiceBusAsync_ComposeHost_AcceptsOnlyConfiguredLocalEmulator",
+          "line": 35
+        },
+        {
+          "method": "ServiceBusAsync_RepeatedCalls_ReusesClientAndCreatesIndependentMessageIds",
+          "line": 44
+        },
+        {
+          "method": "ServiceBusAsync_NoncanonicalOrDuplicateFields_RejectsBeforeFactoryUse",
+          "line": 71
+        },
+        {
+          "method": "ServiceBusAsync_UnsafeEndpoint_RejectsBeforeFactoryUse",
+          "line": 87
+        },
+        {
+          "method": "ServiceBusAsync_CanonicalLocalConnection_MatchesSdkSelectedEndpoint",
+          "line": 101
+        },
+        {
+          "method": "ServiceBusAsync_DisallowedConfiguration_RejectsBeforeFactoryUse",
+          "line": 126
+        },
+        {
+          "method": "ServiceBusAsync_MissingEmulatorConfiguration_RejectsWithoutNetworkCalls",
+          "line": 137
+        },
+        {
+          "method": "Publisher_EmptyText_RejectsBeforeCreatingClients",
+          "line": 149
+        },
+        {
+          "method": "Publisher_OversizedText_RejectsBeforeCreatingClients",
+          "line": 159
+        },
+        {
+          "method": "StorageQueueAsync_BoundaryText_CreatesQueueAndPublishesCompatibleJsonEnvelope",
+          "line": 168
+        },
+        {
+          "method": "StorageQueueAsync_RemoteEndpoint_RejectsBeforeFactoryUse",
+          "line": 187
+        },
+        {
+          "method": "StorageQueueAsync_ComposeHost_AcceptsAzuriteEndpoint",
+          "line": 198
+        },
+        {
+          "method": "Publisher_SdkFailure_PropagatesAndDisposesSender",
+          "line": 212
+        },
+        {
+          "method": "Publisher_CanceledInvocation_ForwardsTokenToSdk",
+          "line": 233
+        },
+        {
+          "method": "DisposeAsync_UnusedPublisher_DoesNotCreateAnSdkClient",
+          "line": 249
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Functions.Tests/ResourceFunctionsTests.cs",
+      "sha256": "cba1c960bded3eaa22b2a2c7704a0c09b47cc759a69f06fb23d7c60daae665db",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Functions.Tests",
+      "counts": {
+        "TestCaseSource": 4,
+        "Test": 2,
+        "TestCase": 3,
+        "authoredAttributedMethodDeclarations": 7
+      },
+      "definitions": [
+        {
+          "method": "RunAsync_SupportedRoute_ReturnsJsonAndForwardsCancellation",
+          "line": 17
+        },
+        {
+          "method": "RunAsync_UppercaseRoute_UsesTheSameResource",
+          "line": 49
+        },
+        {
+          "method": "RunAsync_UnknownRoute_Returns404WithoutInvokingResources",
+          "line": 60
+        },
+        {
+          "method": "RunAsync_ResourceFailure_PropagatesInsteadOfReturningSuccess",
+          "line": 73
+        },
+        {
+          "method": "RunAsync_CanceledInvocation_PropagatesTheInvocationToken",
+          "line": 83
+        },
+        {
+          "method": "RunAsync_MissingRoute_RejectsBeforeCallingResources",
+          "line": 97
+        },
+        {
+          "method": "RunAsync_NullRequest_RejectsBeforeCallingResources",
+          "line": 106
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Lambda.Tests/FunctionTests.cs",
+      "sha256": "b4a6df6909d796453ebfb5ffa77a4e5079ff2d25e4f35e2e7aacce24a430b224",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Lambda.Tests",
+      "counts": {
+        "TestCase": 26,
+        "Test": 19,
+        "authoredAttributedMethodDeclarations": 27
+      },
+      "definitions": [
+        {
+          "method": "ReadMessage_ValidBoundary_PreservesMessage",
+          "line": 17
+        },
+        {
+          "method": "ReadMessage_EmptyBody_RejectsInput",
+          "line": 26
+        },
+        {
+          "method": "ReadMessage_MalformedJson_RejectsInput",
+          "line": 32
+        },
+        {
+          "method": "ReadMessage_InvalidContract_RejectsInput",
+          "line": 42
+        },
+        {
+          "method": "ReadMessage_TooLong_RejectsInput",
+          "line": 48
+        },
+        {
+          "method": "HandleHttp_NullRequest_ReturnsBadRequest",
+          "line": 55
+        },
+        {
+          "method": "HandleHttp_OversizedBody_ReturnsBadRequest",
+          "line": 64
+        },
+        {
+          "method": "HandleHttp_Base64Body_ReturnsDecodedMessage",
+          "line": 77
+        },
+        {
+          "method": "HandleHttp_Base64WithInvalidUtf8_ReturnsBadRequest",
+          "line": 90
+        },
+        {
+          "method": "HandleHttp_MalformedBody_ReturnsBadRequest",
+          "line": 105
+        },
+        {
+          "method": "HandleEvent_EventBridgeEnvelope_ReadsDetail",
+          "line": 115
+        },
+        {
+          "method": "HandleEvent_InvalidEnvelope_RejectsInput",
+          "line": 127
+        },
+        {
+          "method": "HandleHttp_InvalidBody_ReturnsSafeErrorWithoutLoggingPayload",
+          "line": 134
+        },
+        {
+          "method": "HandleHttp_ValidBody_LogsCompletionWithoutPayloadContents",
+          "line": 146
+        },
+        {
+          "method": "HandleEvent_ValidPayload_LogsWithoutPayloadContents",
+          "line": 158
+        },
+        {
+          "method": "HandleSqs_ValidRecord_PersistsStableIdentityAndAcknowledges",
+          "line": 169
+        },
+        {
+          "method": "HandleSqs_DuplicateDelivery_AcknowledgesAlreadyPersistedWork",
+          "line": 182
+        },
+        {
+          "method": "HandleSqs_MixedBatch_ContinuesAndRetriesOnlyFailedRecords",
+          "line": 191
+        },
+        {
+          "method": "HandleSqs_CanceledPersistence_ReportsRetryAndContinuesBatch",
+          "line": 209
+        },
+        {
+          "method": "HandleSqs_EmptyBatch_AcknowledgesWithoutResolvingDatabase",
+          "line": 221
+        },
+        {
+          "method": "HandleSqs_InsufficientExecutionTime_RetriesWithoutStartingDatabaseWork",
+          "line": 230
+        },
+        {
+          "method": "HandleSqs_ExecutionBudgetExpires_RetriesInflightAndUnstartedRecords",
+          "line": 242
+        },
+        {
+          "method": "HandleSqs_PersistenceReturnsAfterBudgetCancellation_RetriesWithoutSuccessLog",
+          "line": 256
+        },
+        {
+          "method": "HandleSqs_NullBatch_RejectsInput",
+          "line": 280
+        },
+        {
+          "method": "HandleSqs_MessageIdBoundary_RejectsOnlyOversizedIdentity",
+          "line": 287
+        },
+        {
+          "method": "HandleSqs_InvalidRecords_ReportsEachFailedMessage",
+          "line": 298
+        },
+        {
+          "method": "HandleSqs_MissingMessageId_RejectsUnreportableFailure",
+          "line": 309
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Lib.Tests/DependencyTests.cs",
+      "sha256": "73b27fb8818cd21369047095f85e261b4e6fbb3e4675add8e4979f17995ca411",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Lib.Tests",
+      "counts": {
+        "Test": 1,
+        "authoredAttributedMethodDeclarations": 1
+      },
+      "definitions": [
+        {
+          "method": "GetMessage_NewDependency_ReturnsDefaultSampleGreeting",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Messaging.Tests/LocalServiceBusConnectionTests.cs",
+      "sha256": "3bf44410d3270ad8db5b7ac6b1957f34574e246fcfee8113e9a620a41f15c1ce",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Messaging.Tests",
+      "counts": {
+        "TestCase": 24,
+        "Test": 2,
+        "authoredAttributedMethodDeclarations": 5
+      },
+      "definitions": [
+        {
+          "method": "Read_CanonicalLocalConnection_MatchesSdkSelectedEndpoint",
+          "line": 13
+        },
+        {
+          "method": "Read_NoncanonicalOrDuplicateFields_RejectsAmbiguousConnection",
+          "line": 39
+        },
+        {
+          "method": "Read_UnsafeEndpoint_RejectsConnection",
+          "line": 52
+        },
+        {
+          "method": "Read_EmulatorTextInsideKeyName_RejectsMissingFlag",
+          "line": 60
+        },
+        {
+          "method": "Read_EmulatorFlagIsFalse_RejectsLocalEndpointWithoutEmulatorMode",
+          "line": 68
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Messaging.Tests/MessagingSamplesReceiveTests.cs",
+      "sha256": "b30ea533c61e7d3ada77b814ceb1bf2f9b30f5e0a16e0cf23f8b4975446bbccd",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Messaging.Tests",
+      "counts": {
+        "TestCase": 10,
+        "Test": 6,
+        "authoredAttributedMethodDeclarations": 8
+      },
+      "definitions": [
+        {
+          "method": "ReceiveAsync_MissingQueueOrCorrelation_RejectsBeforeReceiving",
+          "line": 15
+        },
+        {
+          "method": "ReceiveAsync_UnmatchedWork_HidesOnceUntilMatchingMessageAndRestoresEntireBatch",
+          "line": 25
+        },
+        {
+          "method": "ReceiveAsync_DuplicateCorrelatedDelivery_RestoresEveryUnsettledMessage",
+          "line": 41
+        },
+        {
+          "method": "ReceiveAsync_UnrelatedBodyMentionsCorrelation_RestoresItAndDeletesOnlyMatchingEnvelope",
+          "line": 59
+        },
+        {
+          "method": "ReceiveAsync_MatchingMessageDoesNotArrive_RestoresUnmatchedWorkAfterTimeout",
+          "line": 72
+        },
+        {
+          "method": "ReceiveAsync_PollingIsCanceled_RestoresUnmatchedWorkAndPreservesCancellation",
+          "line": 85
+        },
+        {
+          "method": "ReceiveAsync_PollingAndRestorationFail_ReportsBothProviderFailures",
+          "line": 98
+        },
+        {
+          "method": "ReceiveAsync_RestorationFailsAfterMatch_ReportsProviderFailure",
+          "line": 110
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Messaging.Tests/MessagingSamplesTests.cs",
+      "sha256": "abd817de26e72ffdfebd4a88cb0977764a130d3d37d4f2ef95f644a049b0dba6",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Messaging.Tests",
+      "counts": {
+        "Test": 4,
+        "TestCase": 37,
+        "authoredAttributedMethodDeclarations": 13
+      },
+      "definitions": [
+        {
+          "method": "SqsAsync_ValidRequest_SendsAndDeletesOnlyCorrelatedMessage",
+          "line": 17
+        },
+        {
+          "method": "SnsAsync_ValidRequest_PublishesAndReceivesSubscriptionDelivery",
+          "line": 32
+        },
+        {
+          "method": "EventBridgeAsync_ValidRequest_PublishesContractAndReceivesEnvelope",
+          "line": 45
+        },
+        {
+          "method": "EventBridgeAsync_RejectedEntry_StopsBeforeReceivingAndReturnsSafeError",
+          "line": 61
+        },
+        {
+          "method": "AwsSample_ProviderFailure_PreservesProviderException",
+          "line": 75
+        },
+        {
+          "method": "AwsSample_InvalidEndpoint_RejectsBeforeProviderAccess",
+          "line": 98
+        },
+        {
+          "method": "AwsSample_ComposeEndpoint_UsesCanonicalEmulatorHost",
+          "line": 112
+        },
+        {
+          "method": "Sample_CanceledRequest_StopsBeforeProviderAccess",
+          "line": 125
+        },
+        {
+          "method": "RabbitMqAsync_MissingPassword_RejectsBeforeConnecting",
+          "line": 146
+        },
+        {
+          "method": "RabbitMqAsync_InvalidDestination_RejectsBeforeConnecting",
+          "line": 157
+        },
+        {
+          "method": "NativeSample_ComposeDestinationAndCancellation_ValidatesBeforeConnecting",
+          "line": 170
+        },
+        {
+          "method": "ServiceBusSample_InvalidConnection_RejectsBeforeConnecting",
+          "line": 185
+        },
+        {
+          "method": "ServiceBusSample_MalformedConnection_RejectsBeforeConnecting",
+          "line": 194
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Messaging.Tests/ServiceBusValidationSamplesTests.cs",
+      "sha256": "ba2b39b5298f52f764823873ca1cb95f1057e2ab3af6577372c408e999ce63b0",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Messaging.Tests",
+      "counts": {
+        "TestCase": 10,
+        "Test": 10,
+        "authoredAttributedMethodDeclarations": 14
+      },
+      "definitions": [
+        {
+          "method": "ValidateAsync_CorrelatedDelivery_CompletesOnlyOwnedMessage",
+          "line": 11
+        },
+        {
+          "method": "ValidateQueueAsync_LocalEndpoint_PreservesCustomTransportAddress",
+          "line": 35
+        },
+        {
+          "method": "ValidateQueueAsync_UnmatchedWork_RetainsLocksUntilLaterCorrelatedDelivery",
+          "line": 45
+        },
+        {
+          "method": "ValidateQueueAsync_NoCorrelation_TimesOutAndAbandonsUnmatchedWork",
+          "line": 55
+        },
+        {
+          "method": "ValidateQueueAsync_CanceledPolling_UsesIndependentCleanupToken",
+          "line": 68
+        },
+        {
+          "method": "ValidateTopicAsync_CompletionFails_PropagatesProviderFailureAndAbandonsUnrelatedWork",
+          "line": 82
+        },
+        {
+          "method": "ValidateQueueAsync_PollingAndCleanupFail_ReportsBothFailures",
+          "line": 95
+        },
+        {
+          "method": "ValidateQueueAsync_CleanupFailsAfterCompletion_ReportsFailure",
+          "line": 109
+        },
+        {
+          "method": "ValidateQueueAsync_ReceiverCloseFails_ReportsFailureAfterAbandoningUnrelatedWork",
+          "line": 122
+        },
+        {
+          "method": "ValidateQueueAsync_SendAndReceiverCloseFail_PreservesBothFailures",
+          "line": 134
+        },
+        {
+          "method": "ValidateQueueAsync_SendFails_PropagatesWithoutPolling",
+          "line": 147
+        },
+        {
+          "method": "ValidateAsync_PreCanceledRequest_StopsBeforeCreatingClient",
+          "line": 161
+        },
+        {
+          "method": "ValidateQueueAsync_InvalidConnection_RejectsBeforeCreatingClient",
+          "line": 174
+        },
+        {
+          "method": "ValidateTopicAsync_MalformedConnection_RejectsBeforeCreatingClient",
+          "line": 184
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Resources.Tests/AwsResourceSamplesTests.cs",
+      "sha256": "e82e92ef90193798f59ca1b731c0cb8c4f3a37bf0262d8eca6dd1cb1b2f92d85",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Resources.Tests",
+      "counts": {
+        "Test": 13,
+        "TestCase": 2,
+        "authoredAttributedMethodDeclarations": 14
+      },
+      "definitions": [
+        {
+          "method": "S3Async_Success_UsesConfiguredBucketAndDeletesOnlyUploadedObject",
+          "line": 15
+        },
+        {
+          "method": "S3Async_MismatchedRead_DeletesOwnObjectAndFailsVerification",
+          "line": 44
+        },
+        {
+          "method": "S3Async_CanceledRead_CleansUpAndPreservesCancellation",
+          "line": 55
+        },
+        {
+          "method": "S3Async_UploadFails_DoesNotDeleteAnObjectItDidNotCreate",
+          "line": 71
+        },
+        {
+          "method": "S3Async_ReadAndCleanupFail_SurfacesBothProviderFailures",
+          "line": 82
+        },
+        {
+          "method": "S3Async_CleanupFails_DoesNotReportSuccessfulRoundTrip",
+          "line": 95
+        },
+        {
+          "method": "DynamoDbAsync_NewTable_CreatesStringPartitionKeyAndReadsConsistently",
+          "line": 105
+        },
+        {
+          "method": "DynamoDbAsync_ExistingTable_ReusesTableWithoutDeletingIt",
+          "line": 129
+        },
+        {
+          "method": "DynamoDbAsync_CreateDenied_DoesNotContinueOrSuppressProviderFailure",
+          "line": 140
+        },
+        {
+          "method": "DynamoDbAsync_CanceledWhileTableIsCreating_DoesNotWriteAnItem",
+          "line": 151
+        },
+        {
+          "method": "DynamoDbAsync_MismatchedRead_RemovesOnlyOwnItem",
+          "line": 164
+        },
+        {
+          "method": "DynamoDbAsync_CanceledRead_CleansUpWithIndependentToken",
+          "line": 175
+        },
+        {
+          "method": "DynamoDbAsync_ReadAndCleanupFail_PreservesBothFailures",
+          "line": 191
+        },
+        {
+          "method": "AwsResourceAsync_RemoteEndpoint_RejectsBeforeInvokingClientFactory",
+          "line": 205
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Resources.Tests/AzureCleanupTests.cs",
+      "sha256": "cdba5dd90f251bff64c3e325fb8a7ad2038462858244c1685dcb34a02a01230e",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Resources.Tests",
+      "counts": {
+        "Test": 3,
+        "authoredAttributedMethodDeclarations": 3
+      },
+      "definitions": [
+        {
+          "method": "BlobAsync_VerifiedRead_DeletesOnlyCreatedBlobWithBoundedToken",
+          "line": 12
+        },
+        {
+          "method": "BlobAsync_CanceledRead_CleansUpWithIndependentToken",
+          "line": 25
+        },
+        {
+          "method": "BlobAsync_ReadAndCleanupFail_PreservesBothFailures",
+          "line": 39
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Resources.Tests/AzureQueueAndTableTests.cs",
+      "sha256": "47d760477190417d36d86da3591e83cbdf921f7148c90c06d2c2278432e18713",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Resources.Tests",
+      "counts": {
+        "Test": 5,
+        "TestCase": 2,
+        "authoredAttributedMethodDeclarations": 6
+      },
+      "definitions": [
+        {
+          "method": "StorageQueueAsync_RoundTrip_UsesIsolatedQueueAndDeletesReceivedMessageBeforeQueue",
+          "line": 14
+        },
+        {
+          "method": "StorageQueueAsync_InvalidRead_RemovesQueueWithoutAcknowledgingMessage",
+          "line": 30
+        },
+        {
+          "method": "StorageQueueAsync_CanceledRead_DeletesQueueWithIndependentToken",
+          "line": 42
+        },
+        {
+          "method": "TableAsync_RoundTrip_UsesStableKeysAndRemovesOnlyCreatedEntity",
+          "line": 56
+        },
+        {
+          "method": "TableAsync_MismatchedRead_RemovesEntityAndRejectsWrongValue",
+          "line": 74
+        },
+        {
+          "method": "TableAsync_CanceledRead_RemovesEntityWithIndependentToken",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "source": "tests/DeveloperToolbox.Example.Resources.Tests/ResourceSamplesTests.cs",
+      "sha256": "c64515435595a05ab9c4b1d7aee2261942fff8fbf7b0b10e42797f5e67e57cca",
+      "framework": "NUnit",
+      "area": "tests/DeveloperToolbox.Example.Resources.Tests",
+      "counts": {
+        "TestCaseSource": 1,
+        "TestCase": 8,
+        "Test": 10,
+        "authoredAttributedMethodDeclarations": 13
+      },
+      "definitions": [
+        {
+          "method": "ResourceAsync_RemoteDestination_RejectsBeforeConnecting",
+          "line": 29
+        },
+        {
+          "method": "ResourceAsync_UnsafeDestination_RejectsBeforeConnecting",
+          "line": 44
+        },
+        {
+          "method": "CosmosAsync_MissingEmulatorKey_ExplainsInvokedSampleOnly",
+          "line": 52
+        },
+        {
+          "method": "SeqAsync_Success_SendsCorrelatedClefAndConfiguredKey",
+          "line": 62
+        },
+        {
+          "method": "SeqAsync_ServerRejectsEvent_SurfacesHttpFailure",
+          "line": 89
+        },
+        {
+          "method": "HttpSample_LocalRedirect_RejectsBeforeReportingSuccess",
+          "line": 101
+        },
+        {
+          "method": "SeqAsync_Cancellation_PropagatesToHttp",
+          "line": 120
+        },
+        {
+          "method": "WireMockAsync_Success_RemovesExactlyTheCreatedMapping",
+          "line": 135
+        },
+        {
+          "method": "WireMockAsync_MismatchedRead_StillRemovesMapping",
+          "line": 165
+        },
+        {
+          "method": "WireMockAsync_CanceledRead_CleansUpWithIndependentToken",
+          "line": 181
+        },
+        {
+          "method": "WireMockAsync_CreateRejected_DoesNotDeleteOtherMappings",
+          "line": 208
+        },
+        {
+          "method": "WireMockAsync_ReadAndCleanupFail_PreservesBothFailures",
+          "line": 224
+        },
+        {
+          "method": "WireMockAsync_CleanupRejected_DoesNotReportSuccess",
+          "line": 238
+        }
+      ]
+    },
+    {
+      "source": "tests/test_ai_assets.py",
+      "sha256": "eeacaf60bc3681275a45fd30c92ea9854db3bad2ea16d78bf81c09518a750e6b",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 7
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_architecture_inventory.py",
+      "sha256": "b176865d491117bba907690d2ef85ee09b0356efc6fc7cabfcaa17cf2aa36894",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 8
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_aws_resources.py",
+      "sha256": "6c6f39b3006bbdc85f3473524bc221b6437209ff905b935d9111d120624633ea",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 14
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_build_toolbox_image.ps1",
+      "sha256": "f519216b776ab808cc0a28e1213367e6c314f34137abea012eed66854ae70dd4",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_configure_examples.py",
+      "sha256": "e026064e850b74c7b2f4c2eb18fe69ae380d19b2ece506b4e08741c4f20e8201",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 28
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_container_lifecycle_helpers.py",
+      "sha256": "6eead943ebac1a665499ecb028df608ec2a2d7bf628727da01a3de84d550373f",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 7
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_docker_pull.ps1",
+      "sha256": "92d60568d34ffa6bbefdf0be6058ce2cd8ee5ca21f2449a646a4c590af65b86b",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_docker_pull.sh",
+      "sha256": "3ee7362517019152872cb93296bc7410782396fe34398f0e0585d9736f964694",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_docker_setup.ps1",
+      "sha256": "8578f2f19e5da99d638c48c8da8c0fd0733164f935e65b58684430ffaf8021cc",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_docker_setup.sh",
+      "sha256": "9d213e27b4fc2c1a1b04ff0863bad04376f7ee65974a359a28872bd0b0642b83",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_ensure_image.ps1",
+      "sha256": "b18b8f5a0699a03bcbc1bf062ee0f393e7f63c2671b6c0d6da592251458bd669",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_ensure_image.sh",
+      "sha256": "3ce12bb9a64ff88c83df6986be968878cb0bdab733e4d6fc1f1bcb525add531c",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_environment.ps1",
+      "sha256": "895998f23e072f7994df902dc0e94c70333d4a5e579bf807191bd1233535f525",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_environment.sh",
+      "sha256": "79b0ae983e8bf1c5449046a72f783b80ef36935e2aaccad021a5d3a64f309fc3",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_git_tag_cleanup.ps1",
+      "sha256": "8a25c094de7094efe7e57e9722c870ca76036a0d9badf6c5f3e81076aa7ac70b",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_host_example_helpers.py",
+      "sha256": "9eb3a8780fc183921a16d9293124cb6dc93616837bd6d4359fa9bad52f1c15bc",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 19
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_moto_integration.py",
+      "sha256": "5836d4552d479b7f0a90c9a4ff0f9515e5abe6e5ef11643d27943e66a4078205",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 6
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_oidc_contract.ps1",
+      "sha256": "ffa522aa3e17e40d4d54d3cacdb0624d276aa345e4ea77c39b33e28654c95c9e",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_oidc_startup.ps1",
+      "sha256": "525095020ffc1cd2bd44c7a3266ecb28d9fe8a3c7d7e3052560c37ab87eabdb8",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_review_inventory.py",
+      "sha256": "e5ef06a5c4738529d7bf21895a7a160512256e4dfa13f30f36e8ec076b986bf0",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 4
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_servicebus_container_helpers.py",
+      "sha256": "36954045472e38db170869b577b9828a57653b3529d22b8d9bb5d7c3f69e5d33",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 6
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_shared_container_helpers.py",
+      "sha256": "f479f0cc300ce4bcf7c2e3b429a9679cbb192a8313ceab6fa49880819eefc6c2",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 4
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_source_port.py",
+      "sha256": "4ad3cd98cb166cfd6cf7d6a87e5d3039ced24f38fb7cadca0fdab4e2b585cac1",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 5
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_toolbox_bootstrap.ps1",
+      "sha256": "9d9d76d78e97a4f8dce326ccd894693b59caa647ac053617fbec117d5dfe1445",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_toolbox_bootstrap.sh",
+      "sha256": "e730ffff5d30747e3ec2dec11626e9509699dd5cf21247ffddcd8f529ffd8f20",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_wiki_inventory.py",
+      "sha256": "b651620963a5fe47ae55523d0e9abfa9ffcd60c826f09d261965a37fa0c5e990",
+      "framework": "Python test functions",
+      "area": "tests",
+      "counts": {
+        "authoredFunctions": 9
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_wiremock_certificates.ps1",
+      "sha256": "7d1017e635614e22d028d33484eb633df3f5e7412d9c35071033d06c5f4fef10",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    },
+    {
+      "source": "tests/test_wiremock_certificates.sh",
+      "sha256": "f270ff42529056108f4bd4636e3ec5df3dd81688741b497041f78e7bde59b638",
+      "framework": "Standalone shell scripts",
+      "area": "tests",
+      "counts": {
+        "scripts": 1
+      },
+      "definitions": []
+    }
+  ]
+}

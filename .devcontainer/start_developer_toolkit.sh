@@ -35,6 +35,9 @@ is_devcontainer() {
             1|true|TRUE|True)
                 return 0
                 ;;
+            *)
+                continue
+                ;;
         esac
     done
     return 1
@@ -97,5 +100,3 @@ fi
 
 cd "$REPO_ROOT"
 "${setup_command[@]}"
-
-

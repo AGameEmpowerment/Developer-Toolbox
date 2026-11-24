@@ -25,7 +25,7 @@ new_test_repository() {
     local origin_url="${2:-}"
 
     mkdir -p "$path"
-    git -C "$path" init --quiet
+    git -C "$path" init --quiet --initial-branch=main
     if [[ -n "$origin_url" ]]; then
         git -C "$path" remote add origin "$origin_url"
     fi
@@ -37,7 +37,7 @@ printf '%s\n' '#!/usr/bin/env bash' 'exit 1' > "${mock_bin}/docker"
 printf '%s\n' \
     '#!/usr/bin/env bash' \
     'if [[ -n "${EXPECTED_CONNECTION:-}" && "${CONTAINER_CONNECTION:-}" != "$EXPECTED_CONNECTION" ]]; then exit 1; fi' \
-    '[[ "$1" == "info" ]]' > "${mock_bin}/podman"
+    '[[ "$1" == "info" || "$1" == "image" ]]' > "${mock_bin}/podman"
 printf '%s\n' \
     '#!/usr/bin/env bash' \
     'printf "%s\n" "$*"' > "${mock_bin}/devcontainer"
@@ -162,8 +162,8 @@ if [[ ! -f "${preserve_path}/.devcontainer/consumer-owned.txt" ]]; then
     echo "Assertion failed: installer replaced an existing target directory" >&2
     exit 1
 fi
-if [[ -e "${preserve_path}/.devcontainer/devcontainer.json" ]]; then
-    echo "Assertion failed: installer added files to an existing target directory" >&2
+if [[ ! -f "${preserve_path}/.devcontainer/devcontainer.json" ]]; then
+    echo "Assertion failed: installer did not add missing managed files to an existing target directory" >&2
     exit 1
 fi
 

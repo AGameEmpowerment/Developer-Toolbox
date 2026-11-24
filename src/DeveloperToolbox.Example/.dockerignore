@@ -1,0 +1,11 @@
+# Shared local-development build context. Never bake host settings or credentials.
+**/bin
+**/obj
+**/.tools
+**/node_modules
+**/local.settings*.json
+**/appsettings*.json
+**/.env*
+**/NuGet.Config
+**/nuget.config
+DeveloperToolbox.Example.Client

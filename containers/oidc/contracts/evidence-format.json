@@ -1,0 +1,28 @@
+{
+  "formatVersion": 1,
+  "purpose": "source-only receipt field contract, not an execution result or runtime schema engine",
+  "requiredFields": {
+    "timestampUtc": "ISO 8601 UTC timestamp",
+    "runId": "unique non-secret owned run identifier",
+    "sources": "repository, exact commit, dirty boolean, changed input hashes if dirty",
+    "engine": "docker or podman, version, connection/context identity, host OS",
+    "platform": "measured OS/architecture; linux/arm64 remains unverified until run",
+    "images": "upstream reference and resolved local image ID, base and derived IDs, contract label/version, lineage",
+    "profile": "default/project and descriptor identity, topology and issuer reachability category",
+    "command": "exact executable and non-secret arguments, selection and prerequisites",
+    "inventory": "framework/area, authored definitions, discovered expanded cases, browser/persona repetitions, snapshots and standalone scripts separately",
+    "results": "pass/fail/skip counts by framework and area, or explicit not-run/unsupported status",
+    "checks": "fixed check names and passed/failed/skipped/not-run only",
+    "cleanup": "owned resources removed, failures and cancellation status",
+    "coverage": "measured report location and percentage, or unavailable"
+  },
+  "buildInventory": ["effective UID/user", "entrypoint/command", "runtime file bytes", "added layers", "no added packages or test tools"],
+  "forbiddenFields": ["credentials", "rendered realm imports", "tokens", "authorization codes", "PKCE verifiers", "nonce/state values", "cookies", "request/response bodies", "raw browser traces", "unredacted native logs"],
+  "rules": [
+    "Use a new evidence directory for every run; retain failed results.",
+    "A manifest digest is not a resolved local image ID.",
+    "Record native CLI/build/runtime failures explicitly; never reuse historical receipts as a current pass.",
+    "Protocol-only, fixture-graph and real application acceptance remain separate.",
+    "Test totals are not coverage percentages and do not establish assertion quality."
+  ]
+}

@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-Gets the Developer Toolbox and starts its shared local service stack.
+Gets the Edu Developer Toolbox and starts its shared local service stack.
 
 .DESCRIPTION
 Repository-root convenience entry point. All clone, update, and setup behavior
@@ -57,5 +57,3 @@ if (-not (Test-Path -LiteralPath $toolboxLauncher -PathType Leaf)) {
 }
 
 & $toolboxLauncher @PSBoundParameters
-
-

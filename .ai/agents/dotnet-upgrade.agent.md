@@ -69,7 +69,7 @@ Use these prompts for targeted analysis of specific upgrade aspects.
 ---
 
 ## Quick Start
-1. Run a discovery pass to enumerate all `*.sln` and `*.csproj` files in the repository.
+1. Run a discovery pass to enumerate all `*.slnx` and `*.csproj` files in the repository.
 2. Detect the current .NET version(s) used across projects.
 3. Identify the latest available stable .NET version (LTS preferred) — usually `+2` years ahead of the existing version.
 4. Generate an upgrade plan to move from current → next stable version (e.g., `net8.0 → net10.0`).

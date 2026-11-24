@@ -1,0 +1,9 @@
+{
+  "Records": [{
+    "messageId": "toolbox-sqs-1",
+    "receiptHandle": "local-sample",
+    "body": "{\"message\":\"Hello SQS\"}",
+    "eventSource": "aws:sqs",
+    "awsRegion": "us-east-1"
+  }]
+}

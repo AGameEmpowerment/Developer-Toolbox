@@ -170,7 +170,7 @@ When implementing solutions, **ALWAYS follow this process**:
 ### Test Structure
 
 ```csharp
-[Fact(DisplayName = "Descriptive test scenario")]
+[Test(Description = "Descriptive test scenario")]
 public void MethodName_Condition_ExpectedResult()
 {
     // Setup for the test
@@ -181,8 +181,8 @@ public void MethodName_Condition_ExpectedResult()
     var result = aggregate.PerformAction(parameters);
 
     // Verification of the outcome
-    Assert.NotNull(result);
-    Assert.Equal(expectedValue, result.Value);
+    Assert.That(result, Is.Not.Null);
+    Assert.That(result.Value, Is.EqualTo(expectedValue));
 }
 ```
 

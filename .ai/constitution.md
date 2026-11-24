@@ -1,6 +1,6 @@
 # AI Engineering Constitution
 
-This repository is a multi-language scaffolding template intended to seed new projects (e.g., .NET (C# / ASP.NET / Blazor), React, TypeScript/JavaScript frontends, infrastructure (Terraform), DevOps pipelines, and containerized services). It intentionally contains minimal source code. This constitution guides all AI coding tools consistently and delegates specialized concerns to `.ai/instructions/`.
+This repository is a local developer toolbox and multi-language scaffolding template. C# (.NET), Java, JavaScript (Node.js, including TypeScript), and Python are first-class primary languages. It provides reusable examples, containerized services, infrastructure templates, and development tooling. This constitution guides all AI coding tools consistently and delegates specialized concerns to `.ai/instructions/`.
 
 `AGENTS.md`, `CLAUDE.md`, and `.github/copilot-instructions.md` are discovery
 entry points. This file is the authoritative repository-wide policy. Vendor
@@ -16,6 +16,25 @@ When generating code for this repository or any project created from it:
 3. Codebase Patterns: After a project is seeded, scan existing source folders for naming, error handling, testing, dependency injection, logging, and configuration patterns. Mirror them exactly.
 4. Architectural Consistency: Maintain a Mixed architecture style (this template can evolve into layered, DDD, microservices, or serverless). Never introduce architectural boundaries not already established.
 5. Code Quality: Treat maintainability, performance, security, accessibility, and testability as equal priorities (All). If a trade-off is required, prefer clarity + security + testability, then performance.
+6. Language Support: Shared resources must expose language-neutral protocols or supported SDKs for all four primary languages. Keep SDK versions and idiomatic implementation choices specific to each language rather than treating one language's framework as universal. Examples and validators run independently outside the shared container collection, using only the developer's chosen language SDK.
+7. Local Dependencies: Prefer free, open-source dependencies. Every library, package, image, container, and other dependency must be usable for the intended local development without a licensing barrier. Free developer editions are permitted even when production editions are paid. Verify licenses and document feature limitations; default startup must not require a purchased license or real cloud credentials.
+
+### Shared Containers And Independent Examples
+
+- `containers/docker-compose-{common,azure,aws}.yml` split shared infrastructure resources and their required initialization jobs into common, Azure, and AWS projects. Do not bundle example applications, Functions/Lambda handlers, SDK validators, or sample queue dispatchers into the shared image collection.
+- Creating the shared collection must require neither a host .NET SDK nor a host Java/JDK installation. Support developers with either SDK, another primary language, or no application SDK. Use an ephemeral tool from an existing infrastructure image when setup needs a utility unavailable on the host.
+- Developers can build and run an example or validator outside the collection to exercise its services. Keep each language's build, unit tests, and live resource checks independently runnable; no developer must install every primary language to validate their chosen examples.
+- Local endpoint guards must validate the effective destination selected by the installed SDK. When a separate validator parses raw connection strings, reject ambiguous duplicate or noncanonical keys instead of validating a different effective connection; regressions must check the SDK constructor's selected destination without contacting a cloud endpoint.
+- Dotenv setup must preserve explicit credentials and paths, including literal hashes. Test both shell implementations against Compose's quoting and inline-comment behavior before changing placeholder recognition.
+
+### Dependency License Rules
+
+- Prefer dependencies that are both open source and free for the intended developer-toolbox use. This applies to libraries, packages, images, containers, tooling, and their included dependencies.
+- The primary requirement is unblocked local development: every selected dependency must permit the intended use without purchasing a license. A free developer edition is allowed even if the production product is proprietary and paid; SQL Server Developer is an example. Check organizational/developer eligibility and required license terms, rather than assuming that "free to download" permits the intended use.
+- Comply with the dependency's actual license, including applicable notices, attribution, and redistribution conditions. Document the license and source of newly adopted dependencies.
+- Do not add dependencies requiring paid licenses, license tokens, or paid cloud accounts to default local startup. Do not pin obsolete versions to evade licensing requirements.
+- Do not adopt dependencies requiring payment or an unavailable license for local development. Select a free, open-source alternative or a freely licensed developer edition instead. A paid production offering alone does not disqualify its free developer edition.
+- If a dependency's license, eligibility, or permission for the intended developer use is unclear, ask the user before adopting it. Identify the dependency and what is uncertain; do not guess. If terms conflict with these rules, report the conflict and resolve it with the user before proceeding. Do not invent license permissions or bypass restrictions.
 
 ---
 ## Technology Version Detection
@@ -25,7 +44,8 @@ Because this template does not yet define concrete application code, AI assistan
 1. Language Versions
 	- For .NET: Inspect `.csproj` `<TargetFramework>` / `<LangVersion>` or global.json. Only use C# features available in that language version.
 	- For Node/React/TypeScript: Inspect `package.json` engines, dependency versions, `tsconfig.json` (target/module/lib). Respect configured ECMAScript/TypeScript targets.
-	- For Python (if added): Read `pyproject.toml` / `requirements.txt` / runtime spec.
+	- For Java: Inspect `pom.xml`, Gradle toolchains, compiler release settings, and the supported Functions/Lambda runtime version.
+	- For Python: Read `pyproject.toml` / `requirements.txt` / runtime spec.
 2. Framework Versions
 	- ASP.NET Core / Blazor: Detect from NuGet package versions and SDK references.
 	- React / React DOM / React Router: Use only documented APIs present in detected versions.
@@ -34,6 +54,49 @@ Because this template does not yet define concrete application code, AI assistan
 	- When absent or ambiguous, generate conservative, widely supported patterns.
 
 Never introduce language or framework features that exceed detected versions. Always annotate version assumptions in comments ONLY when non-obvious (e.g., performance-critical or security-sensitive code paths) using minimal, purpose-driven commentary.
+
+### Container Image Versions and Pulls
+
+The architect set this policy on 2026-10-25 for Toolbox and the projects that
+use it. The full text, with examples, is in
+[docs/guides/container-image-policy.md](../docs/guides/container-image-policy.md).
+
+1. Development and test containers use `latest` by default. This covers
+   everything that only runs locally or in test environments: OneBox,
+   Testcontainers, the Aspire AppHost, the test runner, Playwright browsers,
+   service mocks (smtp4dev, SQL Server, WireMock, Seq, Keycloak), Ryuk and
+   helper containers, and Toolbox-managed devcontainers. No digest pins, and no
+   tests whose only job is to enforce pins. The one exception is the
+   devcontainer: it may keep pinned versions, including its
+   `devcontainer-lock.json` feature lock.
+2. Pin only when a tool needs a matching version, and then by tag, not digest.
+   Each pinned tag gets a one-line comment explaining why. Today that means
+   Playwright (the browser image matches the Playwright package version, for
+   example `v1.63.0-noble`), the .NET SDK (`10.0`, because the projects target
+   .NET 10), Node (`24` only if the build requires it, otherwise latest/LTS).
+   A product-line tag such as the Cosmos DB
+   Emulator's `vnext-latest` is not a pin.
+3. Production images stay pinned. Any image that is deployed, or is the base
+   for something deployed, stays pinned, by digest if that is what is there
+   today. That includes the Server runtime image the Build-Docker pipeline
+   publishes and any other base that feeds a shipped image.
+4. The Keycloak OIDC mock (the Okta stand-in) is
+   `quay.io/keycloak/keycloak:latest`. That is and stays the accepted version
+   in ExamplePortal and Toolbox.
+5. Reuse local images. A local copy of a tag is reused rather than pulled on
+   every run. It is pulled only when it is missing, with the registry mirror as
+   fallback. A local copy is refreshed with an explicit `docker pull`. No step
+   forces a pull, and no helper images get pulled.
+6. Keep it simple. If pinning is not clearly required by one of these rules,
+   do not pin.
+
+Separate rule: always keep the latest `mcp/seq-otlp` image on the machine.
+
+Container image sources must prefer the primary approved publisher: official
+Docker Hub images first when available, then Microsoft Container Registry or
+GitHub Container Registry for Microsoft/GitHub-published assets. Use the registry
+mirror as the fallback when the primary source is unavailable or
+organizational policy requires the mirror.
 
 ---
 ## Context & Specialized Instruction Files
@@ -110,7 +173,7 @@ When the generated project contains actual source code:
 ## Testing Approach (All)
 
 ### Unit Testing
-- Follow existing framework: e.g., xUnit/NUnit/MSTest for .NET; Jest/Vitest for JS/TS; React Testing Library for components.
+- Use NUnit for .NET tests and NSubstitute when mocks are needed. Use native NUnit constraint assertions and await asynchronous assertions. Preserve per-case isolation; do not enable parallel execution for tests that mutate process-wide state. Jest/Vitest and React Testing Library remain the JavaScript/TypeScript tools.
 - One conceptual expectation per test method/block.
 
 ### Integration Testing
@@ -136,6 +199,16 @@ When the generated project contains actual source code:
 - Respect `tsconfig.json` compiler targets; avoid unsupported ECMAScript proposals.
 - Use function components with hooks unless existing code prefers classes.
 - Keep state colocated; escalate to context/state managers only when reuse or cross-cut concerns justify it.
+
+### Java
+- Detect the declared JDK and Maven/Gradle versions; use supported cloud-runtime releases for serverless examples.
+- Reuse SDK clients, close resources, and propagate failures so queue consumers can retry safely.
+- Use JUnit or the existing project test framework, with deterministic unit tests and separate live-container validation.
+
+### Python
+- Detect the declared Python runtime and dependency versions; keep environment dependencies isolated.
+- Use supported SDKs and context managers for resource lifetimes; validate event payloads before side effects.
+- Use unittest, pytest, or the existing project framework; separate unit tests from live-container validation.
 
 ### Infrastructure (Terraform / DevOps)
 - Follow existing folder naming (`terraform/`, `devops/pipelines/`).

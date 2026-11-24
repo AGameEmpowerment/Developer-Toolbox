@@ -15,6 +15,9 @@
 ##   This will handle all files NOT defined below.
 *                 text=auto
 
+# Prettier requires CRLF in the local client example, including Linux checkouts.
+src/DeveloperToolbox.Example/DeveloperToolbox.Example.Client/** text=auto eol=crlf
+
 # Source code
 *.bash            text eol=lf
 *.bat             text eol=crlf
@@ -59,7 +62,7 @@
 *.cs       text diff=csharp
 *.cshtml   text diff=html
 *.csx      text diff=csharp
-*.sln      text eol=crlf
+*.slnx      text eol=crlf
 *.csproj   text eol=crlf
 
 # Docker

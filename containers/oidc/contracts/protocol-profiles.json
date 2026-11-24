@@ -1,0 +1,35 @@
+{
+  "contractVersion": 1,
+  "sourceOnly": true,
+  "scope": "local-development-only",
+  "profiles": [
+    {
+      "name": "default-browser",
+      "startupProfile": "default",
+      "clientId": "toolbox-local-web",
+      "personas": ["admin", "user"],
+      "grantTypes": ["authorization_code"],
+      "pkce": "S256",
+      "requiredChecks": ["readiness", "discovery", "jwks", "browser-code", "id-token", "access-token", "userinfo"],
+      "unsupportedByThisProfile": ["client_credentials", "application-authorization"]
+    },
+    {
+      "name": "project-browser",
+      "startupProfile": "project",
+      "clientId": "toolbox-example-web",
+      "tokenEndpointAuthMethod": "client_secret_post",
+      "grantTypes": ["authorization_code", "refresh_token"],
+      "pkce": "S256",
+      "requiredChecks": ["default-users-absent", "browser-code", "refresh-rotation", "refresh-replay-rejected", "logout", "new-persona-login"]
+    },
+    {
+      "name": "project-service",
+      "startupProfile": "project",
+      "clientId": "toolbox-example-service",
+      "tokenEndpointAuthMethod": "client_secret_basic",
+      "grantTypes": ["client_credentials"],
+      "requiredChecks": ["service-audience", "service-scopes", "browser-grant-rejected", "refresh-token-absent"]
+    }
+  ],
+  "fixtureRule": "Only external drivers generate native realm JSON, exact callbacks and runtime credentials. Descriptors are acceptance targets, not execution evidence."
+}

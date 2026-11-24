@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Get the Developer Toolbox and start its shared local service stack.
+# Get the Edu Developer Toolbox and start its shared local service stack.
 set -euo pipefail
 
 readonly TOOLBOX_REPOSITORY="AGameEmpowerment/Developer-Toolbox"
@@ -19,7 +19,7 @@ Usage: ./setup/_toolbox.sh [OPTIONS]
 
 Options:
   --path DIR        Toolbox checkout path. Defaults to $DEVELOPER_TOOLBOX_ROOT, then
-                    a Developer-Toolbox directory beside this repository.
+                    an Developer-Toolbox directory beside this repository.
   --branch NAME     Toolbox branch to clone or fast-forward. Default: main.
   --runtime VALUE   Container runtime: auto, docker, or podman. Default: auto.
   --skip-setup      Clone or update without starting the service stack.
@@ -45,6 +45,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --path=*)
+            require_value "--path" "${1#*=}"
             TOOLBOX_PATH="${1#*=}"
             shift
             ;;
@@ -54,6 +55,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --branch=*)
+            require_value "--branch" "${1#*=}"
             BRANCH="${1#*=}"
             shift
             ;;
@@ -63,6 +65,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --runtime=*)
+            require_value "--runtime" "${1#*=}"
             CONTAINER_RUNTIME="${1#*=}"
             shift
             ;;
@@ -147,20 +150,24 @@ if [[ -d "$TOOLBOX_PATH" ]] && git -C "$TOOLBOX_PATH" rev-parse --is-inside-work
         exit 1
     fi
     if ! toolbox_origin_is_valid "$origin_url"; then
-        echo "error: Toolbox checkout '$requested_toolbox_path' has unexpected origin '$origin_url'; expected $TOOLBOX_HTTPS_URL" >&2
+        echo "error: Toolbox checkout '$requested_toolbox_path' has an unexpected origin; expected $TOOLBOX_HTTPS_URL" >&2
         exit 1
     fi
 
     echo "Using existing Toolbox checkout at $TOOLBOX_PATH"
+    if ! current_branch="$(git -C "$TOOLBOX_PATH" symbolic-ref --quiet --short HEAD)"; then
+        echo "error: Toolbox checkout '$requested_toolbox_path' has a detached HEAD; switch to the requested branch '$BRANCH' with git switch before retrying" >&2
+        exit 1
+    fi
+    if [[ "$current_branch" != "$BRANCH" ]]; then
+        echo "error: Toolbox checkout '$requested_toolbox_path' is on branch '$current_branch', not requested branch '$BRANCH'; switch branches explicitly or pass --branch '$current_branch'" >&2
+        exit 1
+    fi
+
     if [[ "$NO_UPDATE" -eq 0 ]]; then
         if git ${GIT_AUTHENTICATION_ARGUMENTS[@]+"${GIT_AUTHENTICATION_ARGUMENTS[@]}"} -C "$TOOLBOX_PATH" fetch origin --prune; then
-            current_branch="$(git -C "$TOOLBOX_PATH" rev-parse --abbrev-ref HEAD)"
-            if [[ "$current_branch" == "$BRANCH" ]]; then
-                if ! git -C "$TOOLBOX_PATH" merge --ff-only "origin/$BRANCH"; then
-                    echo "warning: could not fast-forward '$BRANCH'; continuing with the existing checkout" >&2
-                fi
-            else
-                echo "warning: Toolbox is on '$current_branch', not '$BRANCH'; continuing without changing branches" >&2
+            if ! git -C "$TOOLBOX_PATH" merge --ff-only "origin/$BRANCH"; then
+                echo "warning: could not fast-forward '$BRANCH'; continuing with the existing checkout" >&2
             fi
         else
             echo "warning: could not fetch Toolbox updates; continuing with the existing checkout" >&2
@@ -201,4 +208,3 @@ echo "Starting the Toolbox service stack with runtime '$CONTAINER_RUNTIME'..."
 
 echo "Toolbox service stack is running."
 echo "Stop it with: '${TOOLBOX_PATH}/docker_down.sh' --runtime '$CONTAINER_RUNTIME'"
-

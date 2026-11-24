@@ -80,7 +80,8 @@ function Resolve-HostContainerRuntime {
 
     $installedRuntimes = @()
     foreach ($runtimeName in $runtimeNames) {
-        $runtimeCommand = Get-Command $runtimeName -ErrorAction SilentlyContinue
+        $runtimeCommand = Get-Command $runtimeName -ErrorAction SilentlyContinue |
+            Select-Object -First 1
         if (-not $runtimeCommand) {
             continue
         }
@@ -88,7 +89,7 @@ function Resolve-HostContainerRuntime {
         $installedRuntimes += $runtimeName
         $runtimeIsReachable = $false
         try {
-            & $runtimeCommand.Source info *> $null
+            & $runtimeCommand.Path info *> $null
             $runtimeIsReachable = ($LASTEXITCODE -eq 0)
         } catch {
             $runtimeIsReachable = $false
@@ -97,7 +98,7 @@ function Resolve-HostContainerRuntime {
         if ($runtimeIsReachable) {
             return [PSCustomObject]@{
                 Name = $runtimeName
-                Path = $runtimeCommand.Source
+                Path = $runtimeCommand.Path
             }
         }
     }
@@ -134,24 +135,38 @@ try {
     }
 
     $runtimePath = $runtime.Path
-    $devcontainerCommand = Get-Command devcontainer -ErrorAction SilentlyContinue
+    $devcontainerConfigPath = Join-Path $PSScriptRoot "devcontainer.json"
+    $imageMatch = Select-String -LiteralPath $devcontainerConfigPath `
+        -Pattern '^\s*"image"\s*:\s*"([^"]+)"' |
+        Select-Object -First 1
+    if (-not $imageMatch) {
+        throw "No devcontainer base image was found in '$devcontainerConfigPath'."
+    }
+    $baseImage = $imageMatch.Matches[0].Groups[1].Value
+
+    . (Join-Path $PSScriptRoot 'ensure_image.ps1')
+    Ensure-ToolboxImage -Runtime $runtimePath -Image $baseImage
+    $devcontainerCommand = Get-Command devcontainer -ErrorAction SilentlyContinue |
+        Select-Object -First 1
     if ($devcontainerCommand) {
-        $commandPath = $devcontainerCommand.Source
+        $commandPath = $devcontainerCommand.Path
         $commandArguments = @(
             "up",
             "--workspace-folder", $repoRoot,
             "--docker-path", $runtimePath
         )
     } else {
-        $npxCommand = Get-Command npx.cmd -ErrorAction SilentlyContinue
+        $npxCommand = Get-Command npx.cmd -ErrorAction SilentlyContinue |
+            Select-Object -First 1
         if (-not $npxCommand) {
-            $npxCommand = Get-Command npx -ErrorAction SilentlyContinue
+            $npxCommand = Get-Command npx -ErrorAction SilentlyContinue |
+                Select-Object -First 1
         }
         if (-not $npxCommand) {
             throw "Install the Dev Container CLI or Node.js with npx, then retry."
         }
 
-        $commandPath = $npxCommand.Source
+        $commandPath = $npxCommand.Path
         $commandArguments = @(
             "--yes", "@devcontainers/cli",
             "up",
@@ -171,5 +186,3 @@ try {
         $env:CONTAINER_CONNECTION = $previousPodmanConnection
     }
 }
-
-

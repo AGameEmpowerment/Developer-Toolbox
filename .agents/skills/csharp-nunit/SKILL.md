@@ -1,71 +1,54 @@
 ---
 name: csharp-nunit
-description: 'Get best practices for NUnit unit testing, including data-driven tests'
+description: 'Write and migrate NUnit tests for C# projects, including parameterized cases, asynchronous assertions, fixture isolation, and NSubstitute mocks.'
 ---
 
 # NUnit Best Practices
 
-Your goal is to help me write effective unit tests with NUnit, covering both standard and data-driven testing approaches.
+Use NUnit for .NET tests in this repository. Use NSubstitute when interface
+mocks are needed; retain stateful simulators that exercise resource lifetimes,
+ordering, cancellation or message delivery.
 
 ## Project Setup
 
-- Use a separate test project with naming convention `[ProjectName].Tests`
-- Reference Microsoft.NET.Test.Sdk, NUnit, and NUnit3TestAdapter packages
-- Create test classes that match the classes being tested (e.g., `CalculatorTests` for `Calculator`)
-- Use .NET SDK test commands: `dotnet test` for running tests
+- Keep tests in a separate `[ProjectName].Tests` project.
+- Reference `Microsoft.NET.Test.Sdk`, `NUnit` and `NUnit3TestAdapter` using the
+  repository's selected versions. Follow the NuGet Manager skill for package edits.
+- Add `NSubstitute` only to projects that use it. Substitute interfaces or virtual
+  members; do not substitute non-virtual methods or change production APIs solely for mocking.
+- Run tests using `dotnet test`; preserve the existing target framework.
 
-## Test Structure
+## Cases and Isolation
 
-- Apply `[TestFixture]` attribute to test classes
-- Use `[Test]` attribute for test methods
-- Follow the Arrange-Act-Assert (AAA) pattern
-- Name tests using the pattern `MethodName_Scenario_ExpectedBehavior`
-- Use `[SetUp]` and `[TearDown]` for per-test setup and teardown
-- Use `[OneTimeSetUp]` and `[OneTimeTearDown]` for per-class setup and teardown
-- Use `[SetUpFixture]` for assembly-level setup and teardown
+- Use `[Test]` for a parameterless case, `[TestCase(...)]` for inline rows and
+  `[TestCaseSource(nameof(Cases))]` for a static source. Do not add `[Test]` to
+  a method that already has parameterized case attributes.
+- Name tests `MethodName_Scenario_ExpectedBehavior` and keep each method focused.
+- Use `[FixtureLifeCycle(LifeCycle.InstancePerTestCase)]` when tests require fresh
+  instances. Use `[SetUp]` and `[TearDown]` for per-case setup and cleanup.
+- Shared one-time setup must respect the selected fixture lifecycle. Do not enable
+  parallelism for tests that mutate environment variables or other global state.
+- Use `[Category("Integration")]` and explicit opt-in configuration for live
+  resources. Report a clear `Assert.Ignore` reason when the opt-in is absent.
+- Clean up only resources owned by the test; persistent shared Toolbox services
+  and consumer resources must remain intact.
 
-## Standard Tests
+## Assertions and Mocks
 
-- Keep tests focused on a single behavior
-- Avoid testing multiple behaviors in one test method
-- Use clear assertions that express intent
-- Include only the assertions needed to verify the test case
-- Make tests independent and idempotent (can run in any order)
-- Avoid test interdependencies
+- Prefer `Assert.That(actual, Is.EqualTo(expected))`, `Is.SameAs`, `Is.True`,
+  `Is.Null`, `Does.Contain` and `Has.Count.EqualTo` constraints.
+- Preserve exact-type checks (`Is.TypeOf<T>`, `Assert.Throws<T>`) versus
+  subtype checks (`Is.InstanceOf<T>`, `Assert.Catch<T>`).
+- NUnit 5 exception assertions are asynchronous: await `Assert.ThrowsAsync<T>`
+  and `Assert.CatchAsync<T>`. Keep asynchronous tests returning `Task`.
+- Use `Substitute.For<IContract>()`, explicit `.Returns(...)` behavior, and
+  `.Received(...)`/`.DidNotReceive()` checks for meaningful interactions.
+- Keep assertion strength and all parameter rows when migrating tests. Do not
+  introduce an assertion compatibility shim.
 
-## Data-Driven Tests
+## Evidence
 
-- Use `[TestCase]` for inline test data
-- Use `[TestCaseSource]` for programmatically generated test data
-- Use `[Values]` for simple parameter combinations
-- Use `[ValueSource]` for property or method-based data sources
-- Use `[Random]` for random numeric test values
-- Use `[Range]` for sequential numeric test values
-- Use `[Combinatorial]` or `[Pairwise]` for combining multiple parameters
-
-## Assertions
-
-- Use `Assert.That` with constraint model (preferred NUnit style)
-- Use constraints like `Is.EqualTo`, `Is.SameAs`, `Contains.Item`
-- Use `Assert.AreEqual` for simple value equality (classic style)
-- Use `CollectionAssert` for collection comparisons
-- Use `StringAssert` for string-specific assertions
-- Use `Assert.Throws<T>` or `Assert.ThrowsAsync<T>` to test exceptions
-- Use descriptive messages in assertions for clarity on failure
-
-## Mocking and Isolation
-
-- Consider using Moq or NSubstitute alongside NUnit
-- Mock dependencies to isolate units under test
-- Use interfaces to facilitate mocking
-- Consider using a DI container for complex test setups
-
-## Test Organization
-
-- Group tests by feature or component
-- Use categories with `[Category("CategoryName")]`
-- Use `[Order]` to control test execution order when necessary
-- Use `[Author("DeveloperName")]` to indicate ownership
-- Use `[Description]` to provide additional test information
-- Consider `[Explicit]` for tests that shouldn't run automatically
-- Use `[Ignore("Reason")]` to temporarily skip tests
+- Record authored methods separately from adapter-expanded/discovered cases and
+  executed passed, failed and skipped results.
+- Preserve dated source inventories and execution evidence. Coverage requires a
+  measured report; test counts alone do not establish coverage or assertion quality.

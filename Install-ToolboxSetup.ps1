@@ -19,7 +19,7 @@ The root directory of the Git repository that will receive the bootstrap files.
 None.
 
 .NOTES
-Run this script from a Developer-Toolbox checkout. Git must be available on
+Run this script from an Developer-Toolbox checkout. Git must be available on
 PATH. The target must be the repository root, not a subdirectory inside it.
 #>
 [CmdletBinding(SupportsShouldProcess, ConfirmImpact = "Medium")]
@@ -78,6 +78,41 @@ function Test-PathEntry {
         if ($entry.Name.Equals($entryName, $comparison)) {
             return $true
         }
+    }
+
+    return $false
+}
+
+function Test-PathHasLinkedAncestor {
+    param(
+        [Parameter(Mandatory)]
+        [string]$RootPath,
+
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+
+    $normalizedRoot = Get-NormalizedPath $RootPath
+    $candidatePath = Split-Path -Parent ([System.IO.Path]::GetFullPath($Path))
+    $comparison = if ($env:OS -eq 'Windows_NT') {
+        [System.StringComparison]::OrdinalIgnoreCase
+    } else {
+        [System.StringComparison]::Ordinal
+    }
+
+    while ($candidatePath -and -not $candidatePath.Equals($normalizedRoot, $comparison)) {
+        if (Test-PathEntry -Path $candidatePath) {
+            $parentPath = Split-Path -Parent $candidatePath
+            $entryName = Split-Path -Leaf $candidatePath
+            $entry = Get-ChildItem -LiteralPath $parentPath -Force -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name.Equals($entryName, $comparison) } |
+                Select-Object -First 1
+            if ($entry -and
+                ($entry.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+                return $true
+            }
+        }
+        $candidatePath = Split-Path -Parent $candidatePath
     }
 
     return $false
@@ -188,8 +223,16 @@ foreach ($manifestEntry in $manifestEntries) {
 
     $targetEntryPath = Join-Path $repositoryRoot $manifestEntry
     if (Test-PathEntry -Path $targetEntryPath) {
-        Write-Verbose "Preserving existing target entry: $targetEntryPath"
-        continue
+        if (-not (Test-Path -LiteralPath $targetEntryPath -PathType Container)) {
+            Write-Verbose "Preserving existing non-directory target entry: $targetEntryPath"
+            continue
+        }
+
+        $targetEntry = Get-Item -LiteralPath $targetEntryPath -Force
+        if (($targetEntry.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+            Write-Verbose "Preserving existing linked target entry: $targetEntryPath"
+            continue
+        }
     }
 
     foreach ($sourceFile in Get-ChildItem -LiteralPath $sourcePath -File -Recurse) {
@@ -214,6 +257,11 @@ foreach ($manifestEntry in $manifestEntries) {
 
 foreach ($bootstrapFile in $bootstrapFiles) {
     $targetFile = Join-Path $repositoryRoot $bootstrapFile.RelativePath
+
+    if (Test-PathHasLinkedAncestor -RootPath $repositoryRoot -Path $targetFile) {
+        Write-Verbose "Preserving target beneath an existing linked directory: $targetFile"
+        continue
+    }
 
     if (Test-PathEntry -Path $targetFile) {
         Write-Verbose "Preserving existing target: $targetFile"

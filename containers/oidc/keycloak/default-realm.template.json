@@ -1,0 +1,78 @@
+{
+  "realm": "toolbox-local",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "roles": {
+    "realm": [
+      { "name": "admin", "description": "Synthetic local application role; no management permissions" },
+      { "name": "user", "description": "Synthetic local application role" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "toolbox-local-web",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "${TOOLBOX_OIDC_CLIENT_SECRET}",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": ["${TOOLBOX_OIDC_CALLBACK_URI}"],
+      "webOrigins": [],
+      "attributes": { "pkce.code.challenge.method": "S256" },
+      "defaultClientScopes": ["profile", "email", "roles"],
+      "protocolMappers": [
+        {
+          "name": "application-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "toolbox-local-web",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        },
+        {
+          "name": "application-realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "config": {
+            "claim.name": "realm_access.roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "access.token.claim": "true",
+            "id.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "firstName": "Local",
+      "lastName": "Admin",
+      "email": "admin@toolbox.invalid",
+      "emailVerified": true,
+      "realmRoles": ["admin"],
+      "credentials": [{ "type": "password", "value": "${TOOLBOX_OIDC_ADMIN_PASSWORD}", "temporary": false }]
+    },
+    {
+      "username": "user",
+      "enabled": true,
+      "firstName": "Local",
+      "lastName": "User",
+      "email": "user@toolbox.invalid",
+      "emailVerified": true,
+      "realmRoles": ["user"],
+      "credentials": [{ "type": "password", "value": "${TOOLBOX_OIDC_USER_PASSWORD}", "temporary": false }]
+    }
+  ]
+}

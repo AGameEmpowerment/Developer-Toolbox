@@ -1,0 +1,8 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /samples",
+  "rawPath": "/samples",
+  "requestContext": { "http": { "method": "POST", "path": "/samples" } },
+  "body": "{\"message\":\"Hello Lambda\"}",
+  "isBase64Encoded": false
+}

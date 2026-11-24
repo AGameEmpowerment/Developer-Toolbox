@@ -4,15 +4,18 @@ Starts the local emulator stack inside the devcontainer.
 
 .DESCRIPTION
 Runs the repository's docker_setup.ps1 script when invoked from the Toolbox
-checkout. In a repository installed with Install-ToolboxSetup.ps1 or
-install_toolbox_setup.sh, delegates to setup_toolbox.ps1 instead. The
+checkout. In an installed consumer repository, delegates to setup_toolbox.ps1
+instead. The
 devcontainer installs Docker-in-Docker by default, so Docker is normally
 selected. Podman can be selected when a Podman runtime with Compose support is
 available instead.
 
-The delegated setup validates the selected runtime and its Compose support, creates containers/.env
-from containers/.env.example when needed, prepares the WireMock development
-certificate, and starts the services in containers/docker-compose-common.yml.
+The delegated setup resolves the Toolbox checkout, validates the selected runtime and its Compose
+support, creates <toolbox>/containers/.env from <toolbox>/containers/.env.example when needed,
+prepares the WireMock development certificate, and starts the services in
+<toolbox>/containers/docker-compose-common.yml, docker-compose-azure.yml, and
+docker-compose-aws.yml as three shared groups. Those emulator files live in the Toolbox checkout,
+not in an installed consumer repository.
 
 This script does not install Docker, start during container creation, import external
 resources, or delete existing container data. Port forwarding remains controlled by
@@ -93,5 +96,3 @@ try {
 } finally {
     Pop-Location
 }
-
-

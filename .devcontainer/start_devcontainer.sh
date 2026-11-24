@@ -38,6 +38,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --runtime=*)
+            require_value "--runtime" "${1#*=}"
             container_runtime="${1#*=}"
             shift
             ;;
@@ -47,6 +48,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --podman-connection=*)
+            require_value "--podman-connection" "${1#*=}"
             podman_connection="${1#*=}"
             shift
             ;;
@@ -128,6 +130,13 @@ else
     exit 1
 fi
 
+devcontainer_config="${SCRIPT_DIR}/devcontainer.json"
+base_image="$(sed -nE 's/^[[:space:]]*"image"[[:space:]]*:[[:space:]]*"([^"]+)".*/\1/p' "$devcontainer_config" | head -n 1)"
+if [[ -z "$base_image" ]]; then
+    echo "error: no devcontainer base image was found in '$devcontainer_config'" >&2
+    exit 1
+fi
+
 devcontainer_command+=(
     up
     --workspace-folder "$REPO_ROOT"
@@ -136,11 +145,14 @@ devcontainer_command+=(
 
 if [[ "$dry_run" -eq 1 ]]; then
     printf 'Would run:'
+    printf ' %q' "$runtime_path" image inspect "$base_image"
+    printf '\n'
+    printf 'Would run:'
     printf ' %q' "${devcontainer_command[@]}"
     printf '\n'
     exit 0
 fi
 
+source "${SCRIPT_DIR}/ensure_image.sh"
+ensure_toolbox_image "$runtime_path" "$base_image"
 "${devcontainer_command[@]}"
-
-

@@ -164,6 +164,10 @@ format_runtime_display_name() {
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONTAINERS_DIR="${SCRIPT_DIR}/containers"
 CERTS_DIR="${CONTAINERS_DIR}/certs"
+ENV_FILE="${CONTAINERS_DIR}/.env"
+if [[ ! -f "$ENV_FILE" ]]; then
+    ENV_FILE="${CONTAINERS_DIR}/.env.example"
+fi
 CONTAINER_CLI="$(resolve_container_runtime "$CONTAINER_RUNTIME")"
 RUNTIME_DISPLAY_NAME="$(format_runtime_display_name "$CONTAINER_CLI")"
 
@@ -200,20 +204,27 @@ fi
 if [[ -n "$CONTAINER_CLI" ]]; then
     echo -e "${YELLOW}Stopping and removing containers...${NC}"
 
-    # Teardown the shared development collection.
+    # Teardown the complete shared development collection, including PostgreSQL
+    # and DynamoDB Local. The label-based cleanup below removes named volumes
+    # only when the caller explicitly requests volume cleanup.
     if compose_available "$CONTAINER_CLI"; then
-        if ! "$CONTAINER_CLI" compose \
-            -f "${CONTAINERS_DIR}/docker-compose-common.yml" \
-            -p dev_common_shared \
-            down --remove-orphans; then
-            echo -e "${YELLOW}Warning: ${RUNTIME_DISPLAY_NAME} compose down failed. Continuing with leftover resource cleanup.${NC}" >&2
-        fi
+        for group in aws azure common; do
+            if ! "$CONTAINER_CLI" compose \
+                --env-file "$ENV_FILE" \
+                -f "${CONTAINERS_DIR}/docker-compose-${group}.yml" \
+                -p "dev_${group}_shared" \
+                down --remove-orphans; then
+                echo -e "${YELLOW}Warning: ${RUNTIME_DISPLAY_NAME} compose down for dev_${group}_shared failed. Continuing with leftover resource cleanup.${NC}" >&2
+            fi
+        done
     else
         echo -e "${YELLOW}Warning: Missing dependency: ${RUNTIME_DISPLAY_NAME} compose support is not available. Skipping compose down and continuing with leftover resource cleanup.${NC}" >&2
     fi
 
     # Safety net: remove any leftover resources still labeled with this compose project.
     PROJECT_NAMES=(
+        "dev_aws_shared"
+        "dev_azure_shared"
         "dev_common_shared"
     )
     COMPOSE_PROJECT_LABELS=(

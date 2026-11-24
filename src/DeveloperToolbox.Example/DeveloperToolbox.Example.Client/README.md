@@ -4,6 +4,8 @@ This public Next.js sample demonstrates App Router pages, localization,
 dynamic routes, linting, formatting, and accessibility-focused unit tests. It
 uses a local example catalog so builds and tests do not depend on a private API.
 
+Use Node.js 26.
+
 ```powershell
 npm install
 npm run verify
