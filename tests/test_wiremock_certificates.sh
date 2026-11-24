@@ -110,6 +110,7 @@ if TOOLBOX_CERT_SKIP_OUTPUT=true run_generator "$fixture" docker; then fail 'Suc
 
 # Exercise setup's credential/runtime delegation without involving any engine or trust store.
 fixture="${TEST_ROOT}/setup custom password"
+export TOOLBOX_LOCAL_CA_DIR="${fixture}/local authority"
 mkdir -p "${fixture}/containers/certs" "${fixture}/.devcontainer"
 cp "${REPO_ROOT}/docker_setup.sh" "$fixture/"
 cp "${REPO_ROOT}/docker_pull.sh" "$fixture/"
@@ -126,14 +127,19 @@ printf '%s\n' "$assignment" >> "${fixture}/containers/.env"
 cat > "${fixture}/containers/certs/generate-wiremock-cert.sh" <<'GENERATOR'
 #!/usr/bin/env bash
 set -euo pipefail
-[[ "$*" == '--runtime podman -f' ]] || exit 8
+[[ $# -eq 4 && "$1" == --runtime && "$2" == podman && "$3" == --local-ca && "$4" == -f ]] || exit 8
 if [[ "${TOOLBOX_CERT_GENERATED_MODE:-false}" == true ]]; then
     [[ "$TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD" =~ ^Tb!1[0-9a-f]{64}$ ]] || exit 9
 else
     [[ "$TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD" == "$TOOLBOX_CERT_EXPECTED_PASSWORD" ]] || exit 9
 fi
 printf 'generated\n' >> "$TOOLBOX_CERT_GENERATOR_LOG"
-printf 'fixture\n' > "$(dirname "${BASH_SOURCE[0]}")/wiremock.jks"
+certs="$(dirname "${BASH_SOURCE[0]}")"
+mkdir -p "$TOOLBOX_LOCAL_CA_DIR"
+root="$TOOLBOX_LOCAL_CA_DIR/root-ca.crt"
+[[ -f "$root" ]] || printf 'fixture root\n' > "$root"
+cp "$root" "$certs/wiremock-ca.crt"
+printf 'fixture\n' > "$certs/wiremock.jks"
 GENERATOR
 cat > "${TEST_ROOT}/bin/podman" <<'SETUP_MOCK'
 #!/usr/bin/env bash
@@ -203,6 +209,8 @@ fi
 [[ ! -f "$TOOLBOX_CERT_GENERATOR_LOG" ]] || fail 'Setup generated a certificate after its password utility failed.'
 ! grep -Fq "$TOOLBOX_CERT_EXPECTED_PASSWORD" "${fixture}/setup.log" || fail 'Password utility failure exposed a secret.'
 bash "${fixture}/docker_setup.sh" --runtime podman > "${fixture}/setup.log" 2>&1 || fail 'Setup certificate delegation failed.'
+[[ "$(grep -Fxc generated "$TOOLBOX_CERT_GENERATOR_LOG")" == 1 ]] || fail 'Setup did not generate a local CA-signed keystore.'
+cmp -s "$TOOLBOX_LOCAL_CA_DIR/root-ca.crt" "${fixture}/containers/certs/wiremock-ca.crt" || fail 'Setup did not use the configured local CA.'
 grep -Fxq "$assignment" "${fixture}/containers/.env" || fail 'Setup rewrote a custom password assignment.'
 ! grep -Fq "$TOOLBOX_CERT_EXPECTED_PASSWORD" "${fixture}/setup.log" || fail 'Setup printed a custom password.'
 [[ "$(grep -Fc 'rm ' "$TOOLBOX_CERT_MIGRATION_LOG")" == 3 ]] || fail 'Migration removed extra or duplicate containers.'
@@ -225,4 +233,8 @@ bash "${fixture}/docker_setup.sh" --runtime podman > "${fixture}/setup.log" 2>&1
 [[ "$(grep -Fxc generated "$TOOLBOX_CERT_GENERATOR_LOG")" == 2 ]] || fail 'Existing keystore was not regenerated for the new generated password.'
 bash "${fixture}/docker_setup.sh" --runtime podman > "${fixture}/setup.log" 2>&1 || fail 'Repeated setup failed.'
 [[ "$(grep -Fxc generated "$TOOLBOX_CERT_GENERATOR_LOG")" == 2 ]] || fail 'Unchanged explicit password caused unnecessary keystore regeneration.'
+printf 'rotated root\n' > "$TOOLBOX_LOCAL_CA_DIR/root-ca.crt"
+bash "${fixture}/docker_setup.sh" --runtime podman > "${fixture}/setup.log" 2>&1 || fail 'CA rotation setup failed.'
+[[ "$(grep -Fxc generated "$TOOLBOX_CERT_GENERATOR_LOG")" == 3 ]] || fail 'Setup did not regenerate the keystore after the CA changed.'
+cmp -s "$TOOLBOX_LOCAL_CA_DIR/root-ca.crt" "${fixture}/containers/certs/wiremock-ca.crt" || fail 'Setup did not update the issuer marker.'
 echo 'Bash WireMock/setup tests passed: isolated certificate, provider-resolution, and targeted migration scenarios.'

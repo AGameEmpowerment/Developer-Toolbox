@@ -8,6 +8,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) "toolbox-wiremock-$([guid]::NewGuid().ToString('N'))"
 $previousPassword = [Environment]::GetEnvironmentVariable('TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD', 'Process')
+$previousCaDirectory = [Environment]::GetEnvironmentVariable('TOOLBOX_LOCAL_CA_DIR', 'Process')
 $previousJavaHome = [Environment]::GetEnvironmentVariable('JAVA_HOME', 'Process')
 $global:ToolboxWireMockCertificateTest = @{}
 $global:ToolboxWireMockCertificateTest.hostKeyTool = $false
@@ -136,6 +137,9 @@ try {
     $fixture = Join-Path $testRoot 'setup custom password'
     $containers = Join-Path $fixture 'containers'
     $certs = Join-Path $containers 'certs'
+    $env:TOOLBOX_LOCAL_CA_DIR = Join-Path $fixture 'local authority'
+    $rootCertificate = Join-Path $env:TOOLBOX_LOCAL_CA_DIR 'root-ca.crt'
+    $issuerMarker = Join-Path $certs 'wiremock-ca.crt'
     New-Item -ItemType Directory -Path $certs -Force | Out-Null
     $helpers = Join-Path $fixture '.devcontainer'
     New-Item -ItemType Directory -Path $helpers -Force | Out-Null
@@ -152,12 +156,20 @@ try {
     $assignment = 'export WIREMOCK_KEYSTORE_PASSWORD = "${TOOLBOX_CERT_PASSWORD}"'
     Add-Content -LiteralPath (Join-Path $containers '.env') -Value $assignment -Encoding UTF8
     @'
-param([string]$ContainerRuntime, [switch]$Force)
-if ($ContainerRuntime -ne 'podman') { throw 'Setup changed its selected engine.' }
+param([string]$ContainerRuntime, [switch]$UseLocalCa, [switch]$Force)
+if ($ContainerRuntime -ne 'podman' -or -not $UseLocalCa -or -not $Force) {
+    throw 'Setup did not request a forced local CA issuance through its selected engine.'
+}
 if ($global:ToolboxWireMockCertificateTest.generatedMode) {
     if ($env:TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD -cnotmatch '^Tb!1[0-9a-f]{64}$') { throw 'Setup did not pass the generated password.' }
 } elseif ($env:TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD -cne 'fixture;# secret $ with spaces') { throw 'Setup changed its configured password.' }
 $global:ToolboxWireMockCertificateTest.generationCount++
+[IO.Directory]::CreateDirectory($env:TOOLBOX_LOCAL_CA_DIR) | Out-Null
+$root = Join-Path $env:TOOLBOX_LOCAL_CA_DIR 'root-ca.crt'
+if (-not (Test-Path -LiteralPath $root -PathType Leaf)) {
+    Set-Content -LiteralPath $root -Value 'fixture root'
+}
+Copy-Item -LiteralPath $root -Destination (Join-Path $PSScriptRoot 'wiremock-ca.crt') -Force
 Set-Content -LiteralPath (Join-Path $PSScriptRoot 'wiremock.jks') -Value 'fixture'
 '@ | Set-Content -LiteralPath (Join-Path $certs 'Generate-WireMockCert.ps1') -Encoding UTF8
     function podman {
@@ -233,6 +245,8 @@ Set-Content -LiteralPath (Join-Path $PSScriptRoot 'wiremock.jks') -Value 'fixtur
     Assert-Condition (-not ([IO.File]::ReadAllText((Join-Path $fixture 'setup.log')).Contains($global:ToolboxWireMockCertificateTest.expectedPassword))) 'Password utility failure exposed a secret.'
     $global:ToolboxWireMockCertificateTest.utilityFails = $false
     & (Join-Path $fixture 'docker_setup.ps1') -ContainerRuntime 'podman' *> (Join-Path $fixture 'setup.log')
+    Assert-Condition ($global:ToolboxWireMockCertificateTest.generationCount -eq 1) 'Setup did not generate a local CA-signed keystore.'
+    Assert-Condition ((Get-FileHash -LiteralPath $rootCertificate).Hash -eq (Get-FileHash -LiteralPath $issuerMarker).Hash) 'Setup did not use the configured local CA.'
     Assert-Condition ([System.IO.File]::ReadAllText((Join-Path $containers '.env')).Contains($assignment)) 'Setup rewrote the custom dotenv password.'
     Assert-Condition (-not ([System.IO.File]::ReadAllText((Join-Path $fixture 'setup.log')).Contains($global:ToolboxWireMockCertificateTest.expectedPassword))) 'Setup printed the custom password.'
     Assert-Condition ($env:TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD -ceq 'previous-secret') 'Setup did not restore its caller environment.'
@@ -256,9 +270,14 @@ Set-Content -LiteralPath (Join-Path $PSScriptRoot 'wiremock.jks') -Value 'fixtur
     Assert-Condition ($global:ToolboxWireMockCertificateTest.generationCount -eq 2) 'Setup did not regenerate an existing keystore after replacing an auto password.'
     & (Join-Path $fixture 'docker_setup.ps1') -ContainerRuntime 'podman' *> (Join-Path $fixture 'setup.log')
     Assert-Condition ($global:ToolboxWireMockCertificateTest.generationCount -eq 2) 'Setup regenerated a keystore with an unchanged explicit password.'
+    Set-Content -LiteralPath $rootCertificate -Value 'rotated root'
+    & (Join-Path $fixture 'docker_setup.ps1') -ContainerRuntime 'podman' *> (Join-Path $fixture 'setup.log')
+    Assert-Condition ($global:ToolboxWireMockCertificateTest.generationCount -eq 3) 'Setup did not regenerate the keystore after the CA changed.'
+    Assert-Condition ((Get-FileHash -LiteralPath $rootCertificate).Hash -eq (Get-FileHash -LiteralPath $issuerMarker).Hash) 'Setup did not update the issuer marker.'
     Write-Host 'PowerShell WireMock/setup tests passed: isolated certificate, provider-resolution, and targeted migration scenarios.'
 } finally {
     [Environment]::SetEnvironmentVariable('TOOLBOX_WIREMOCK_KEYSTORE_PASSWORD', $previousPassword, 'Process')
+    [Environment]::SetEnvironmentVariable('TOOLBOX_LOCAL_CA_DIR', $previousCaDirectory, 'Process')
     [Environment]::SetEnvironmentVariable('JAVA_HOME', $previousJavaHome, 'Process')
     Remove-Variable -Name ToolboxWireMockCertificateTest -Scope Global -ErrorAction SilentlyContinue
     $resolvedTestRoot = [System.IO.Path]::GetFullPath($testRoot)
